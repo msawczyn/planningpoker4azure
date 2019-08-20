@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Duracellko.PlanningPoker.Domain.Estimate" BaseTypeListCollapsed="true">
+    <Position X="7.5" Y="12.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgAAAAAAAAAAAAIAAAAAgAAAAAAA=</HashCode>
+      <FileName>Estimate.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Duracellko.PlanningPoker.Domain.EstimateResult" BaseTypeListCollapsed="true">
+    <Position X="11.75" Y="10.25" Width="4" />
+    <AssociationLine Name="_estimations" Type="Duracellko.PlanningPoker.Domain.Estimate" FixedToPoint="true">
+      <Path>
+        <Point X="11.75" Y="13.75" />
+        <Point X="9.5" Y="13.75" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>ACABAAAAAIAAAFAQCAAgAAQAAIAACAAAIAQAAAAAAgA=</HashCode>
+      <FileName>EstimateResult.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="_estimations" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Duracellko.PlanningPoker.Domain.EstimateResultMessage">
+    <Position X="14" Y="3.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>EstimateResultMessage.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="EstimateResult" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Duracellko.PlanningPoker.Domain.Member">
+    <Position X="3.25" Y="7.5" Width="2.25" />
+    <AssociationLine Name="Estimate" Type="Duracellko.PlanningPoker.Domain.Estimate" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="3.25" Y="8.569" />
+        <Point X="2.875" Y="8.569" />
+        <Point X="2.875" Y="13.47" />
+        <Point X="7.5" Y="13.47" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAEAAAAAAA=</HashCode>
+      <FileName>Member.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Estimate" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Duracellko.PlanningPoker.Domain.MemberMessage">
+    <Position X="10.5" Y="3.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MemberMessage.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Member" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Duracellko.PlanningPoker.Domain.Message">
+    <Position X="12.5" Y="0.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Message.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Duracellko.PlanningPoker.Domain.MessageReceivedEventArgs">
+    <Position X="16.25" Y="0.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>MessageReceivedEventArgs.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Message" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Duracellko.PlanningPoker.Domain.Observer">
+    <Position X="3.25" Y="3" Width="2.25" />
+    <AssociationLine Name="Messages" Type="Duracellko.PlanningPoker.Domain.Message" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="4.312" Y="3" />
+        <Point X="4.312" Y="2" />
+        <Point X="12.5" Y="2" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>IAFEAAAAQAAAAAAAACAAAAQAEAAAAAAIEAAAAQAAAgA=</HashCode>
+      <FileName>Observer.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Team" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="Messages" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Duracellko.PlanningPoker.Domain.ScrumMaster">
+    <Position X="3.25" Y="10" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ScrumMaster.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Duracellko.PlanningPoker.Domain.ScrumTeam">
+    <Position X="7.5" Y="5.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>CgQQAgOAQIAAAAhAAKQQAAQEggAAAAAAEAAEBAQACgA=</HashCode>
+      <FileName>ScrumTeam.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="ScrumMaster" />
+      <Property Name="EstimateResult" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="Observers" />
+      <Property Name="Members" />
+      <Property Name="Estimates" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

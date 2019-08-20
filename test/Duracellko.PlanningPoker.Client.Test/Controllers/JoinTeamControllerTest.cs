@@ -8,6 +8,7 @@ using Duracellko.PlanningPoker.Service;
 using Microsoft.AspNetCore.Blazor.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Moq.Language.Flow;
 
 namespace Duracellko.PlanningPoker.Client.Test.Controllers
 {
@@ -22,11 +23,11 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [DataRow(PlanningPokerData.ObserverName, true, DisplayName = "Observer name")]
         public async Task JoinTeam_MemberName_JoinTeamOnService(string memberName, bool asObserver)
         {
-            var scrumTeam = PlanningPokerData.GetScrumTeam();
-            var planningPokerService = new Mock<IPlanningPokerClient>();
+            ScrumTeam scrumTeam = PlanningPokerData.GetScrumTeam();
+            Mock<IPlanningPokerClient> planningPokerService = new Mock<IPlanningPokerClient>();
             planningPokerService.Setup(o => o.JoinTeam(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(scrumTeam);
-            var target = CreateController(planningPokerService: planningPokerService.Object);
+            JoinTeamController target = CreateController(planningPokerService: planningPokerService.Object);
 
             await target.JoinTeam(PlanningPokerData.TeamName, memberName, asObserver);
 
@@ -39,10 +40,10 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [DataRow(PlanningPokerData.ObserverName, true, DisplayName = "Observer name")]
         public async Task JoinTeam_MemberName_ReturnsTrue(string memberName, bool asObserver)
         {
-            var scrumTeam = PlanningPokerData.GetScrumTeam();
-            var target = CreateController(scrumTeam: scrumTeam);
+            ScrumTeam scrumTeam = PlanningPokerData.GetScrumTeam();
+            JoinTeamController target = CreateController(scrumTeam: scrumTeam);
 
-            var result = await target.JoinTeam(PlanningPokerData.TeamName, memberName, asObserver);
+            bool result = await target.JoinTeam(PlanningPokerData.TeamName, memberName, asObserver);
 
             Assert.IsTrue(result);
         }
@@ -58,10 +59,10 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [DataRow(PlanningPokerData.TeamName, null, true, DisplayName = "Member name is Null and observer")]
         public async Task JoinTeam_TeamNameOrMemberNameIsEmpty_ReturnsFalse(string teamName, string memberName, bool asObserver)
         {
-            var planningPokerService = new Mock<IPlanningPokerClient>();
-            var target = CreateController(planningPokerService: planningPokerService.Object);
+            Mock<IPlanningPokerClient> planningPokerService = new Mock<IPlanningPokerClient>();
+            JoinTeamController target = CreateController(planningPokerService: planningPokerService.Object);
 
-            var result = await target.JoinTeam(teamName, memberName, asObserver);
+            bool result = await target.JoinTeam(teamName, memberName, asObserver);
 
             Assert.IsFalse(result);
             planningPokerService.Verify(o => o.JoinTeam(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()), Times.Never());
@@ -71,11 +72,11 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [DataTestMethod]
         public async Task JoinTeam_ServiceReturnsTeam_InitializePlanningPokerController()
         {
-            var scrumTeam = PlanningPokerData.GetScrumTeam();
-            var planningPokerInitializer = new Mock<IPlanningPokerInitializer>();
-            var target = CreateController(planningPokerInitializer: planningPokerInitializer.Object, scrumTeam: scrumTeam);
+            ScrumTeam scrumTeam = PlanningPokerData.GetScrumTeam();
+            Mock<IPlanningPokerInitializer> planningPokerInitializer = new Mock<IPlanningPokerInitializer>();
+            JoinTeamController target = CreateController(planningPokerInitializer: planningPokerInitializer.Object, scrumTeam: scrumTeam);
 
-            var result = await target.JoinTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName, false);
+            bool result = await target.JoinTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName, false);
 
             planningPokerInitializer.Verify(o => o.InitializeTeam(scrumTeam, PlanningPokerData.MemberName));
         }
@@ -83,9 +84,9 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task JoinTeam_ServiceReturnsTeam_NavigatesToPlanningPoker()
         {
-            var scrumTeam = PlanningPokerData.GetScrumTeam();
-            var uriHelper = new Mock<IUriHelper>();
-            var target = CreateController(uriHelper: uriHelper.Object, scrumTeam: scrumTeam);
+            ScrumTeam scrumTeam = PlanningPokerData.GetScrumTeam();
+            Mock<IUriHelper> uriHelper = new Mock<IUriHelper>();
+            JoinTeamController target = CreateController(uriHelper: uriHelper.Object, scrumTeam: scrumTeam);
 
             await target.JoinTeam(PlanningPokerData.TeamName, PlanningPokerData.ObserverName, true);
 
@@ -95,9 +96,9 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task JoinTeam_ServiceThrowsException_ReturnsFalse()
         {
-            var target = CreateController(errorMessage: ErrorMessage);
+            JoinTeamController target = CreateController(errorMessage: ErrorMessage);
 
-            var result = await target.JoinTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName, false);
+            bool result = await target.JoinTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName, false);
 
             Assert.IsFalse(result);
         }
@@ -105,9 +106,9 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task JoinTeam_ServiceThrowsException_DoesNotInitializePlanningPokerController()
         {
-            var planningPokerInitializer = new Mock<IPlanningPokerInitializer>();
+            Mock<IPlanningPokerInitializer> planningPokerInitializer = new Mock<IPlanningPokerInitializer>();
 
-            var target = CreateController(planningPokerInitializer: planningPokerInitializer.Object, errorMessage: ErrorMessage);
+            JoinTeamController target = CreateController(planningPokerInitializer: planningPokerInitializer.Object, errorMessage: ErrorMessage);
 
             await target.JoinTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName, false);
 
@@ -117,9 +118,9 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task JoinTeam_ServiceThrowsException_DoesNotNavigateToPlanningPoker()
         {
-            var uriHelper = new Mock<IUriHelper>();
+            Mock<IUriHelper> uriHelper = new Mock<IUriHelper>();
 
-            var target = CreateController(uriHelper: uriHelper.Object, errorMessage: ErrorMessage);
+            JoinTeamController target = CreateController(uriHelper: uriHelper.Object, errorMessage: ErrorMessage);
 
             await target.JoinTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName, false);
 
@@ -129,9 +130,9 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task JoinTeam_ServiceThrowsException_ShowsMessage()
         {
-            var messageBoxService = new Mock<IMessageBoxService>();
+            Mock<IMessageBoxService> messageBoxService = new Mock<IMessageBoxService>();
 
-            var target = CreateController(messageBoxService: messageBoxService.Object, errorMessage: ErrorMessage);
+            JoinTeamController target = CreateController(messageBoxService: messageBoxService.Object, errorMessage: ErrorMessage);
 
             await target.JoinTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName, false);
 
@@ -141,10 +142,10 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task JoinTeam_ServiceThrowsException_Shows1LineMessage()
         {
-            var errorMessage = "Planning Poker Error\r\nArgumentException";
-            var messageBoxService = new Mock<IMessageBoxService>();
+            string errorMessage = "Planning Poker Error\r\nArgumentException";
+            Mock<IMessageBoxService> messageBoxService = new Mock<IMessageBoxService>();
 
-            var target = CreateController(messageBoxService: messageBoxService.Object, errorMessage: errorMessage);
+            JoinTeamController target = CreateController(messageBoxService: messageBoxService.Object, errorMessage: errorMessage);
 
             await target.JoinTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName, false);
 
@@ -154,16 +155,16 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task JoinTeam_TeamName_ShowsBusyIndicator()
         {
-            var planningPokerService = new Mock<IPlanningPokerClient>();
-            var busyIndicatorService = new Mock<IBusyIndicatorService>();
-            var joinTeamTask = new TaskCompletionSource<ScrumTeam>();
+            Mock<IPlanningPokerClient> planningPokerService = new Mock<IPlanningPokerClient>();
+            Mock<IBusyIndicatorService> busyIndicatorService = new Mock<IBusyIndicatorService>();
+            TaskCompletionSource<ScrumTeam> joinTeamTask = new TaskCompletionSource<ScrumTeam>();
             planningPokerService.Setup(o => o.JoinTeam(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
                 .Returns(joinTeamTask.Task);
-            var busyIndicatorInstance = new Mock<IDisposable>();
+            Mock<IDisposable> busyIndicatorInstance = new Mock<IDisposable>();
             busyIndicatorService.Setup(o => o.Show()).Returns(busyIndicatorInstance.Object);
-            var target = CreateController(planningPokerService: planningPokerService.Object, busyIndicatorService: busyIndicatorService.Object);
+            JoinTeamController target = CreateController(planningPokerService: planningPokerService.Object, busyIndicatorService: busyIndicatorService.Object);
 
-            var result = target.JoinTeam(PlanningPokerData.TeamName, PlanningPokerData.ObserverName, true);
+            Task<bool> result = target.JoinTeam(PlanningPokerData.TeamName, PlanningPokerData.ObserverName, true);
 
             busyIndicatorService.Verify(o => o.Show());
             busyIndicatorInstance.Verify(o => o.Dispose(), Times.Never());
@@ -177,17 +178,17 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task JoinTeam_MemberAlreadyExistsButUserDoesNotReconnect_DoesNotReconnect()
         {
-            var planningPokerService = new Mock<IPlanningPokerClient>();
+            Mock<IPlanningPokerClient> planningPokerService = new Mock<IPlanningPokerClient>();
             planningPokerService.Setup(o => o.JoinTeam(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new PlanningPokerException(ReconnectErrorMessage));
-            var messageBoxService = new Mock<IMessageBoxService>();
+            Mock<IMessageBoxService> messageBoxService = new Mock<IMessageBoxService>();
             SetupReconnectMessageBox(messageBoxService, false);
 
-            var target = CreateController(planningPokerService: planningPokerService.Object, messageBoxService: messageBoxService.Object);
+            JoinTeamController target = CreateController(planningPokerService: planningPokerService.Object, messageBoxService: messageBoxService.Object);
 
             await target.JoinTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName, false);
 
-            var userMessage = ReconnectErrorMessage + Environment.NewLine + "Do you want to reconnect?";
+            string userMessage = ReconnectErrorMessage + Environment.NewLine + "Do you want to reconnect?";
             messageBoxService.Verify(o => o.ShowMessage(userMessage, "Reconnect", "Reconnect"));
             planningPokerService.Verify(o => o.ReconnectTeam(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never());
         }
@@ -197,13 +198,13 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [DataRow(PlanningPokerData.ObserverName, true, DisplayName = "Observer name")]
         public async Task ReconnectTeam_MemberName_JoinTeamOnService(string memberName, bool asObserver)
         {
-            var reconnectTeamResult = PlanningPokerData.GetReconnectTeamResult();
-            var planningPokerService = new Mock<IPlanningPokerClient>();
+            ReconnectTeamResult reconnectTeamResult = PlanningPokerData.GetReconnectTeamResult();
+            Mock<IPlanningPokerClient> planningPokerService = new Mock<IPlanningPokerClient>();
             planningPokerService.Setup(o => o.JoinTeam(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new PlanningPokerException(ReconnectErrorMessage));
             planningPokerService.Setup(o => o.ReconnectTeam(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(reconnectTeamResult);
-            var target = CreateController(memberExistsError: true, planningPokerService: planningPokerService.Object);
+            JoinTeamController target = CreateController(memberExistsError: true, planningPokerService: planningPokerService.Object);
 
             await target.JoinTeam(PlanningPokerData.TeamName, memberName, asObserver);
 
@@ -216,10 +217,10 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [DataRow(PlanningPokerData.ObserverName, true, DisplayName = "Observer name")]
         public async Task ReconnectTeam_MemberName_ReturnsTrue(string memberName, bool asObserver)
         {
-            var reconnectTeamResult = PlanningPokerData.GetReconnectTeamResult();
-            var target = CreateController(memberExistsError: true, reconnectTeamResult: reconnectTeamResult);
+            ReconnectTeamResult reconnectTeamResult = PlanningPokerData.GetReconnectTeamResult();
+            JoinTeamController target = CreateController(memberExistsError: true, reconnectTeamResult: reconnectTeamResult);
 
-            var result = await target.JoinTeam(PlanningPokerData.TeamName, memberName, asObserver);
+            bool result = await target.JoinTeam(PlanningPokerData.TeamName, memberName, asObserver);
 
             Assert.IsTrue(result);
         }
@@ -227,11 +228,11 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [DataTestMethod]
         public async Task ReconnectTeam_ServiceReturnsTeam_InitializePlanningPokerController()
         {
-            var reconnectTeamResult = PlanningPokerData.GetReconnectTeamResult();
-            var planningPokerInitializer = new Mock<IPlanningPokerInitializer>();
-            var target = CreateController(memberExistsError: true, planningPokerInitializer: planningPokerInitializer.Object, reconnectTeamResult: reconnectTeamResult);
+            ReconnectTeamResult reconnectTeamResult = PlanningPokerData.GetReconnectTeamResult();
+            Mock<IPlanningPokerInitializer> planningPokerInitializer = new Mock<IPlanningPokerInitializer>();
+            JoinTeamController target = CreateController(memberExistsError: true, planningPokerInitializer: planningPokerInitializer.Object, reconnectTeamResult: reconnectTeamResult);
 
-            var result = await target.JoinTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName, false);
+            bool result = await target.JoinTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName, false);
 
             planningPokerInitializer.Verify(o => o.InitializeTeam(reconnectTeamResult, PlanningPokerData.MemberName));
         }
@@ -239,9 +240,9 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task ReconnectTeam_ServiceReturnsTeam_NavigatesToPlanningPoker()
         {
-            var reconnectTeamResult = PlanningPokerData.GetReconnectTeamResult();
-            var uriHelper = new Mock<IUriHelper>();
-            var target = CreateController(memberExistsError: true, uriHelper: uriHelper.Object, reconnectTeamResult: reconnectTeamResult);
+            ReconnectTeamResult reconnectTeamResult = PlanningPokerData.GetReconnectTeamResult();
+            Mock<IUriHelper> uriHelper = new Mock<IUriHelper>();
+            JoinTeamController target = CreateController(memberExistsError: true, uriHelper: uriHelper.Object, reconnectTeamResult: reconnectTeamResult);
 
             await target.JoinTeam(PlanningPokerData.TeamName, PlanningPokerData.ObserverName, true);
 
@@ -251,9 +252,9 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task ReconnectTeam_ServiceThrowsException_ReturnsFalse()
         {
-            var target = CreateController(memberExistsError: true, errorMessage: ErrorMessage);
+            JoinTeamController target = CreateController(memberExistsError: true, errorMessage: ErrorMessage);
 
-            var result = await target.JoinTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName, false);
+            bool result = await target.JoinTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName, false);
 
             Assert.IsFalse(result);
         }
@@ -261,9 +262,9 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task ReconnectTeam_ServiceThrowsException_DoesNotInitializePlanningPokerController()
         {
-            var planningPokerInitializer = new Mock<IPlanningPokerInitializer>();
+            Mock<IPlanningPokerInitializer> planningPokerInitializer = new Mock<IPlanningPokerInitializer>();
 
-            var target = CreateController(memberExistsError: true, planningPokerInitializer: planningPokerInitializer.Object, errorMessage: ErrorMessage);
+            JoinTeamController target = CreateController(memberExistsError: true, planningPokerInitializer: planningPokerInitializer.Object, errorMessage: ErrorMessage);
 
             await target.JoinTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName, false);
 
@@ -273,9 +274,9 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task ReconnectTeam_ServiceThrowsException_DoesNotNavigateToPlanningPoker()
         {
-            var uriHelper = new Mock<IUriHelper>();
+            Mock<IUriHelper> uriHelper = new Mock<IUriHelper>();
 
-            var target = CreateController(memberExistsError: true, uriHelper: uriHelper.Object, errorMessage: ErrorMessage);
+            JoinTeamController target = CreateController(memberExistsError: true, uriHelper: uriHelper.Object, errorMessage: ErrorMessage);
 
             await target.JoinTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName, false);
 
@@ -285,10 +286,10 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task ReconnectTeam_ServiceThrowsException_ShowsMessage()
         {
-            var messageBoxService = new Mock<IMessageBoxService>();
+            Mock<IMessageBoxService> messageBoxService = new Mock<IMessageBoxService>();
             SetupReconnectMessageBox(messageBoxService, true);
 
-            var target = CreateController(memberExistsError: true, messageBoxService: messageBoxService.Object, errorMessage: ErrorMessage);
+            JoinTeamController target = CreateController(memberExistsError: true, messageBoxService: messageBoxService.Object, errorMessage: ErrorMessage);
 
             await target.JoinTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName, false);
 
@@ -298,11 +299,11 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task ReconnectTeam_ServiceThrowsException_Shows1LineMessage()
         {
-            var errorMessage = "Planning Poker Error\r\nArgumentException";
-            var messageBoxService = new Mock<IMessageBoxService>();
+            string errorMessage = "Planning Poker Error\r\nArgumentException";
+            Mock<IMessageBoxService> messageBoxService = new Mock<IMessageBoxService>();
             SetupReconnectMessageBox(messageBoxService, true);
 
-            var target = CreateController(memberExistsError: true, messageBoxService: messageBoxService.Object, errorMessage: errorMessage);
+            JoinTeamController target = CreateController(memberExistsError: true, messageBoxService: messageBoxService.Object, errorMessage: errorMessage);
 
             await target.JoinTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName, false);
 
@@ -312,25 +313,25 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task ReconnectTeam_TeamName_ShowsBusyIndicator()
         {
-            var planningPokerService = new Mock<IPlanningPokerClient>();
-            var busyIndicatorService = new Mock<IBusyIndicatorService>();
-            var joinTeamTask = new TaskCompletionSource<ScrumTeam>();
-            var reconnectTeamTask = new TaskCompletionSource<ReconnectTeamResult>();
+            Mock<IPlanningPokerClient> planningPokerService = new Mock<IPlanningPokerClient>();
+            Mock<IBusyIndicatorService> busyIndicatorService = new Mock<IBusyIndicatorService>();
+            TaskCompletionSource<ScrumTeam> joinTeamTask = new TaskCompletionSource<ScrumTeam>();
+            TaskCompletionSource<ReconnectTeamResult> reconnectTeamTask = new TaskCompletionSource<ReconnectTeamResult>();
             planningPokerService.Setup(o => o.JoinTeam(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
                 .Returns(joinTeamTask.Task);
             planningPokerService.Setup(o => o.ReconnectTeam(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .Returns(reconnectTeamTask.Task);
-            var target = CreateController(memberExistsError: true, planningPokerService: planningPokerService.Object, busyIndicatorService: busyIndicatorService.Object);
+            JoinTeamController target = CreateController(memberExistsError: true, planningPokerService: planningPokerService.Object, busyIndicatorService: busyIndicatorService.Object);
 
-            var busyIndicatorInstance1 = new Mock<IDisposable>();
+            Mock<IDisposable> busyIndicatorInstance1 = new Mock<IDisposable>();
             busyIndicatorService.Setup(o => o.Show()).Returns(busyIndicatorInstance1.Object);
 
-            var result = target.JoinTeam(PlanningPokerData.TeamName, PlanningPokerData.ObserverName, true);
+            Task<bool> result = target.JoinTeam(PlanningPokerData.TeamName, PlanningPokerData.ObserverName, true);
 
             busyIndicatorService.Verify(o => o.Show());
             busyIndicatorInstance1.Verify(o => o.Dispose(), Times.Never());
 
-            var busyIndicatorInstance2 = new Mock<IDisposable>();
+            Mock<IDisposable> busyIndicatorInstance2 = new Mock<IDisposable>();
             busyIndicatorService.Setup(o => o.Show()).Returns(busyIndicatorInstance2.Object);
 
             joinTeamTask.SetException(new PlanningPokerException(ReconnectErrorMessage));
@@ -348,11 +349,11 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task TryReconnectTeam_TeamNameAndMemberName_LoadsMemberCredentialsFromStore()
         {
-            var reconnectTeamResult = PlanningPokerData.GetReconnectTeamResult();
-            var memberCredentials = PlanningPokerData.GetMemberCredentials();
-            var memberCredentialsStore = new Mock<IMemberCredentialsStore>();
+            ReconnectTeamResult reconnectTeamResult = PlanningPokerData.GetReconnectTeamResult();
+            MemberCredentials memberCredentials = PlanningPokerData.GetMemberCredentials();
+            Mock<IMemberCredentialsStore> memberCredentialsStore = new Mock<IMemberCredentialsStore>();
             memberCredentialsStore.Setup(o => o.GetCredentialsAsync()).ReturnsAsync(memberCredentials);
-            var target = CreateController(memberCredentialsStore: memberCredentialsStore.Object, memberExistsError: true, reconnectTeamResult: reconnectTeamResult);
+            JoinTeamController target = CreateController(memberCredentialsStore: memberCredentialsStore.Object, memberExistsError: true, reconnectTeamResult: reconnectTeamResult);
 
             await target.TryReconnectTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName);
 
@@ -366,10 +367,10 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [DataRow(PlanningPokerData.TeamName, "", DisplayName = "MemberName is empty.")]
         public async Task TryReconnectTeam_TeamNameOrMemberNameIsEmptyOrNull_DoesNotLoadMemberCredentialsFromStore(string teamName, string memberName)
         {
-            var memberCredentialsStore = new Mock<IMemberCredentialsStore>();
-            var target = CreateController(memberCredentialsStore: memberCredentialsStore.Object);
+            Mock<IMemberCredentialsStore> memberCredentialsStore = new Mock<IMemberCredentialsStore>();
+            JoinTeamController target = CreateController(memberCredentialsStore: memberCredentialsStore.Object);
 
-            var result = await target.TryReconnectTeam(teamName, memberName);
+            bool result = await target.TryReconnectTeam(teamName, memberName);
 
             Assert.IsFalse(result);
             memberCredentialsStore.Verify(o => o.GetCredentialsAsync(), Times.Never());
@@ -382,12 +383,12 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [DataRow("tEST tEAM", "tEST mEMBER", DisplayName = "TEST TEAM, TEST MEMBER")]
         public async Task TryReconnectTeam_CredentialsAreStored_ReconnectTeamOnService(string teamName, string memberName)
         {
-            var reconnectTeamResult = PlanningPokerData.GetReconnectTeamResult();
-            var planningPokerService = new Mock<IPlanningPokerClient>();
+            ReconnectTeamResult reconnectTeamResult = PlanningPokerData.GetReconnectTeamResult();
+            Mock<IPlanningPokerClient> planningPokerService = new Mock<IPlanningPokerClient>();
             planningPokerService.Setup(o => o.ReconnectTeam(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(reconnectTeamResult);
-            var memberCredentials = PlanningPokerData.GetMemberCredentials();
-            var target = CreateController(planningPokerService: planningPokerService.Object, memberCredentials: memberCredentials);
+            MemberCredentials memberCredentials = PlanningPokerData.GetMemberCredentials();
+            JoinTeamController target = CreateController(planningPokerService: planningPokerService.Object, memberCredentials: memberCredentials);
 
             await target.TryReconnectTeam(teamName, memberName);
 
@@ -397,11 +398,11 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task TryReconnectTeam_ReconnectTeamIsSuccessful_ReturnsTrue()
         {
-            var reconnectTeamResult = PlanningPokerData.GetReconnectTeamResult();
-            var memberCredentials = PlanningPokerData.GetMemberCredentials();
-            var target = CreateController(memberExistsError: true, reconnectTeamResult: reconnectTeamResult, memberCredentials: memberCredentials);
+            ReconnectTeamResult reconnectTeamResult = PlanningPokerData.GetReconnectTeamResult();
+            MemberCredentials memberCredentials = PlanningPokerData.GetMemberCredentials();
+            JoinTeamController target = CreateController(memberExistsError: true, reconnectTeamResult: reconnectTeamResult, memberCredentials: memberCredentials);
 
-            var result = await target.TryReconnectTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName);
+            bool result = await target.TryReconnectTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName);
 
             Assert.IsTrue(result);
         }
@@ -409,10 +410,10 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task TryReconnectTeam_ReconnectTeamIsSuccessful_InitializePlanningPokerController()
         {
-            var reconnectTeamResult = PlanningPokerData.GetReconnectTeamResult();
-            var memberCredentials = PlanningPokerData.GetMemberCredentials();
-            var planningPokerInitializer = new Mock<IPlanningPokerInitializer>();
-            var target = CreateController(
+            ReconnectTeamResult reconnectTeamResult = PlanningPokerData.GetReconnectTeamResult();
+            MemberCredentials memberCredentials = PlanningPokerData.GetMemberCredentials();
+            Mock<IPlanningPokerInitializer> planningPokerInitializer = new Mock<IPlanningPokerInitializer>();
+            JoinTeamController target = CreateController(
                 planningPokerInitializer: planningPokerInitializer.Object,
                 memberExistsError: true,
                 reconnectTeamResult: reconnectTeamResult,
@@ -426,10 +427,10 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task TryReconnectTeam_ReconnectTeamIsSuccessful_NavigatesToPlanningPoker()
         {
-            var reconnectTeamResult = PlanningPokerData.GetReconnectTeamResult();
-            var memberCredentials = PlanningPokerData.GetMemberCredentials();
-            var uriHelper = new Mock<IUriHelper>();
-            var target = CreateController(
+            ReconnectTeamResult reconnectTeamResult = PlanningPokerData.GetReconnectTeamResult();
+            MemberCredentials memberCredentials = PlanningPokerData.GetMemberCredentials();
+            Mock<IUriHelper> uriHelper = new Mock<IUriHelper>();
+            JoinTeamController target = CreateController(
                 uriHelper: uriHelper.Object,
                 memberExistsError: true,
                 reconnectTeamResult: reconnectTeamResult,
@@ -443,10 +444,10 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task TryReconnectTeam_ServiceThrowsException_ReturnsFalse()
         {
-            var memberCredentials = PlanningPokerData.GetMemberCredentials();
-            var target = CreateController(memberExistsError: true, errorMessage: ErrorMessage, memberCredentials: memberCredentials);
+            MemberCredentials memberCredentials = PlanningPokerData.GetMemberCredentials();
+            JoinTeamController target = CreateController(memberExistsError: true, errorMessage: ErrorMessage, memberCredentials: memberCredentials);
 
-            var result = await target.TryReconnectTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName);
+            bool result = await target.TryReconnectTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName);
 
             Assert.IsFalse(result);
         }
@@ -454,9 +455,9 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task TryReconnectTeam_ServiceThrowsException_DoesNotInitializePlanningPokerController()
         {
-            var memberCredentials = PlanningPokerData.GetMemberCredentials();
-            var planningPokerInitializer = new Mock<IPlanningPokerInitializer>();
-            var target = CreateController(
+            MemberCredentials memberCredentials = PlanningPokerData.GetMemberCredentials();
+            Mock<IPlanningPokerInitializer> planningPokerInitializer = new Mock<IPlanningPokerInitializer>();
+            JoinTeamController target = CreateController(
                 planningPokerInitializer: planningPokerInitializer.Object,
                 memberExistsError: true,
                 errorMessage: ErrorMessage,
@@ -470,9 +471,9 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task TryReconnectTeam_ServiceThrowsException_DoesNotNavigateToPlanningPoker()
         {
-            var memberCredentials = PlanningPokerData.GetMemberCredentials();
-            var uriHelper = new Mock<IUriHelper>();
-            var target = CreateController(
+            MemberCredentials memberCredentials = PlanningPokerData.GetMemberCredentials();
+            Mock<IUriHelper> uriHelper = new Mock<IUriHelper>();
+            JoinTeamController target = CreateController(
                 uriHelper: uriHelper.Object,
                 memberExistsError: true,
                 errorMessage: ErrorMessage,
@@ -486,9 +487,9 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task TryReconnectTeam_ServiceThrowsException_DoesNotShowUserMessage()
         {
-            var memberCredentials = PlanningPokerData.GetMemberCredentials();
-            var messageBoxService = new Mock<IMessageBoxService>();
-            var target = CreateController(
+            MemberCredentials memberCredentials = PlanningPokerData.GetMemberCredentials();
+            Mock<IMessageBoxService> messageBoxService = new Mock<IMessageBoxService>();
+            JoinTeamController target = CreateController(
                 messageBoxService: messageBoxService.Object,
                 memberExistsError: true,
                 errorMessage: ErrorMessage,
@@ -503,10 +504,10 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task TryReconnectTeam_NoMemberCredentialsStored_DoesNotReconnectTeamOnService()
         {
-            var planningPokerService = new Mock<IPlanningPokerClient>();
-            var target = CreateController(planningPokerService: planningPokerService.Object);
+            Mock<IPlanningPokerClient> planningPokerService = new Mock<IPlanningPokerClient>();
+            JoinTeamController target = CreateController(planningPokerService: planningPokerService.Object);
 
-            var result = await target.TryReconnectTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName);
+            bool result = await target.TryReconnectTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName);
 
             Assert.IsFalse(result);
             planningPokerService.Verify(o => o.ReconnectTeam(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never());
@@ -523,15 +524,15 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [DataRow(PlanningPokerData.TeamName, null, DisplayName = "Test team, [null]")]
         public async Task TryReconnectTeam_MemberCredentialsDoNotMatch_DoesNotReconnectTeamOnService(string teamName, string memberName)
         {
-            var planningPokerService = new Mock<IPlanningPokerClient>();
-            var memberCredentials = new MemberCredentials
+            Mock<IPlanningPokerClient> planningPokerService = new Mock<IPlanningPokerClient>();
+            MemberCredentials memberCredentials = new MemberCredentials
             {
                 TeamName = teamName,
                 MemberName = memberName
             };
-            var target = CreateController(planningPokerService: planningPokerService.Object, memberCredentials: memberCredentials);
+            JoinTeamController target = CreateController(planningPokerService: planningPokerService.Object, memberCredentials: memberCredentials);
 
-            var result = await target.TryReconnectTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName);
+            bool result = await target.TryReconnectTeam(PlanningPokerData.TeamName, PlanningPokerData.MemberName);
 
             Assert.IsFalse(result);
             planningPokerService.Verify(o => o.ReconnectTeam(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never());
@@ -552,15 +553,15 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         {
             if (planningPokerInitializer == null)
             {
-                var planningPokerInitializerMock = new Mock<IPlanningPokerInitializer>();
+                Mock<IPlanningPokerInitializer> planningPokerInitializerMock = new Mock<IPlanningPokerInitializer>();
                 planningPokerInitializer = planningPokerInitializerMock.Object;
             }
 
             if (planningPokerService == null)
             {
-                var planningPokerServiceMock = new Mock<IPlanningPokerClient>();
-                var joinSetup = planningPokerServiceMock.Setup(o => o.JoinTeam(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()));
-                var reconnectSetup = planningPokerServiceMock.Setup(o => o.ReconnectTeam(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()));
+                Mock<IPlanningPokerClient> planningPokerServiceMock = new Mock<IPlanningPokerClient>();
+                ISetup<IPlanningPokerClient, Task<ScrumTeam>> joinSetup = planningPokerServiceMock.Setup(o => o.JoinTeam(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()));
+                ISetup<IPlanningPokerClient, Task<ReconnectTeamResult>> reconnectSetup = planningPokerServiceMock.Setup(o => o.ReconnectTeam(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()));
                 if (memberExistsError)
                 {
                     joinSetup.ThrowsAsync(new PlanningPokerException(ReconnectErrorMessage));
@@ -590,7 +591,7 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
 
             if (messageBoxService == null)
             {
-                var messageBoxServiceMock = new Mock<IMessageBoxService>();
+                Mock<IMessageBoxService> messageBoxServiceMock = new Mock<IMessageBoxService>();
                 if (memberExistsError)
                 {
                     SetupReconnectMessageBox(messageBoxServiceMock, true);
@@ -601,19 +602,19 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
 
             if (busyIndicatorService == null)
             {
-                var busyIndicatorServiceMock = new Mock<IBusyIndicatorService>();
+                Mock<IBusyIndicatorService> busyIndicatorServiceMock = new Mock<IBusyIndicatorService>();
                 busyIndicatorService = busyIndicatorServiceMock.Object;
             }
 
             if (uriHelper == null)
             {
-                var uriHelperMock = new Mock<IUriHelper>();
+                Mock<IUriHelper> uriHelperMock = new Mock<IUriHelper>();
                 uriHelper = uriHelperMock.Object;
             }
 
             if (memberCredentialsStore == null)
             {
-                var memberCredentialsStoreMock = new Mock<IMemberCredentialsStore>();
+                Mock<IMemberCredentialsStore> memberCredentialsStoreMock = new Mock<IMemberCredentialsStore>();
                 memberCredentialsStoreMock.Setup(o => o.GetCredentialsAsync()).ReturnsAsync(memberCredentials);
                 memberCredentialsStore = memberCredentialsStoreMock.Object;
             }

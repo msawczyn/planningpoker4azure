@@ -9,23 +9,23 @@ namespace Duracellko.PlanningPoker.Service
     public enum TeamState
     {
         /// <summary>
-        /// Scrum team is initial state and estimation has not started yet.
+        /// Scrum team is initial state and estimate has not started yet.
         /// </summary>
         Initial,
 
         /// <summary>
-        /// Estimation is in progress. Members can pick their estimations.
+        /// Estimate is in progress. Members can pick their estimates.
         /// </summary>
-        EstimationInProgress,
+        EstimateInProgress,
 
         /// <summary>
-        /// All members picked estimations and the estimation is finished.
+        /// All members picked estimates and the estimate is finished.
         /// </summary>
-        EstimationFinished,
+        EstimateFinished,
 
         /// <summary>
-        /// Estimation was canceled by Scrum master.
+        /// Estimate was canceled by Scrum master.
         /// </summary>
-        EstimationCanceled
+        EstimateCanceled
     }
 }

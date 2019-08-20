@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Duracellko.PlanningPoker.Domain
 {
     /// <summary>
-    /// Observer is not involved in estimations and cannot vote for estimation. However, he/she can watch planning poker and see estimations results.
+    /// Observer is not involved in estimates and cannot vote for estimate. However, he/she can watch planning poker and see estimates results.
     /// Usually product owner connects as an observer.
     /// </summary>
     [Serializable]

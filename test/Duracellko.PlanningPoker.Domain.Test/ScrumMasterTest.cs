@@ -12,11 +12,11 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void Constructor_TeamAndNameIsSpecified_TeamAndNameIsSet()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var name = "test";
+            ScrumTeam team = new ScrumTeam("test team");
+            string name = "test";
 
             // Act
-            var result = new ScrumMaster(team, name);
+            ScrumMaster result = new ScrumMaster(team, name);
 
             // Verify
             Assert.AreEqual<ScrumTeam>(team, result.Team);
@@ -28,10 +28,10 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void Constructor_TeamNotSpecified_ArgumentNullException()
         {
             // Arrange
-            var name = "test";
+            string name = "test";
 
             // Act
-            var result = new ScrumMaster(null, name);
+            ScrumMaster result = new ScrumMaster(null, name);
         }
 
         [TestMethod]
@@ -39,162 +39,162 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void Constructor_NameIsEmpty_ArgumentNullException()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
+            ScrumTeam team = new ScrumTeam("test team");
 
             // Act
-            var result = new ScrumMaster(team, string.Empty);
+            ScrumMaster result = new ScrumMaster(team, string.Empty);
         }
 
         [TestMethod]
-        public void StartEstimation_EstimationNotStarted_StateChangedToEstimationInProgress()
+        public void StartEstimate_EstimateNotStarted_StateChangedToEstimateInProgress()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
 
             // Act
-            master.StartEstimation();
+            master.StartEstimate();
 
             // Verify
-            Assert.AreEqual<TeamState>(TeamState.EstimationInProgress, team.State);
+            Assert.AreEqual<TeamState>(TeamState.EstimateInProgress, team.State);
         }
 
         [TestMethod]
-        public void StartEstimation_EstimationNotStarted_ScrumTeamGotMessageEstimationStarted()
+        public void StartEstimate_EstimateNotStarted_ScrumTeamGotMessageEstimateStarted()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
             MessageReceivedEventArgs eventArgs = null;
             team.MessageReceived += new EventHandler<MessageReceivedEventArgs>((s, e) => eventArgs = e);
 
             // Act
-            master.StartEstimation();
+            master.StartEstimate();
 
             // Verify
             Assert.IsNotNull(eventArgs);
-            var message = eventArgs.Message;
+            Message message = eventArgs.Message;
             Assert.IsNotNull(message);
-            Assert.AreEqual<MessageType>(MessageType.EstimationStarted, message.MessageType);
+            Assert.AreEqual<MessageType>(MessageType.EstimateStarted, message.MessageType);
         }
 
         [TestMethod]
-        public void StartEstimation_EstimationNotStarted_ScrumMasterGotMessageEstimationStarted()
+        public void StartEstimate_EstimateNotStarted_ScrumMasterGotMessageEstimateStarted()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
 
             // Act
-            master.StartEstimation();
+            master.StartEstimate();
 
             // Verify
             Assert.IsTrue(master.HasMessage);
-            var message = master.PopMessage();
+            Message message = master.PopMessage();
             Assert.IsNotNull(message);
-            Assert.AreEqual<MessageType>(MessageType.EstimationStarted, message.MessageType);
+            Assert.AreEqual<MessageType>(MessageType.EstimateStarted, message.MessageType);
             Assert.IsFalse(master.HasMessage);
         }
 
         [TestMethod]
-        public void StartEstimation_EstimationNotStarted_ScrumMasterReceivedMessage()
+        public void StartEstimate_EstimateNotStarted_ScrumMasterReceivedMessage()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
             EventArgs eventArgs = null;
             master.MessageReceived += new EventHandler((s, e) => eventArgs = e);
 
             // Act
-            master.StartEstimation();
+            master.StartEstimate();
 
             // Verify
             Assert.IsNotNull(eventArgs);
         }
 
         [TestMethod]
-        public void StartEstimation_EstimationNotStarted_MemberGotMessageEstimationStarted()
+        public void StartEstimate_EstimateNotStarted_MemberGotMessageEstimateStarted()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            var member = team.Join("member", false);
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            Observer member = team.Join("member", false);
 
             // Act
-            master.StartEstimation();
+            master.StartEstimate();
 
             // Verify
             Assert.IsTrue(member.HasMessage);
-            var message = member.PopMessage();
+            Message message = member.PopMessage();
             Assert.IsNotNull(message);
-            Assert.AreEqual<MessageType>(MessageType.EstimationStarted, message.MessageType);
+            Assert.AreEqual<MessageType>(MessageType.EstimateStarted, message.MessageType);
             Assert.IsFalse(member.HasMessage);
         }
 
         [TestMethod]
-        public void StartEstimation_MemberHasEstimation_MembersEstimationIsReset()
+        public void StartEstimate_MemberHasEstimate_MembersEstimateIsReset()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            var member = (Member)team.Join("member", false);
-            member.Estimation = new Estimation();
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            Member member = (Member)team.Join("member", false);
+            member.Estimate = new Estimate();
 
             // Act
-            master.StartEstimation();
+            master.StartEstimate();
 
             // Verify
-            Assert.IsNull(member.Estimation);
+            Assert.IsNull(member.Estimate);
         }
 
         [TestMethod]
-        public void StartEstimation_EstimationNotStarted_MemberReceivedMessage()
+        public void StartEstimate_EstimateNotStarted_MemberReceivedMessage()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            var member = team.Join("member", false);
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            Observer member = team.Join("member", false);
             EventArgs eventArgs = null;
             member.MessageReceived += new EventHandler((s, e) => eventArgs = e);
 
             // Act
-            master.StartEstimation();
+            master.StartEstimate();
 
             // Verify
             Assert.IsNotNull(eventArgs);
         }
 
         [TestMethod]
-        public void StartEstimation_EstimationNotStarted_ObserverGotMessageEstimationStarted()
+        public void StartEstimate_EstimateNotStarted_ObserverGotMessageEstimateStarted()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            var observer = team.Join("observer", true);
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            Observer observer = team.Join("observer", true);
 
             // Act
-            master.StartEstimation();
+            master.StartEstimate();
 
             // Verify
             Assert.IsTrue(observer.HasMessage);
-            var message = observer.PopMessage();
+            Message message = observer.PopMessage();
             Assert.IsNotNull(message);
-            Assert.AreEqual<MessageType>(MessageType.EstimationStarted, message.MessageType);
+            Assert.AreEqual<MessageType>(MessageType.EstimateStarted, message.MessageType);
             Assert.IsFalse(observer.HasMessage);
         }
 
         [TestMethod]
-        public void StartEstimation_EstimationNotStarted_ObserverReceivedMessage()
+        public void StartEstimate_EstimateNotStarted_ObserverReceivedMessage()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            var observer = team.Join("observer", false);
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            Observer observer = team.Join("observer", false);
             EventArgs eventArgs = null;
             observer.MessageReceived += new EventHandler((s, e) => eventArgs = e);
 
             // Act
-            master.StartEstimation();
+            master.StartEstimate();
 
             // Verify
             Assert.IsNotNull(eventArgs);
@@ -202,338 +202,338 @@ namespace Duracellko.PlanningPoker.Domain.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void StartEstimation_EstimationInProgress_InvalidOperationException()
+        public void StartEstimate_EstimateInProgress_InvalidOperationException()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            master.StartEstimation();
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            master.StartEstimate();
 
             // Act
-            master.StartEstimation();
+            master.StartEstimate();
         }
 
         [TestMethod]
-        public void StartEstimation_EstimationNotStarted_EstimationResultSetToNull()
+        public void StartEstimate_EstimateNotStarted_EstimateResultSetToNull()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
 
             // Act
-            master.StartEstimation();
+            master.StartEstimate();
 
             // Verify
-            Assert.IsNull(team.EstimationResult);
+            Assert.IsNull(team.EstimateResult);
         }
 
         [TestMethod]
-        public void StartEstimation_EstimationFinished_EstimationResultSetToNull()
+        public void StartEstimate_EstimateFinished_EstimateResultSetToNull()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            master.StartEstimation();
-            master.Estimation = new Estimation();
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            master.StartEstimate();
+            master.Estimate = new Estimate();
 
             // Act
-            master.StartEstimation();
+            master.StartEstimate();
 
             // Verify
-            Assert.IsNull(team.EstimationResult);
+            Assert.IsNull(team.EstimateResult);
         }
 
         [TestMethod]
-        public void CancelEstimation_EstimationInProgress_StateChangedToEstimationCanceled()
+        public void CancelEstimate_EstimateInProgress_StateChangedToEstimateCanceled()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            master.StartEstimation();
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            master.StartEstimate();
 
             // Act
-            master.CancelEstimation();
+            master.CancelEstimate();
 
             // Verify
-            Assert.AreEqual<TeamState>(TeamState.EstimationCanceled, team.State);
+            Assert.AreEqual<TeamState>(TeamState.EstimateCanceled, team.State);
         }
 
         [TestMethod]
-        public void CancelEstimation_EstimationInProgress_ScrumTeamGetMessageEstimationCanceled()
+        public void CancelEstimate_EstimateInProgress_ScrumTeamGetMessageEstimateCanceled()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            master.StartEstimation();
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            master.StartEstimate();
             MessageReceivedEventArgs eventArgs = null;
             team.MessageReceived += new EventHandler<MessageReceivedEventArgs>((s, e) => eventArgs = e);
 
             // Act
-            master.CancelEstimation();
+            master.CancelEstimate();
 
             // Verify
             Assert.IsNotNull(eventArgs);
-            var message = eventArgs.Message;
+            Message message = eventArgs.Message;
             Assert.IsNotNull(message);
-            Assert.AreEqual<MessageType>(MessageType.EstimationCanceled, message.MessageType);
+            Assert.AreEqual<MessageType>(MessageType.EstimateCanceled, message.MessageType);
         }
 
         [TestMethod]
-        public void CancelEstimation_EstimationInProgress_ScrumTeamGet2Messages()
+        public void CancelEstimate_EstimateInProgress_ScrumTeamGet2Messages()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            var eventArgsList = new List<MessageReceivedEventArgs>();
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            List<MessageReceivedEventArgs> eventArgsList = new List<MessageReceivedEventArgs>();
             team.MessageReceived += new EventHandler<MessageReceivedEventArgs>((s, e) => eventArgsList.Add(e));
-            master.StartEstimation();
+            master.StartEstimate();
 
             // Act
-            master.CancelEstimation();
+            master.CancelEstimate();
 
             // Verify
             Assert.AreEqual<int>(2, eventArgsList.Count);
-            var message1 = eventArgsList[0].Message;
-            var message2 = eventArgsList[1].Message;
-            Assert.AreEqual<MessageType>(MessageType.EstimationStarted, message1.MessageType);
-            Assert.AreEqual<MessageType>(MessageType.EstimationCanceled, message2.MessageType);
+            Message message1 = eventArgsList[0].Message;
+            Message message2 = eventArgsList[1].Message;
+            Assert.AreEqual<MessageType>(MessageType.EstimateStarted, message1.MessageType);
+            Assert.AreEqual<MessageType>(MessageType.EstimateCanceled, message2.MessageType);
         }
 
         [TestMethod]
-        public void CancelEstimation_EstimationNotStarted_ScrumTeamGetNoMessage()
+        public void CancelEstimate_EstimateNotStarted_ScrumTeamGetNoMessage()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
             MessageReceivedEventArgs eventArgs = null;
             team.MessageReceived += new EventHandler<MessageReceivedEventArgs>((s, e) => eventArgs = e);
 
             // Act
-            master.CancelEstimation();
+            master.CancelEstimate();
 
             // Verify
             Assert.IsNull(eventArgs);
         }
 
         [TestMethod]
-        public void CancelEstimation_EstimationInProgress_ScrumMasterGetMessageEstimationCanceled()
+        public void CancelEstimate_EstimateInProgress_ScrumMasterGetMessageEstimateCanceled()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            master.StartEstimation();
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            master.StartEstimate();
             TestHelper.ClearMessages(master);
 
             // Act
-            master.CancelEstimation();
+            master.CancelEstimate();
 
             // Verify
             Assert.IsTrue(master.HasMessage);
-            var message = master.PopMessage();
+            Message message = master.PopMessage();
             Assert.IsNotNull(message);
-            Assert.AreEqual<MessageType>(MessageType.EstimationCanceled, message.MessageType);
+            Assert.AreEqual<MessageType>(MessageType.EstimateCanceled, message.MessageType);
             Assert.IsFalse(master.HasMessage);
         }
 
         [TestMethod]
-        public void CancelEstimation_EstimationInProgress_ScrumMasterGet2Messages()
+        public void CancelEstimate_EstimateInProgress_ScrumMasterGet2Messages()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            master.StartEstimation();
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            master.StartEstimate();
 
             // Act
-            master.CancelEstimation();
+            master.CancelEstimate();
 
             // Verify
             Assert.AreEqual<int>(2, master.Messages.Count());
-            var message1 = master.Messages.First();
-            var message2 = master.Messages.Skip(1).First();
-            Assert.AreEqual<MessageType>(MessageType.EstimationStarted, message1.MessageType);
+            Message message1 = master.Messages.First();
+            Message message2 = master.Messages.Skip(1).First();
+            Assert.AreEqual<MessageType>(MessageType.EstimateStarted, message1.MessageType);
             Assert.AreEqual<long>(1, message1.Id);
-            Assert.AreEqual<MessageType>(MessageType.EstimationCanceled, message2.MessageType);
+            Assert.AreEqual<MessageType>(MessageType.EstimateCanceled, message2.MessageType);
             Assert.AreEqual<long>(2, message2.Id);
         }
 
         [TestMethod]
-        public void CancelEstimation_EstimationInProgress_ScrumMasterMessageReceived()
+        public void CancelEstimate_EstimateInProgress_ScrumMasterMessageReceived()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            master.StartEstimation();
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            master.StartEstimate();
             EventArgs eventArgs = null;
             master.MessageReceived += new EventHandler((s, e) => eventArgs = e);
 
             // Act
-            master.CancelEstimation();
+            master.CancelEstimate();
 
             // Verify
             Assert.IsNotNull(eventArgs);
         }
 
         [TestMethod]
-        public void CancelEstimation_EstimationNotStarted_ScrumMasterGetNoMessage()
+        public void CancelEstimate_EstimateNotStarted_ScrumMasterGetNoMessage()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
 
             // Act
-            master.CancelEstimation();
+            master.CancelEstimate();
 
             // Verify
             Assert.IsFalse(master.HasMessage);
         }
 
         [TestMethod]
-        public void CancelEstimation_EstimationInProgress_MemberGetMessageEstimationCanceled()
+        public void CancelEstimate_EstimateInProgress_MemberGetMessageEstimateCanceled()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            var member = team.Join("member", false);
-            master.StartEstimation();
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            Observer member = team.Join("member", false);
+            master.StartEstimate();
             TestHelper.ClearMessages(member);
 
             // Act
-            master.CancelEstimation();
+            master.CancelEstimate();
 
             // Verify
             Assert.IsTrue(member.HasMessage);
-            var message = member.PopMessage();
+            Message message = member.PopMessage();
             Assert.IsNotNull(message);
-            Assert.AreEqual<MessageType>(MessageType.EstimationCanceled, message.MessageType);
+            Assert.AreEqual<MessageType>(MessageType.EstimateCanceled, message.MessageType);
             Assert.IsFalse(member.HasMessage);
         }
 
         [TestMethod]
-        public void CancelEstimation_EstimationInProgress_MemberGet2Messages()
+        public void CancelEstimate_EstimateInProgress_MemberGet2Messages()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            var member = team.Join("member", false);
-            master.StartEstimation();
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            Observer member = team.Join("member", false);
+            master.StartEstimate();
 
             // Act
-            master.CancelEstimation();
+            master.CancelEstimate();
 
             // Verify
             Assert.AreEqual<int>(2, member.Messages.Count());
-            var message1 = member.Messages.First();
-            var message2 = member.Messages.Skip(1).First();
-            Assert.AreEqual<MessageType>(MessageType.EstimationStarted, message1.MessageType);
+            Message message1 = member.Messages.First();
+            Message message2 = member.Messages.Skip(1).First();
+            Assert.AreEqual<MessageType>(MessageType.EstimateStarted, message1.MessageType);
             Assert.AreEqual<long>(1, message1.Id);
-            Assert.AreEqual<MessageType>(MessageType.EstimationCanceled, message2.MessageType);
+            Assert.AreEqual<MessageType>(MessageType.EstimateCanceled, message2.MessageType);
             Assert.AreEqual<long>(2, message2.Id);
         }
 
         [TestMethod]
-        public void CancelEstimation_EstimationInProgress_MemberMessageReceived()
+        public void CancelEstimate_EstimateInProgress_MemberMessageReceived()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            var member = team.Join("member", false);
-            master.StartEstimation();
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            Observer member = team.Join("member", false);
+            master.StartEstimate();
             EventArgs eventArgs = null;
             member.MessageReceived += new EventHandler((s, e) => eventArgs = e);
 
             // Act
-            master.CancelEstimation();
+            master.CancelEstimate();
 
             // Verify
             Assert.IsNotNull(eventArgs);
         }
 
         [TestMethod]
-        public void CancelEstimation_EstimationNotStarted_MemberGetNoMessage()
+        public void CancelEstimate_EstimateNotStarted_MemberGetNoMessage()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            var member = team.Join("member", false);
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            Observer member = team.Join("member", false);
 
             // Act
-            master.CancelEstimation();
+            master.CancelEstimate();
 
             // Verify
             Assert.IsFalse(member.HasMessage);
         }
 
         [TestMethod]
-        public void CancelEstimation_EstimationInProgress_ObserverGetMessageEstimationCanceled()
+        public void CancelEstimate_EstimateInProgress_ObserverGetMessageEstimateCanceled()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            var observer = team.Join("observer", true);
-            master.StartEstimation();
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            Observer observer = team.Join("observer", true);
+            master.StartEstimate();
             TestHelper.ClearMessages(observer);
 
             // Act
-            master.CancelEstimation();
+            master.CancelEstimate();
 
             // Verify
             Assert.IsTrue(observer.HasMessage);
-            var message = observer.PopMessage();
+            Message message = observer.PopMessage();
             Assert.IsNotNull(message);
-            Assert.AreEqual<MessageType>(MessageType.EstimationCanceled, message.MessageType);
+            Assert.AreEqual<MessageType>(MessageType.EstimateCanceled, message.MessageType);
             Assert.IsFalse(observer.HasMessage);
         }
 
         [TestMethod]
-        public void CancelEstimation_EstimationInProgress_ObserverGet2Message()
+        public void CancelEstimate_EstimateInProgress_ObserverGet2Message()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            var observer = team.Join("observer", true);
-            master.StartEstimation();
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            Observer observer = team.Join("observer", true);
+            master.StartEstimate();
 
             // Act
-            master.CancelEstimation();
+            master.CancelEstimate();
 
             // Verify
             Assert.AreEqual<int>(2, observer.Messages.Count());
-            var message1 = observer.Messages.First();
-            var message2 = observer.Messages.Skip(1).First();
-            Assert.AreEqual<MessageType>(MessageType.EstimationStarted, message1.MessageType);
+            Message message1 = observer.Messages.First();
+            Message message2 = observer.Messages.Skip(1).First();
+            Assert.AreEqual<MessageType>(MessageType.EstimateStarted, message1.MessageType);
             Assert.AreEqual<long>(1, message1.Id);
-            Assert.AreEqual<MessageType>(MessageType.EstimationCanceled, message2.MessageType);
+            Assert.AreEqual<MessageType>(MessageType.EstimateCanceled, message2.MessageType);
             Assert.AreEqual<long>(2, message2.Id);
         }
 
         [TestMethod]
-        public void CancelEstimation_EstimationInProgress_ObserverMessageReceived()
+        public void CancelEstimate_EstimateInProgress_ObserverMessageReceived()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            var observer = team.Join("observer", true);
-            master.StartEstimation();
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            Observer observer = team.Join("observer", true);
+            master.StartEstimate();
             EventArgs eventArgs = null;
             observer.MessageReceived += new EventHandler((s, e) => eventArgs = e);
 
             // Act
-            master.CancelEstimation();
+            master.CancelEstimate();
 
             // Verify
             Assert.IsNotNull(eventArgs);
         }
 
         [TestMethod]
-        public void CancelEstimation_EstimationNotStarted_ObserverGetNoMessage()
+        public void CancelEstimate_EstimateNotStarted_ObserverGetNoMessage()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            var observer = team.Join("observer", true);
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            Observer observer = team.Join("observer", true);
 
             // Act
-            master.CancelEstimation();
+            master.CancelEstimate();
 
             // Verify
             Assert.IsFalse(observer.HasMessage);

@@ -4,10 +4,10 @@ using Newtonsoft.Json;
 namespace Duracellko.PlanningPoker.Service
 {
     /// <summary>
-    /// Status of participant in estimation.
+    /// Status of participant in estimate.
     /// </summary>
     [Serializable]
-    public class EstimationParticipantStatus
+    public class EstimateParticipantStatus
     {
         /// <summary>
         /// Gets or sets the name of the participant.

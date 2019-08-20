@@ -24,22 +24,22 @@ namespace Duracellko.PlanningPoker.Service
         MemberDisconnected,
 
         /// <summary>
-        /// Message specifies that estimation started and members can pick estimation.
+        /// Message specifies that estimate started and members can pick estimate.
         /// </summary>
-        EstimationStarted,
+        EstimateStarted,
 
         /// <summary>
-        /// Message specifies that estimation ended and all members picked their estimations.
+        /// Message specifies that estimate ended and all members picked their estimates.
         /// </summary>
-        EstimationEnded,
+        EstimateEnded,
 
         /// <summary>
-        /// Message specifies that estimation was canceled by Scrum master.
+        /// Message specifies that estimate was canceled by Scrum master.
         /// </summary>
-        EstimationCanceled,
+        EstimateCanceled,
 
         /// <summary>
-        /// Message specifies that a member placed estimation.
+        /// Message specifies that a member placed estimate.
         /// </summary>
         MemberEstimated
     }

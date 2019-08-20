@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Duracellko.PlanningPoker.Configuration;
 using Duracellko.PlanningPoker.Controllers;
@@ -17,12 +18,12 @@ namespace Duracellko.PlanningPoker.Test.Controllers
         public void ScrumTeamNames_2TeamsInRepository_Returns2Teams()
         {
             // Arrange
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.SetupGet(r => r.ScrumTeamNames).Returns(new string[] { "team1", "team2" });
-            var target = CreatePlanningPokerController(repository: repository.Object);
+            PlanningPokerController target = CreatePlanningPokerController(repository: repository.Object);
 
             // Act
-            var result = target.ScrumTeamNames;
+            IEnumerable<string> result = target.ScrumTeamNames;
 
             // Verify
             repository.VerifyGet(r => r.ScrumTeamNames);
@@ -34,11 +35,11 @@ namespace Duracellko.PlanningPoker.Test.Controllers
         public void ScrumTeamNames_2TeamsInRepositoryAnd2TeamCreated_Returns2Teams()
         {
             // Arrange
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.SetupGet(r => r.ScrumTeamNames).Returns(new string[] { "team1", "team2" });
             repository.Setup(r => r.LoadScrumTeam("team1")).Returns((ScrumTeam)null);
             repository.Setup(r => r.LoadScrumTeam("team3")).Returns((ScrumTeam)null);
-            var target = CreatePlanningPokerController(repository: repository.Object);
+            PlanningPokerController target = CreatePlanningPokerController(repository: repository.Object);
             using (target.CreateScrumTeam("team1", "master"))
             {
             }
@@ -48,7 +49,7 @@ namespace Duracellko.PlanningPoker.Test.Controllers
             }
 
             // Act
-            var result = target.ScrumTeamNames;
+            IEnumerable<string> result = target.ScrumTeamNames;
 
             // Verify
             repository.VerifyGet(r => r.ScrumTeamNames);
@@ -60,12 +61,12 @@ namespace Duracellko.PlanningPoker.Test.Controllers
         public void ScrumTeamNames_AllEmpty_ReturnsZeroTeams()
         {
             // Arrange
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.SetupGet(r => r.ScrumTeamNames).Returns(Enumerable.Empty<string>());
-            var target = CreatePlanningPokerController(repository: repository.Object);
+            PlanningPokerController target = CreatePlanningPokerController(repository: repository.Object);
 
             // Act
-            var result = target.ScrumTeamNames;
+            IEnumerable<string> result = target.ScrumTeamNames;
 
             // Verify
             repository.VerifyGet(r => r.ScrumTeamNames);
@@ -77,12 +78,12 @@ namespace Duracellko.PlanningPoker.Test.Controllers
         public void CreateScrumTeam_TeamNotInRepository_TriedToLoadFromRepository()
         {
             // Arrange
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.Setup(r => r.LoadScrumTeam("team")).Returns((ScrumTeam)null);
-            var target = CreatePlanningPokerController(repository: repository.Object);
+            PlanningPokerController target = CreatePlanningPokerController(repository: repository.Object);
 
             // Act
-            using (var teamLock = target.CreateScrumTeam("team", "master"))
+            using (IScrumTeamLock teamLock = target.CreateScrumTeam("team", "master"))
             {
                 // Verify
                 Assert.IsNotNull(teamLock);
@@ -95,20 +96,20 @@ namespace Duracellko.PlanningPoker.Test.Controllers
         public void CreateScrumTeam_TeamInRepository_DoesNotCreateNewTeam()
         {
             // Arrange
-            var timeProvider = new DateTimeProviderMock();
-            var configuration = new Mock<IPlanningPokerConfiguration>(MockBehavior.Strict);
+            DateTimeProviderMock timeProvider = new DateTimeProviderMock();
+            Mock<IPlanningPokerConfiguration> configuration = new Mock<IPlanningPokerConfiguration>(MockBehavior.Strict);
             configuration.SetupGet(c => c.ClientInactivityTimeout).Returns(TimeSpan.FromMinutes(15));
 
             timeProvider.SetUtcNow(new DateTime(2015, 1, 1, 10, 0, 0, DateTimeKind.Utc));
-            var team = new ScrumTeam("team");
-            var master = team.SetScrumMaster("master");
+            ScrumTeam team = new ScrumTeam("team");
+            ScrumMaster master = team.SetScrumMaster("master");
             master.UpdateActivity();
 
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.Setup(r => r.LoadScrumTeam("team")).Returns(team);
 
             timeProvider.SetUtcNow(new DateTime(2015, 1, 1, 10, 14, 0, DateTimeKind.Utc));
-            var target = CreatePlanningPokerController(timeProvider, configuration.Object, repository.Object);
+            PlanningPokerController target = CreatePlanningPokerController(timeProvider, configuration.Object, repository.Object);
 
             // Act
             target.CreateScrumTeam("team", "master");
@@ -118,20 +119,20 @@ namespace Duracellko.PlanningPoker.Test.Controllers
         public void CreateScrumTeam_TeamInRepository_DoesNotDeleteOldTeam()
         {
             // Arrange
-            var timeProvider = new DateTimeProviderMock();
-            var configuration = new Mock<IPlanningPokerConfiguration>(MockBehavior.Strict);
+            DateTimeProviderMock timeProvider = new DateTimeProviderMock();
+            Mock<IPlanningPokerConfiguration> configuration = new Mock<IPlanningPokerConfiguration>(MockBehavior.Strict);
             configuration.SetupGet(c => c.ClientInactivityTimeout).Returns(TimeSpan.FromMinutes(15));
 
             timeProvider.SetUtcNow(new DateTime(2015, 1, 1, 10, 0, 0, DateTimeKind.Utc));
-            var team = new ScrumTeam("team");
-            var master = team.SetScrumMaster("master");
+            ScrumTeam team = new ScrumTeam("team");
+            ScrumMaster master = team.SetScrumMaster("master");
             master.UpdateActivity();
 
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.Setup(r => r.LoadScrumTeam("team")).Returns(team);
 
             timeProvider.SetUtcNow(new DateTime(2015, 1, 1, 10, 14, 0, DateTimeKind.Utc));
-            var target = CreatePlanningPokerController(timeProvider, configuration.Object, repository.Object);
+            PlanningPokerController target = CreatePlanningPokerController(timeProvider, configuration.Object, repository.Object);
 
             // Act
             try
@@ -152,14 +153,14 @@ namespace Duracellko.PlanningPoker.Test.Controllers
         public void CreateScrumTeam_EmptyTeamInRepository_CreatesNewTeamAndDeletesOldOne()
         {
             // Arrange
-            var team = new ScrumTeam("team");
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            ScrumTeam team = new ScrumTeam("team");
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.Setup(r => r.LoadScrumTeam("team")).Returns(team);
             repository.Setup(r => r.DeleteScrumTeam("team"));
-            var target = CreatePlanningPokerController(repository: repository.Object);
+            PlanningPokerController target = CreatePlanningPokerController(repository: repository.Object);
 
             // Act
-            using (var teamLock = target.CreateScrumTeam("team", "master"))
+            using (IScrumTeamLock teamLock = target.CreateScrumTeam("team", "master"))
             {
                 // Verify
                 Assert.AreNotEqual<ScrumTeam>(team, teamLock.Team);
@@ -172,24 +173,24 @@ namespace Duracellko.PlanningPoker.Test.Controllers
         public void CreateScrumTeam_ExpiredTeamInRepository_CreatesNewTeamAndDeletesOldOne()
         {
             // Arrange
-            var timeProvider = new DateTimeProviderMock();
-            var configuration = new Mock<IPlanningPokerConfiguration>(MockBehavior.Strict);
+            DateTimeProviderMock timeProvider = new DateTimeProviderMock();
+            Mock<IPlanningPokerConfiguration> configuration = new Mock<IPlanningPokerConfiguration>(MockBehavior.Strict);
             configuration.SetupGet(c => c.ClientInactivityTimeout).Returns(TimeSpan.FromMinutes(15));
 
             timeProvider.SetUtcNow(new DateTime(2015, 1, 1, 10, 0, 0, DateTimeKind.Utc));
-            var team = new ScrumTeam("team", timeProvider);
-            var master = team.SetScrumMaster("master");
+            ScrumTeam team = new ScrumTeam("team", timeProvider);
+            ScrumMaster master = team.SetScrumMaster("master");
             master.UpdateActivity();
 
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.Setup(r => r.LoadScrumTeam("team")).Returns(team);
             repository.Setup(r => r.DeleteScrumTeam("team"));
 
             timeProvider.SetUtcNow(new DateTime(2015, 1, 1, 10, 16, 0, DateTimeKind.Utc));
-            var target = CreatePlanningPokerController(timeProvider, configuration.Object, repository.Object);
+            PlanningPokerController target = CreatePlanningPokerController(timeProvider, configuration.Object, repository.Object);
 
             // Act
-            using (var teamLock = target.CreateScrumTeam("team", "master"))
+            using (IScrumTeamLock teamLock = target.CreateScrumTeam("team", "master"))
             {
                 // Verify
                 Assert.AreNotEqual<ScrumTeam>(team, teamLock.Team);
@@ -202,9 +203,9 @@ namespace Duracellko.PlanningPoker.Test.Controllers
         public void CreateScrumTeam_TeamAlreadyLoaded_NotLoadingAgain()
         {
             // Arrange
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.Setup(r => r.LoadScrumTeam("team")).Returns((ScrumTeam)null);
-            var target = CreatePlanningPokerController(repository: repository.Object);
+            PlanningPokerController target = CreatePlanningPokerController(repository: repository.Object);
 
             using (target.CreateScrumTeam("team", "master"))
             {
@@ -229,20 +230,20 @@ namespace Duracellko.PlanningPoker.Test.Controllers
         public void CreateScrumTeam_TeamCreatedWhileLoading_DoesNotCreateNewTeam()
         {
             // Arrange
-            var timeProvider = new DateTimeProviderMock();
-            var configuration = new Mock<IPlanningPokerConfiguration>(MockBehavior.Strict);
+            DateTimeProviderMock timeProvider = new DateTimeProviderMock();
+            Mock<IPlanningPokerConfiguration> configuration = new Mock<IPlanningPokerConfiguration>(MockBehavior.Strict);
             configuration.SetupGet(c => c.ClientInactivityTimeout).Returns(TimeSpan.FromMinutes(15));
 
             timeProvider.SetUtcNow(new DateTime(2015, 1, 1, 10, 0, 0, DateTimeKind.Utc));
-            var team = new ScrumTeam("team");
-            var master = team.SetScrumMaster("master");
+            ScrumTeam team = new ScrumTeam("team");
+            ScrumMaster master = team.SetScrumMaster("master");
             master.UpdateActivity();
 
             bool firstLoad = true;
             bool firstReturn = true;
             PlanningPokerController target = null;
 
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.Setup(r => r.LoadScrumTeam("team"))
                 .Callback<string>(n =>
                 {
@@ -251,7 +252,7 @@ namespace Duracellko.PlanningPoker.Test.Controllers
                         firstLoad = false;
                         try
                         {
-                            using (var teamLock = target.CreateScrumTeam("team", "master"))
+                            using (IScrumTeamLock teamLock = target.CreateScrumTeam("team", "master"))
                             {
                                 Assert.AreNotEqual<ScrumTeam>(team, teamLock.Team);
                             }
@@ -284,14 +285,14 @@ namespace Duracellko.PlanningPoker.Test.Controllers
         public void AttachScrumTeam_TeamNotInRepository_TriedToLoadFromRepository()
         {
             // Arrange
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.Setup(r => r.LoadScrumTeam("team")).Returns((ScrumTeam)null);
 
-            var team = new ScrumTeam("team");
-            var target = CreatePlanningPokerController(repository: repository.Object);
+            ScrumTeam team = new ScrumTeam("team");
+            PlanningPokerController target = CreatePlanningPokerController(repository: repository.Object);
 
             // Act
-            using (var teamLock = target.AttachScrumTeam(team))
+            using (IScrumTeamLock teamLock = target.AttachScrumTeam(team))
             {
                 // Verify
                 Assert.IsNotNull(teamLock);
@@ -304,22 +305,22 @@ namespace Duracellko.PlanningPoker.Test.Controllers
         public void AttachScrumTeam_TeamInRepository_DoesNotCreateNewTeam()
         {
             // Arrange
-            var timeProvider = new DateTimeProviderMock();
-            var configuration = new Mock<IPlanningPokerConfiguration>(MockBehavior.Strict);
+            DateTimeProviderMock timeProvider = new DateTimeProviderMock();
+            Mock<IPlanningPokerConfiguration> configuration = new Mock<IPlanningPokerConfiguration>(MockBehavior.Strict);
             configuration.SetupGet(c => c.ClientInactivityTimeout).Returns(TimeSpan.FromMinutes(15));
 
             timeProvider.SetUtcNow(new DateTime(2015, 1, 1, 10, 0, 0, DateTimeKind.Utc));
-            var team = new ScrumTeam("team");
-            var master = team.SetScrumMaster("master");
+            ScrumTeam team = new ScrumTeam("team");
+            ScrumMaster master = team.SetScrumMaster("master");
             master.UpdateActivity();
 
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.Setup(r => r.LoadScrumTeam("team")).Returns(team);
 
             timeProvider.SetUtcNow(new DateTime(2015, 1, 1, 10, 14, 0, DateTimeKind.Utc));
-            var target = CreatePlanningPokerController(timeProvider, configuration.Object, repository.Object);
+            PlanningPokerController target = CreatePlanningPokerController(timeProvider, configuration.Object, repository.Object);
 
-            var inputTeam = new ScrumTeam("team");
+            ScrumTeam inputTeam = new ScrumTeam("team");
 
             // Act
             target.AttachScrumTeam(inputTeam);
@@ -329,22 +330,22 @@ namespace Duracellko.PlanningPoker.Test.Controllers
         public void AttachScrumTeam_TeamInRepository_DoesNotDeleteOldTeam()
         {
             // Arrange
-            var timeProvider = new DateTimeProviderMock();
-            var configuration = new Mock<IPlanningPokerConfiguration>(MockBehavior.Strict);
+            DateTimeProviderMock timeProvider = new DateTimeProviderMock();
+            Mock<IPlanningPokerConfiguration> configuration = new Mock<IPlanningPokerConfiguration>(MockBehavior.Strict);
             configuration.SetupGet(c => c.ClientInactivityTimeout).Returns(TimeSpan.FromMinutes(15));
 
             timeProvider.SetUtcNow(new DateTime(2015, 1, 1, 10, 0, 0, DateTimeKind.Utc));
-            var team = new ScrumTeam("team");
-            var master = team.SetScrumMaster("master");
+            ScrumTeam team = new ScrumTeam("team");
+            ScrumMaster master = team.SetScrumMaster("master");
             master.UpdateActivity();
 
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.Setup(r => r.LoadScrumTeam("team")).Returns(team);
 
             timeProvider.SetUtcNow(new DateTime(2015, 1, 1, 10, 14, 0, DateTimeKind.Utc));
-            var target = CreatePlanningPokerController(timeProvider, configuration.Object, repository.Object);
+            PlanningPokerController target = CreatePlanningPokerController(timeProvider, configuration.Object, repository.Object);
 
-            var inputTeam = new ScrumTeam("team");
+            ScrumTeam inputTeam = new ScrumTeam("team");
 
             // Act
             try
@@ -365,23 +366,23 @@ namespace Duracellko.PlanningPoker.Test.Controllers
         public void GetScrumTeam_TeamInRepository_ReturnsTeamFromRepository()
         {
             // Arrange
-            var timeProvider = new DateTimeProviderMock();
-            var configuration = new Mock<IPlanningPokerConfiguration>(MockBehavior.Strict);
+            DateTimeProviderMock timeProvider = new DateTimeProviderMock();
+            Mock<IPlanningPokerConfiguration> configuration = new Mock<IPlanningPokerConfiguration>(MockBehavior.Strict);
             configuration.SetupGet(c => c.ClientInactivityTimeout).Returns(TimeSpan.FromMinutes(15));
 
             timeProvider.SetUtcNow(new DateTime(2015, 1, 1, 10, 0, 0, DateTimeKind.Utc));
-            var team = new ScrumTeam("team");
-            var master = team.SetScrumMaster("master");
+            ScrumTeam team = new ScrumTeam("team");
+            ScrumMaster master = team.SetScrumMaster("master");
             master.UpdateActivity();
 
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.Setup(r => r.LoadScrumTeam("team")).Returns(team);
 
             timeProvider.SetUtcNow(new DateTime(2015, 1, 1, 10, 14, 0, DateTimeKind.Utc));
-            var target = CreatePlanningPokerController(timeProvider, configuration.Object, repository.Object);
+            PlanningPokerController target = CreatePlanningPokerController(timeProvider, configuration.Object, repository.Object);
 
             // Act
-            using (var teamLock = target.GetScrumTeam("team"))
+            using (IScrumTeamLock teamLock = target.GetScrumTeam("team"))
             {
                 // Verify
                 Assert.AreEqual<ScrumTeam>(team, teamLock.Team);
@@ -395,10 +396,10 @@ namespace Duracellko.PlanningPoker.Test.Controllers
         public void GetScrumTeam_TeamNotInRepository_ReturnsTeamFromRepository()
         {
             // Arrange
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.Setup(r => r.LoadScrumTeam("team")).Returns((ScrumTeam)null);
 
-            var target = CreatePlanningPokerController(repository: repository.Object);
+            PlanningPokerController target = CreatePlanningPokerController(repository: repository.Object);
 
             // Act
             target.GetScrumTeam("team");
@@ -409,11 +410,11 @@ namespace Duracellko.PlanningPoker.Test.Controllers
         public void GetScrumTeam_EmptyTeamInRepository_ThrowsException()
         {
             // Arrange
-            var team = new ScrumTeam("team");
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            ScrumTeam team = new ScrumTeam("team");
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.Setup(r => r.LoadScrumTeam("team")).Returns(team);
             repository.Setup(r => r.DeleteScrumTeam("team"));
-            var target = CreatePlanningPokerController(repository: repository.Object);
+            PlanningPokerController target = CreatePlanningPokerController(repository: repository.Object);
 
             // Act
             target.GetScrumTeam("team");
@@ -423,11 +424,11 @@ namespace Duracellko.PlanningPoker.Test.Controllers
         public void GetScrumTeam_EmptyTeamInRepository_DeletesOldTeam()
         {
             // Arrange
-            var team = new ScrumTeam("team");
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            ScrumTeam team = new ScrumTeam("team");
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.Setup(r => r.LoadScrumTeam("team")).Returns(team);
             repository.Setup(r => r.DeleteScrumTeam("team"));
-            var target = CreatePlanningPokerController(repository: repository.Object);
+            PlanningPokerController target = CreatePlanningPokerController(repository: repository.Object);
 
             // Act
             try
@@ -449,21 +450,21 @@ namespace Duracellko.PlanningPoker.Test.Controllers
         public void GetScrumTeam_ExpiredTeamInRepository_ThrowsException()
         {
             // Arrange
-            var timeProvider = new DateTimeProviderMock();
-            var configuration = new Mock<IPlanningPokerConfiguration>(MockBehavior.Strict);
+            DateTimeProviderMock timeProvider = new DateTimeProviderMock();
+            Mock<IPlanningPokerConfiguration> configuration = new Mock<IPlanningPokerConfiguration>(MockBehavior.Strict);
             configuration.SetupGet(c => c.ClientInactivityTimeout).Returns(TimeSpan.FromMinutes(15));
 
             timeProvider.SetUtcNow(new DateTime(2015, 1, 1, 10, 0, 0, DateTimeKind.Utc));
-            var team = new ScrumTeam("team", timeProvider);
-            var master = team.SetScrumMaster("master");
+            ScrumTeam team = new ScrumTeam("team", timeProvider);
+            ScrumMaster master = team.SetScrumMaster("master");
             master.UpdateActivity();
 
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.Setup(r => r.LoadScrumTeam("team")).Returns(team);
             repository.Setup(r => r.DeleteScrumTeam("team"));
 
             timeProvider.SetUtcNow(new DateTime(2015, 1, 1, 10, 16, 0, DateTimeKind.Utc));
-            var target = CreatePlanningPokerController(timeProvider, configuration.Object, repository.Object);
+            PlanningPokerController target = CreatePlanningPokerController(timeProvider, configuration.Object, repository.Object);
 
             // Act
             target.GetScrumTeam("team");
@@ -473,21 +474,21 @@ namespace Duracellko.PlanningPoker.Test.Controllers
         public void GetScrumTeam_ExpiredTeamInRepository_DeletesOldTeam()
         {
             // Arrange
-            var timeProvider = new DateTimeProviderMock();
-            var configuration = new Mock<IPlanningPokerConfiguration>(MockBehavior.Strict);
+            DateTimeProviderMock timeProvider = new DateTimeProviderMock();
+            Mock<IPlanningPokerConfiguration> configuration = new Mock<IPlanningPokerConfiguration>(MockBehavior.Strict);
             configuration.SetupGet(c => c.ClientInactivityTimeout).Returns(TimeSpan.FromMinutes(15));
 
             timeProvider.SetUtcNow(new DateTime(2015, 1, 1, 10, 0, 0, DateTimeKind.Utc));
-            var team = new ScrumTeam("team", timeProvider);
-            var master = team.SetScrumMaster("master");
+            ScrumTeam team = new ScrumTeam("team", timeProvider);
+            ScrumMaster master = team.SetScrumMaster("master");
             master.UpdateActivity();
 
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.Setup(r => r.LoadScrumTeam("team")).Returns(team);
             repository.Setup(r => r.DeleteScrumTeam("team"));
 
             timeProvider.SetUtcNow(new DateTime(2015, 1, 1, 10, 16, 0, DateTimeKind.Utc));
-            var target = CreatePlanningPokerController(timeProvider, configuration.Object, repository.Object);
+            PlanningPokerController target = CreatePlanningPokerController(timeProvider, configuration.Object, repository.Object);
 
             // Act
             try
@@ -508,27 +509,27 @@ namespace Duracellko.PlanningPoker.Test.Controllers
         public void GetScrumTeam_TeamAlreadyLoaded_NotLoadingAgain()
         {
             // Arrange
-            var timeProvider = new DateTimeProviderMock();
-            var configuration = new Mock<IPlanningPokerConfiguration>(MockBehavior.Strict);
+            DateTimeProviderMock timeProvider = new DateTimeProviderMock();
+            Mock<IPlanningPokerConfiguration> configuration = new Mock<IPlanningPokerConfiguration>(MockBehavior.Strict);
             configuration.SetupGet(c => c.ClientInactivityTimeout).Returns(TimeSpan.FromMinutes(15));
 
             timeProvider.SetUtcNow(new DateTime(2015, 1, 1, 10, 0, 0, DateTimeKind.Utc));
-            var team = new ScrumTeam("team");
-            var master = team.SetScrumMaster("master");
+            ScrumTeam team = new ScrumTeam("team");
+            ScrumMaster master = team.SetScrumMaster("master");
             master.UpdateActivity();
 
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.Setup(r => r.LoadScrumTeam("team")).Returns(team);
 
             timeProvider.SetUtcNow(new DateTime(2015, 1, 1, 10, 14, 0, DateTimeKind.Utc));
-            var target = CreatePlanningPokerController(timeProvider, configuration.Object, repository.Object);
+            PlanningPokerController target = CreatePlanningPokerController(timeProvider, configuration.Object, repository.Object);
 
             // Act
             using (target.GetScrumTeam("team"))
             {
             }
 
-            using (var teamLock = target.GetScrumTeam("team"))
+            using (IScrumTeamLock teamLock = target.GetScrumTeam("team"))
             {
                 // Verify
                 Assert.AreEqual<ScrumTeam>(team, teamLock.Team);
@@ -541,13 +542,13 @@ namespace Duracellko.PlanningPoker.Test.Controllers
         public void GetScrumTeam_TeamCreatedWhileLoading_DoesNotCreateNewTeam()
         {
             // Arrange
-            var timeProvider = new DateTimeProviderMock();
-            var configuration = new Mock<IPlanningPokerConfiguration>(MockBehavior.Strict);
+            DateTimeProviderMock timeProvider = new DateTimeProviderMock();
+            Mock<IPlanningPokerConfiguration> configuration = new Mock<IPlanningPokerConfiguration>(MockBehavior.Strict);
             configuration.SetupGet(c => c.ClientInactivityTimeout).Returns(TimeSpan.FromMinutes(15));
 
             timeProvider.SetUtcNow(new DateTime(2015, 1, 1, 10, 0, 0, DateTimeKind.Utc));
-            var team = new ScrumTeam("team");
-            var master = team.SetScrumMaster("master");
+            ScrumTeam team = new ScrumTeam("team");
+            ScrumMaster master = team.SetScrumMaster("master");
             master.UpdateActivity();
 
             bool firstLoad = true;
@@ -555,14 +556,14 @@ namespace Duracellko.PlanningPoker.Test.Controllers
             PlanningPokerController target = null;
             ScrumTeam createdTeam = null;
 
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.Setup(r => r.LoadScrumTeam("team"))
                 .Callback<string>(n =>
                 {
                     if (firstLoad)
                     {
                         firstLoad = false;
-                        using (var teamLock = target.CreateScrumTeam("team", "master"))
+                        using (IScrumTeamLock teamLock = target.CreateScrumTeam("team", "master"))
                         {
                             createdTeam = teamLock.Team;
                         }
@@ -583,7 +584,7 @@ namespace Duracellko.PlanningPoker.Test.Controllers
             target = CreatePlanningPokerController(timeProvider, configuration.Object, repository.Object);
 
             // Act
-            using (var teamLock = target.GetScrumTeam("team"))
+            using (IScrumTeamLock teamLock = target.GetScrumTeam("team"))
             {
                 // Verify
                 Assert.AreNotEqual<ScrumTeam>(team, createdTeam);
@@ -598,28 +599,28 @@ namespace Duracellko.PlanningPoker.Test.Controllers
         public void GetScrumTeam_DisconnectAfterwards_TeamIsRemovedFromRepository()
         {
             // Arrange
-            var timeProvider = new DateTimeProviderMock();
-            var configuration = new Mock<IPlanningPokerConfiguration>(MockBehavior.Strict);
+            DateTimeProviderMock timeProvider = new DateTimeProviderMock();
+            Mock<IPlanningPokerConfiguration> configuration = new Mock<IPlanningPokerConfiguration>(MockBehavior.Strict);
             configuration.SetupGet(c => c.ClientInactivityTimeout).Returns(TimeSpan.FromMinutes(15));
 
             timeProvider.SetUtcNow(new DateTime(2015, 1, 1, 10, 0, 0, DateTimeKind.Utc));
-            var team = new ScrumTeam("team");
-            var master = team.SetScrumMaster("master");
+            ScrumTeam team = new ScrumTeam("team");
+            ScrumMaster master = team.SetScrumMaster("master");
             master.UpdateActivity();
 
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.Setup(r => r.LoadScrumTeam("team")).Returns(team);
             repository.Setup(r => r.DeleteScrumTeam("team"));
             repository.SetupGet(r => r.ScrumTeamNames).Returns(Enumerable.Empty<string>());
 
             timeProvider.SetUtcNow(new DateTime(2015, 1, 1, 10, 14, 0, DateTimeKind.Utc));
-            var target = CreatePlanningPokerController(timeProvider, configuration.Object, repository.Object);
+            PlanningPokerController target = CreatePlanningPokerController(timeProvider, configuration.Object, repository.Object);
 
             // Act
-            using (var teamLock = target.GetScrumTeam("team"))
+            using (IScrumTeamLock teamLock = target.GetScrumTeam("team"))
             {
                 teamLock.Team.Disconnect(master.Name);
-                var result = target.ScrumTeamNames;
+                IEnumerable<string> result = target.ScrumTeamNames;
 
                 // Verify
                 Assert.AreEqual<ScrumTeam>(team, teamLock.Team);
@@ -633,13 +634,13 @@ namespace Duracellko.PlanningPoker.Test.Controllers
         public void PlanningPokerController_ObserverUpdateActivity_ScrumTeamSavedToRepository()
         {
             // Arrange
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.Setup(r => r.LoadScrumTeam("team")).Returns((ScrumTeam)null);
             repository.Setup(r => r.SaveScrumTeam(It.IsAny<ScrumTeam>()));
-            var target = CreatePlanningPokerController(repository: repository.Object);
+            PlanningPokerController target = CreatePlanningPokerController(repository: repository.Object);
 
             // Act
-            using (var teamLock = target.CreateScrumTeam("team", "master"))
+            using (IScrumTeamLock teamLock = target.CreateScrumTeam("team", "master"))
             {
                 teamLock.Team.ScrumMaster.UpdateActivity();
 
@@ -652,13 +653,13 @@ namespace Duracellko.PlanningPoker.Test.Controllers
         public void PlanningPokerController_JoinMember_ScrumTeamSavedToRepository()
         {
             // Arrange
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.Setup(r => r.LoadScrumTeam("team")).Returns((ScrumTeam)null);
             repository.Setup(r => r.SaveScrumTeam(It.IsAny<ScrumTeam>()));
-            var target = CreatePlanningPokerController(repository: repository.Object);
+            PlanningPokerController target = CreatePlanningPokerController(repository: repository.Object);
 
             // Act
-            using (var teamLock = target.CreateScrumTeam("team", "master"))
+            using (IScrumTeamLock teamLock = target.CreateScrumTeam("team", "master"))
             {
                 teamLock.Team.Join("member", false);
 
@@ -668,18 +669,18 @@ namespace Duracellko.PlanningPoker.Test.Controllers
         }
 
         [TestMethod]
-        public void PlanningPokerController_StartEstimation_ScrumTeamSavedToRepository()
+        public void PlanningPokerController_StartEstimate_ScrumTeamSavedToRepository()
         {
             // Arrange
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.Setup(r => r.LoadScrumTeam("team")).Returns((ScrumTeam)null);
             repository.Setup(r => r.SaveScrumTeam(It.IsAny<ScrumTeam>()));
-            var target = CreatePlanningPokerController(repository: repository.Object);
+            PlanningPokerController target = CreatePlanningPokerController(repository: repository.Object);
 
             // Act
-            using (var teamLock = target.CreateScrumTeam("team", "master"))
+            using (IScrumTeamLock teamLock = target.CreateScrumTeam("team", "master"))
             {
-                teamLock.Team.ScrumMaster.StartEstimation();
+                teamLock.Team.ScrumMaster.StartEstimate();
 
                 // Verify
                 repository.Verify(r => r.SaveScrumTeam(teamLock.Team), Times.Once());

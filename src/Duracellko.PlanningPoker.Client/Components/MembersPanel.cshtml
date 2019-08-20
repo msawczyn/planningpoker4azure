@@ -12,7 +12,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">Members</div>
         <ul class="list-group">
-            @foreach (var member in Controller.Members)
+            @foreach (string member in Controller.Members)
             {
                 <li class="list-group-item">
                     <span>@member</span>
@@ -30,7 +30,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">Observers</div>
         <ul class="list-group">
-            @foreach (var observer in Controller.Observers)
+            @foreach (string observer in Controller.Observers)
             {
                 <li class="list-group-item">
                     <span>@observer</span>

@@ -58,36 +58,36 @@ namespace Duracellko.PlanningPoker.Service
         Task DisconnectTeam(string teamName, string memberName, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Signal from Scrum master to starts the estimation.
+        /// Signal from Scrum master to starts the estimate.
         /// </summary>
         /// <param name="teamName">Name of the Scrum team.</param>
         /// <param name="cancellationToken">The cancellation token to cancel operation.</param>
         /// <returns>
         /// Asynchronous operation.
         /// </returns>
-        Task StartEstimation(string teamName, CancellationToken cancellationToken);
+        Task StartEstimate(string teamName, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Signal from Scrum master to cancels the estimation.
+        /// Signal from Scrum master to cancels the estimate.
         /// </summary>
         /// <param name="teamName">Name of the Scrum team.</param>
         /// <param name="cancellationToken">The cancellation token to cancel operation.</param>
         /// <returns>
         /// Asynchronous operation.
         /// </returns>
-        Task CancelEstimation(string teamName, CancellationToken cancellationToken);
+        Task CancelEstimate(string teamName, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Submits the estimation for specified team member.
+        /// Submits the estimate for specified team member.
         /// </summary>
         /// <param name="teamName">Name of the Scrum team.</param>
         /// <param name="memberName">Name of the member.</param>
-        /// <param name="estimation">The estimation the member is submitting.</param>
+        /// <param name="estimate">The estimate the member is submitting.</param>
         /// <param name="cancellationToken">The cancellation token to cancel operation.</param>
         /// <returns>
         /// Asynchronous operation.
         /// </returns>
-        Task SubmitEstimation(string teamName, string memberName, double? estimation, CancellationToken cancellationToken);
+        Task SubmitEstimate(string teamName, string memberName, double? estimate, CancellationToken cancellationToken);
 
         /// <summary>
         /// Begins to get messages of specified member asynchronously.

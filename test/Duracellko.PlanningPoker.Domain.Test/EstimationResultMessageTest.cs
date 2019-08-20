@@ -4,33 +4,33 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Duracellko.PlanningPoker.Domain.Test
 {
     [TestClass]
-    public class EstimationResultMessageTest
+    public class EstimateResultMessageTest
     {
         [TestMethod]
         public void Constructor_TypeSpecified_MessageTypeIsSet()
         {
             // Arrange
-            var type = MessageType.EstimationEnded;
+            MessageType type = MessageType.EstimateEnded;
 
             // Act
-            var result = new EstimationResultMessage(type);
+            EstimateResultMessage result = new EstimateResultMessage(type);
 
             // Verify
             Assert.AreEqual<MessageType>(type, result.MessageType);
         }
 
         [TestMethod]
-        public void EstimationResult_Set_EstimationResultIsSet()
+        public void EstimateResult_Set_EstimateResultIsSet()
         {
             // Arrange
-            var target = new EstimationResultMessage(MessageType.EstimationEnded);
-            var estimationResult = new EstimationResult(Enumerable.Empty<Member>());
+            EstimateResultMessage target = new EstimateResultMessage(MessageType.EstimateEnded);
+            EstimateResult estimationResult = new EstimateResult(Enumerable.Empty<Member>());
 
             // Act
-            target.EstimationResult = estimationResult;
+            target.EstimateResult = estimationResult;
 
             // Verify
-            Assert.AreEqual<EstimationResult>(estimationResult, target.EstimationResult);
+            Assert.AreEqual<EstimateResult>(estimationResult, target.EstimateResult);
         }
     }
 }

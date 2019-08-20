@@ -49,29 +49,29 @@ namespace Duracellko.PlanningPoker.Service
         public TeamState State { get; set; }
 
         /// <summary>
-        /// Gets or sets the available estimations the members can pick from.
+        /// Gets or sets the available estimates the members can pick from.
         /// </summary>
-        /// <value>The collection of available estimations.</value>
-        [JsonProperty("availableEstimations")]
+        /// <value>The collection of available estimates.</value>
+        [JsonProperty("availableEstimates")]
         [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "All properties of data contract are read-write.")]
-        public IList<Estimation> AvailableEstimations { get; set; }
+        public IList<Estimate> AvailableEstimates { get; set; }
 
         /// <summary>
-        /// Gets or sets the estimation result of last team estimation.
+        /// Gets or sets the estimate result of last team estimate.
         /// </summary>
         /// <value>
-        /// The estimation result items collection.
+        /// The estimate result items collection.
         /// </value>
         [JsonProperty("estimationResult")]
         [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Data contract has all properties read-write.")]
-        public IList<EstimationResultItem> EstimationResult { get; set; }
+        public IList<EstimateResultItem> EstimateResult { get; set; }
 
         /// <summary>
-        /// Gets or sets the collection of participants in current estimation.
+        /// Gets or sets the collection of participants in current estimate.
         /// </summary>
-        /// <value>The collection of estimation participants.</value>
+        /// <value>The collection of estimate participants.</value>
         [JsonProperty("estimationParticipants")]
         [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "All properties of data contract are read-write.")]
-        public IList<EstimationParticipantStatus> EstimationParticipants { get; set; }
+        public IList<EstimateParticipantStatus> EstimateParticipants { get; set; }
     }
 }

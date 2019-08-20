@@ -3,7 +3,7 @@
 namespace Duracellko.PlanningPoker.Domain
 {
     /// <summary>
-    /// Scrum master can additionally to member start and cancel estimation planning poker.
+    /// Scrum master can additionally to member start and cancel estimate planning poker.
     /// </summary>
     [Serializable]
     public class ScrumMaster : Member
@@ -19,26 +19,26 @@ namespace Duracellko.PlanningPoker.Domain
         }
 
         /// <summary>
-        /// Starts new estimation.
+        /// Starts new estimate.
         /// </summary>
-        public void StartEstimation()
+        public void StartEstimate()
         {
-            if (Team.State == TeamState.EstimationInProgress)
+            if (Team.State == TeamState.EstimateInProgress)
             {
-                throw new InvalidOperationException(Resources.Error_EstimationIsInProgress);
+                throw new InvalidOperationException(Resources.Error_EstimateIsInProgress);
             }
 
-            Team.StartEstimation();
+            Team.StartEstimate();
         }
 
         /// <summary>
-        /// Cancels current estimation.
+        /// Cancels current estimate.
         /// </summary>
-        public void CancelEstimation()
+        public void CancelEstimate()
         {
-            if (Team.State == TeamState.EstimationInProgress)
+            if (Team.State == TeamState.EstimateInProgress)
             {
-                Team.CancelEstimation();
+                Team.CancelEstimate();
             }
         }
     }

@@ -22,8 +22,8 @@ namespace Duracellko.PlanningPoker.Web
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var serverAddresses = _server.Features.Get<IServerAddressesFeature>();
-            var address = serverAddresses.Addresses.FirstOrDefault();
+            IServerAddressesFeature serverAddresses = _server.Features.Get<IServerAddressesFeature>();
+            string address = serverAddresses.Addresses.FirstOrDefault();
             if (address == null)
             {
                 // Default ASP.NET Core Kestrel endpoint

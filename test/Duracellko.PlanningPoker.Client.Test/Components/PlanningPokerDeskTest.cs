@@ -18,20 +18,20 @@ namespace Duracellko.PlanningPoker.Client.Test.Components
     public class PlanningPokerDeskTest
     {
         [TestMethod]
-        public async Task InitializedTeamWithScrumMaster_ShowStartEstimationButton()
+        public async Task InitializedTeamWithScrumMaster_ShowStartEstimateButton()
         {
-            var serviceProvider = CreateServiceProvider();
-            var renderer = serviceProvider.GetRequiredService<TestRenderer>();
-            var controller = serviceProvider.GetRequiredService<PlanningPokerController>();
+            IServiceProvider serviceProvider = CreateServiceProvider();
+            TestRenderer renderer = serviceProvider.GetRequiredService<TestRenderer>();
+            PlanningPokerController controller = serviceProvider.GetRequiredService<PlanningPokerController>();
 
             await controller.InitializeTeam(PlanningPokerData.GetScrumTeam(), PlanningPokerData.ScrumMasterName);
             var target = renderer.InstantiateComponent<PlanningPokerDesk>();
 
-            var componentId = renderer.AssignRootComponentId(target);
+            int componentId = renderer.AssignRootComponentId(target);
             renderer.RenderRootComponent(componentId);
 
             Assert.AreEqual(1, renderer.Batches.Count);
-            var frames = renderer.Batches[0].ReferenceFrames;
+            List<RenderTreeFrame> frames = renderer.Batches[0].ReferenceFrames;
             Assert.AreEqual(39, frames.Count);
 
             // Team name and user name
@@ -48,38 +48,38 @@ namespace Duracellko.PlanningPoker.Client.Test.Components
             AssertFrame.Element(frames[16], "span", 2);
             AssertFrame.Text(frames[17], PlanningPokerData.ScrumMasterName);
 
-            // Button to start estimation
+            // Button to start estimate
             AssertFrame.Element(frames[23], "div", 14);
             AssertFrame.Attribute(frames[24], "class", "actionsBar");
             AssertFrame.Element(frames[26], "p", 10);
             AssertFrame.Element(frames[29], "a", 4);
             AssertFrame.Attribute(frames[30], "onclick");
             AssertFrame.Attribute(frames[31], "class", "btn btn-default");
-            AssertFrame.Markup(frames[32], "\n                        <span class=\"glyphicon glyphicon-play\"></span> Start estimation\n                    ");
+            AssertFrame.Markup(frames[32], "\n                        <span class=\"glyphicon glyphicon-play\"></span> Start estimate\n                    ");
         }
 
         [TestMethod]
-        public async Task PlanningPokerStartedWithMember_ShowsAvailableEstimations()
+        public async Task PlanningPokerStartedWithMember_ShowsAvailableEstimates()
         {
-            var serviceProvider = CreateServiceProvider();
-            var renderer = serviceProvider.GetRequiredService<TestRenderer>();
-            var controller = serviceProvider.GetRequiredService<PlanningPokerController>();
+            IServiceProvider serviceProvider = CreateServiceProvider();
+            TestRenderer renderer = serviceProvider.GetRequiredService<TestRenderer>();
+            PlanningPokerController controller = serviceProvider.GetRequiredService<PlanningPokerController>();
 
-            var reconnectResult = PlanningPokerData.GetReconnectTeamResult();
-            reconnectResult.ScrumTeam.State = TeamState.EstimationInProgress;
-            reconnectResult.ScrumTeam.EstimationParticipants = new List<EstimationParticipantStatus>
+            ReconnectTeamResult reconnectResult = PlanningPokerData.GetReconnectTeamResult();
+            reconnectResult.ScrumTeam.State = TeamState.EstimateInProgress;
+            reconnectResult.ScrumTeam.EstimateParticipants = new List<EstimateParticipantStatus>
             {
-                new EstimationParticipantStatus() { MemberName = PlanningPokerData.ScrumMasterName, Estimated = true },
-                new EstimationParticipantStatus() { MemberName = PlanningPokerData.MemberName, Estimated = false }
+                new EstimateParticipantStatus() { MemberName = PlanningPokerData.ScrumMasterName, Estimated = true },
+                new EstimateParticipantStatus() { MemberName = PlanningPokerData.MemberName, Estimated = false }
             };
             await controller.InitializeTeam(reconnectResult, PlanningPokerData.MemberName);
             var target = renderer.InstantiateComponent<PlanningPokerDesk>();
 
-            var componentId = renderer.AssignRootComponentId(target);
+            int componentId = renderer.AssignRootComponentId(target);
             renderer.RenderRootComponent(componentId);
 
             Assert.AreEqual(1, renderer.Batches.Count);
-            var frames = renderer.Batches[0].ReferenceFrames;
+            List<RenderTreeFrame> frames = renderer.Batches[0].ReferenceFrames;
             Assert.AreEqual(133, frames.Count);
 
             // Team name and user name
@@ -96,63 +96,63 @@ namespace Duracellko.PlanningPoker.Client.Test.Components
             AssertFrame.Element(frames[16], "span", 2);
             AssertFrame.Text(frames[17], PlanningPokerData.MemberName);
 
-            // Available estimations
+            // Available estimates
             AssertFrame.Element(frames[22], "div", 86);
-            AssertFrame.Attribute(frames[23], "class", "availableEstimations");
-            AssertFrame.Markup(frames[25], "<h3>Pick estimation</h3>\n            ");
+            AssertFrame.Attribute(frames[23], "class", "availableEstimates");
+            AssertFrame.Markup(frames[25], "<h3>Pick estimate</h3>\n            ");
             AssertFrame.Element(frames[26], "ul", 81);
-            AssertAvailableEstimation(frames, 29, "0");
-            AssertAvailableEstimation(frames, 35, "½");
-            AssertAvailableEstimation(frames, 41, "1");
-            AssertAvailableEstimation(frames, 47, "2");
-            AssertAvailableEstimation(frames, 53, "3");
-            AssertAvailableEstimation(frames, 59, "5");
-            AssertAvailableEstimation(frames, 65, "8");
-            AssertAvailableEstimation(frames, 71, "13");
-            AssertAvailableEstimation(frames, 77, "20");
-            AssertAvailableEstimation(frames, 83, "40");
-            AssertAvailableEstimation(frames, 89, "100");
-            AssertAvailableEstimation(frames, 95, "∞");
-            AssertAvailableEstimation(frames, 101, "?");
+            AssertAvailableEstimate(frames, 29, "0");
+            AssertAvailableEstimate(frames, 35, "½");
+            AssertAvailableEstimate(frames, 41, "1");
+            AssertAvailableEstimate(frames, 47, "2");
+            AssertAvailableEstimate(frames, 53, "3");
+            AssertAvailableEstimate(frames, 59, "5");
+            AssertAvailableEstimate(frames, 65, "8");
+            AssertAvailableEstimate(frames, 71, "13");
+            AssertAvailableEstimate(frames, 77, "20");
+            AssertAvailableEstimate(frames, 83, "40");
+            AssertAvailableEstimate(frames, 89, "100");
+            AssertAvailableEstimate(frames, 95, "∞");
+            AssertAvailableEstimate(frames, 101, "?");
 
             // Members, who estimated already
             AssertFrame.Element(frames[112], "div", 20);
             AssertFrame.Attribute(frames[113], "class", "estimationResult");
             AssertFrame.Markup(frames[115], "<h3>Selected estimates</h3>\n            ");
             AssertFrame.Element(frames[116], "ul", 15);
-            AssertSelectedEstimation(frames, 119, PlanningPokerData.ScrumMasterName, string.Empty);
+            AssertSelectedEstimate(frames, 119, PlanningPokerData.ScrumMasterName, string.Empty);
         }
 
         [TestMethod]
-        public async Task PlanningPokerEstimatedWithObserver_ShowsEstimations()
+        public async Task PlanningPokerEstimatedWithObserver_ShowsEstimates()
         {
-            var serviceProvider = CreateServiceProvider();
-            var renderer = serviceProvider.GetRequiredService<TestRenderer>();
-            var controller = serviceProvider.GetRequiredService<PlanningPokerController>();
+            IServiceProvider serviceProvider = CreateServiceProvider();
+            TestRenderer renderer = serviceProvider.GetRequiredService<TestRenderer>();
+            PlanningPokerController controller = serviceProvider.GetRequiredService<PlanningPokerController>();
 
-            var reconnectResult = PlanningPokerData.GetReconnectTeamResult();
-            reconnectResult.ScrumTeam.State = TeamState.EstimationFinished;
-            reconnectResult.ScrumTeam.EstimationResult = new List<EstimationResultItem>
+            ReconnectTeamResult reconnectResult = PlanningPokerData.GetReconnectTeamResult();
+            reconnectResult.ScrumTeam.State = TeamState.EstimateFinished;
+            reconnectResult.ScrumTeam.EstimateResult = new List<EstimateResultItem>
             {
-                new EstimationResultItem
+                new EstimateResultItem
                 {
                     Member = new TeamMember { Type = PlanningPokerData.ScrumMasterType, Name = PlanningPokerData.ScrumMasterName },
-                    Estimation = new Estimation { Value = 8 }
+                    Estimate = new Estimate { Value = 8 }
                 },
-                new EstimationResultItem
+                new EstimateResultItem
                 {
                     Member = new TeamMember { Type = PlanningPokerData.MemberType, Name = PlanningPokerData.MemberName },
-                    Estimation = new Estimation { Value = 3 }
+                    Estimate = new Estimate { Value = 3 }
                 }
             };
             await controller.InitializeTeam(reconnectResult, PlanningPokerData.ObserverName);
             var target = renderer.InstantiateComponent<PlanningPokerDesk>();
 
-            var componentId = renderer.AssignRootComponentId(target);
+            int componentId = renderer.AssignRootComponentId(target);
             renderer.RenderRootComponent(componentId);
 
             Assert.AreEqual(1, renderer.Batches.Count);
-            var frames = renderer.Batches[0].ReferenceFrames;
+            List<RenderTreeFrame> frames = renderer.Batches[0].ReferenceFrames;
             Assert.AreEqual(57, frames.Count);
 
             // Team name and user name
@@ -169,18 +169,18 @@ namespace Duracellko.PlanningPoker.Client.Test.Components
             AssertFrame.Element(frames[16], "span", 2);
             AssertFrame.Text(frames[17], PlanningPokerData.ObserverName);
 
-            // Estimations
+            // Estimates
             AssertFrame.Element(frames[24], "div", 32);
             AssertFrame.Attribute(frames[25], "class", "estimationResult");
             AssertFrame.Markup(frames[27], "<h3>Selected estimates</h3>\n            ");
             AssertFrame.Element(frames[28], "ul", 27);
-            AssertSelectedEstimation(frames, 31, PlanningPokerData.MemberName, "3");
-            AssertSelectedEstimation(frames, 43, PlanningPokerData.ScrumMasterName, "8");
+            AssertSelectedEstimate(frames, 31, PlanningPokerData.MemberName, "3");
+            AssertSelectedEstimate(frames, 43, PlanningPokerData.ScrumMasterName, "8");
         }
 
         private static IServiceProvider CreateServiceProvider()
         {
-            var serviceCollection = new ServiceCollection();
+            ServiceCollection serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton<TestRenderer>();
             serviceCollection.AddSingleton<PlanningPokerController>();
             serviceCollection.AddSingleton(new Mock<IMessageBoxService>().Object);
@@ -190,7 +190,7 @@ namespace Duracellko.PlanningPoker.Client.Test.Components
             return serviceCollection.BuildServiceProvider();
         }
 
-        private static void AssertAvailableEstimation(List<RenderTreeFrame> frames, int index, string estimationText)
+        private static void AssertAvailableEstimate(List<RenderTreeFrame> frames, int index, string estimationText)
         {
             AssertFrame.Element(frames[index], "li", 4);
             AssertFrame.Element(frames[index + 1], "a", 3);
@@ -198,7 +198,7 @@ namespace Duracellko.PlanningPoker.Client.Test.Components
             AssertFrame.Text(frames[index + 3], estimationText);
         }
 
-        private static void AssertSelectedEstimation(List<RenderTreeFrame> frames, int index, string memberName, string estimationText)
+        private static void AssertSelectedEstimate(List<RenderTreeFrame> frames, int index, string memberName, string estimationText)
         {
             AssertFrame.Element(frames[index], "li", 10);
             AssertFrame.Element(frames[index + 2], "span", 3);

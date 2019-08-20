@@ -9,10 +9,10 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void Constructor_MessageType_MessageTypeIsSet()
         {
             // Arrange
-            var messageType = NodeMessageType.ScrumTeamMessage;
+            NodeMessageType messageType = NodeMessageType.ScrumTeamMessage;
 
             // Act
-            var result = new NodeMessage(messageType);
+            NodeMessage result = new NodeMessage(messageType);
 
             // Verify
             Assert.AreEqual<NodeMessageType>(messageType, result.MessageType);

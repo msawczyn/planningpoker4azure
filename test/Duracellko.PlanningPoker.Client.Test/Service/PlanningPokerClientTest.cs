@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Duracellko.PlanningPoker.Service;
@@ -18,10 +19,10 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
         [TestMethod]
         public async Task CreateTeam_TeamAndScrumMasterName_RequestsCreateTeamUrl()
         {
-            var httpMock = new MockHttpMessageHandler();
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
             httpMock.Expect(BaseUrl + $"api/PlanningPokerService/CreateTeam?teamName={PlanningPokerClientData.TeamName}&scrumMasterName={PlanningPokerClientData.ScrumMasterName}")
                 .Respond(JsonType, PlanningPokerClientData.GetScrumTeamJson());
-            var target = CreatePlanningPokerClient(httpMock);
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
             await target.CreateTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.ScrumMasterName, CancellationToken.None);
 
@@ -31,12 +32,12 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
         [TestMethod]
         public async Task CreateTeam_TeamAndScrumMasterName_ReturnsScrumTeam()
         {
-            var httpMock = new MockHttpMessageHandler();
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
             httpMock.When(BaseUrl + "api/PlanningPokerService/CreateTeam")
                 .Respond(JsonType, PlanningPokerClientData.GetScrumTeamJson());
-            var target = CreatePlanningPokerClient(httpMock);
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
-            var result = await target.CreateTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.ScrumMasterName, CancellationToken.None);
+            ScrumTeam result = await target.CreateTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.ScrumMasterName, CancellationToken.None);
 
             Assert.IsNotNull(result);
             Assert.AreEqual(TeamState.Initial, result.State);
@@ -45,27 +46,27 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, result.ScrumMaster.Type);
 
             Assert.AreEqual(1, result.Members.Count);
-            var member = result.Members[0];
+            TeamMember member = result.Members[0];
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, member.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, member.Type);
 
             Assert.AreEqual(0, result.Observers.Count);
 
-            AssertAvailableEstimations(result);
+            AssertAvailableEstimates(result);
 
-            Assert.AreEqual(0, result.EstimationResult.Count);
-            Assert.AreEqual(0, result.EstimationParticipants.Count);
+            Assert.AreEqual(0, result.EstimateResult.Count);
+            Assert.AreEqual(0, result.EstimateParticipants.Count);
         }
 
         [TestMethod]
         public async Task CreateTeam_TeamNameExists_PlanningPokerException()
         {
-            var httpMock = new MockHttpMessageHandler();
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
             httpMock.When(BaseUrl + "api/PlanningPokerService/CreateTeam")
                 .Respond(HttpStatusCode.BadRequest, TextType, "Team 'Test team' already exists.");
-            var target = CreatePlanningPokerClient(httpMock);
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
-            var exception = await Assert.ThrowsExceptionAsync<PlanningPokerException>(() => target.CreateTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.ScrumMasterName, CancellationToken.None));
+            PlanningPokerException exception = await Assert.ThrowsExceptionAsync<PlanningPokerException>(() => target.CreateTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.ScrumMasterName, CancellationToken.None));
 
             Assert.AreEqual("Team 'Test team' already exists.", exception.Message);
         }
@@ -73,10 +74,10 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
         [TestMethod]
         public async Task JoinTeam_TeamAndMemberName_RequestsJoinTeamUrl()
         {
-            var httpMock = new MockHttpMessageHandler();
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
             httpMock.Expect(BaseUrl + $"api/PlanningPokerService/JoinTeam?teamName={PlanningPokerClientData.TeamName}&memberName={PlanningPokerClientData.MemberName}&asObserver=False")
                 .Respond(JsonType, PlanningPokerClientData.GetScrumTeamJson(member: true));
-            var target = CreatePlanningPokerClient(httpMock);
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
             await target.JoinTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, false, CancellationToken.None);
 
@@ -86,10 +87,10 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
         [TestMethod]
         public async Task JoinTeam_TeamAndObserverName_RequestsJoinTeamUrl()
         {
-            var httpMock = new MockHttpMessageHandler();
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
             httpMock.Expect(BaseUrl + $"api/PlanningPokerService/JoinTeam?teamName={PlanningPokerClientData.TeamName}&memberName={PlanningPokerClientData.ObserverName}&asObserver=True")
                 .Respond(JsonType, PlanningPokerClientData.GetScrumTeamJson(observer: true));
-            var target = CreatePlanningPokerClient(httpMock);
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
             await target.JoinTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.ObserverName, true, CancellationToken.None);
 
@@ -99,12 +100,12 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
         [TestMethod]
         public async Task JoinTeam_TeamAndMemberName_ReturnsScrumTeam()
         {
-            var httpMock = new MockHttpMessageHandler();
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
             httpMock.When(BaseUrl + $"api/PlanningPokerService/JoinTeam")
                 .Respond(JsonType, PlanningPokerClientData.GetScrumTeamJson(member: true));
-            var target = CreatePlanningPokerClient(httpMock);
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
-            var result = await target.JoinTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, false, CancellationToken.None);
+            ScrumTeam result = await target.JoinTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, false, CancellationToken.None);
 
             Assert.IsNotNull(result);
             Assert.AreEqual(TeamState.Initial, result.State);
@@ -113,7 +114,7 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, result.ScrumMaster.Type);
 
             Assert.AreEqual(2, result.Members.Count);
-            var member = result.Members[0];
+            TeamMember member = result.Members[0];
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, member.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, member.Type);
 
@@ -123,21 +124,21 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
 
             Assert.AreEqual(0, result.Observers.Count);
 
-            AssertAvailableEstimations(result);
+            AssertAvailableEstimates(result);
 
-            Assert.AreEqual(0, result.EstimationResult.Count);
-            Assert.AreEqual(0, result.EstimationParticipants.Count);
+            Assert.AreEqual(0, result.EstimateResult.Count);
+            Assert.AreEqual(0, result.EstimateParticipants.Count);
         }
 
         [TestMethod]
         public async Task JoinTeam_TeamAndObserverName_ReturnsScrumTeam()
         {
-            var httpMock = new MockHttpMessageHandler();
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
             httpMock.When(BaseUrl + $"api/PlanningPokerService/JoinTeam")
                 .Respond(JsonType, PlanningPokerClientData.GetScrumTeamJson(observer: true));
-            var target = CreatePlanningPokerClient(httpMock);
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
-            var result = await target.JoinTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.ObserverName, true, CancellationToken.None);
+            ScrumTeam result = await target.JoinTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.ObserverName, true, CancellationToken.None);
 
             Assert.IsNotNull(result);
             Assert.AreEqual(TeamState.Initial, result.State);
@@ -146,7 +147,7 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, result.ScrumMaster.Type);
 
             Assert.AreEqual(1, result.Members.Count);
-            var member = result.Members[0];
+            TeamMember member = result.Members[0];
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, member.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, member.Type);
 
@@ -155,31 +156,31 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
             Assert.AreEqual(PlanningPokerClientData.ObserverName, member.Name);
             Assert.AreEqual(PlanningPokerClientData.ObserverType, member.Type);
 
-            AssertAvailableEstimations(result);
+            AssertAvailableEstimates(result);
 
-            Assert.AreEqual(0, result.EstimationResult.Count);
-            Assert.AreEqual(0, result.EstimationParticipants.Count);
+            Assert.AreEqual(0, result.EstimateResult.Count);
+            Assert.AreEqual(0, result.EstimateParticipants.Count);
         }
 
         [TestMethod]
-        public async Task JoinTeam_TeamAndMemberName_ReturnsScrumTeamWithEstimationFinished()
+        public async Task JoinTeam_TeamAndMemberName_ReturnsScrumTeamWithEstimateFinished()
         {
-            var estimationResultJson = PlanningPokerClientData.GetEstimationResultJson();
-            var httpMock = new MockHttpMessageHandler();
+            string estimationResultJson = PlanningPokerClientData.GetEstimateResultJson();
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
             httpMock.When(BaseUrl + $"api/PlanningPokerService/JoinTeam")
                 .Respond(JsonType, PlanningPokerClientData.GetScrumTeamJson(member: true, observer: true, state: 2, estimationResult: estimationResultJson));
-            var target = CreatePlanningPokerClient(httpMock);
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
-            var result = await target.JoinTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, false, CancellationToken.None);
+            ScrumTeam result = await target.JoinTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, false, CancellationToken.None);
 
             Assert.IsNotNull(result);
-            Assert.AreEqual(TeamState.EstimationFinished, result.State);
+            Assert.AreEqual(TeamState.EstimateFinished, result.State);
             Assert.AreEqual(PlanningPokerClientData.TeamName, result.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, result.ScrumMaster.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, result.ScrumMaster.Type);
 
             Assert.AreEqual(2, result.Members.Count);
-            var member = result.Members[0];
+            TeamMember member = result.Members[0];
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, member.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, member.Type);
 
@@ -192,41 +193,41 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
             Assert.AreEqual(PlanningPokerClientData.ObserverName, member.Name);
             Assert.AreEqual(PlanningPokerClientData.ObserverType, member.Type);
 
-            AssertAvailableEstimations(result);
+            AssertAvailableEstimates(result);
 
-            Assert.AreEqual(2, result.EstimationResult.Count);
-            var estimationResult = result.EstimationResult[0];
+            Assert.AreEqual(2, result.EstimateResult.Count);
+            EstimateResultItem estimationResult = result.EstimateResult[0];
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, estimationResult.Member.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, estimationResult.Member.Type);
-            Assert.AreEqual(5.0, estimationResult.Estimation.Value);
+            Assert.AreEqual(5.0, estimationResult.Estimate.Value);
 
-            estimationResult = result.EstimationResult[1];
+            estimationResult = result.EstimateResult[1];
             Assert.AreEqual(PlanningPokerClientData.MemberName, estimationResult.Member.Name);
             Assert.AreEqual(PlanningPokerClientData.MemberType, estimationResult.Member.Type);
-            Assert.AreEqual(20.0, estimationResult.Estimation.Value);
+            Assert.AreEqual(20.0, estimationResult.Estimate.Value);
 
-            Assert.AreEqual(0, result.EstimationParticipants.Count);
+            Assert.AreEqual(0, result.EstimateParticipants.Count);
         }
 
         [TestMethod]
-        public async Task JoinTeam_TeamAndMemberName_ReturnsScrumTeamWithEstimationFinishedAndEstimationIsInfinity()
+        public async Task JoinTeam_TeamAndMemberName_ReturnsScrumTeamWithEstimateFinishedAndEstimateIsInfinity()
         {
-            var estimationResultJson = PlanningPokerClientData.GetEstimationResultJson(scrumMasterEstimation: "-1111100", memberEstimation: "null");
-            var httpMock = new MockHttpMessageHandler();
+            string estimationResultJson = PlanningPokerClientData.GetEstimateResultJson(scrumMasterEstimate: "-1111100", memberEstimate: "null");
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
             httpMock.When(BaseUrl + $"api/PlanningPokerService/JoinTeam")
                 .Respond(JsonType, PlanningPokerClientData.GetScrumTeamJson(member: true, observer: true, state: 2, estimationResult: estimationResultJson));
-            var target = CreatePlanningPokerClient(httpMock);
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
-            var result = await target.JoinTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, false, CancellationToken.None);
+            ScrumTeam result = await target.JoinTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, false, CancellationToken.None);
 
             Assert.IsNotNull(result);
-            Assert.AreEqual(TeamState.EstimationFinished, result.State);
+            Assert.AreEqual(TeamState.EstimateFinished, result.State);
             Assert.AreEqual(PlanningPokerClientData.TeamName, result.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, result.ScrumMaster.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, result.ScrumMaster.Type);
 
             Assert.AreEqual(2, result.Members.Count);
-            var member = result.Members[0];
+            TeamMember member = result.Members[0];
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, member.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, member.Type);
 
@@ -239,41 +240,41 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
             Assert.AreEqual(PlanningPokerClientData.ObserverName, member.Name);
             Assert.AreEqual(PlanningPokerClientData.ObserverType, member.Type);
 
-            AssertAvailableEstimations(result);
+            AssertAvailableEstimates(result);
 
-            Assert.AreEqual(2, result.EstimationResult.Count);
-            var estimationResult = result.EstimationResult[0];
+            Assert.AreEqual(2, result.EstimateResult.Count);
+            EstimateResultItem estimationResult = result.EstimateResult[0];
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, estimationResult.Member.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, estimationResult.Member.Type);
-            Assert.IsTrue(double.IsPositiveInfinity(estimationResult.Estimation.Value.Value));
+            Assert.IsTrue(double.IsPositiveInfinity(estimationResult.Estimate.Value.Value));
 
-            estimationResult = result.EstimationResult[1];
+            estimationResult = result.EstimateResult[1];
             Assert.AreEqual(PlanningPokerClientData.MemberName, estimationResult.Member.Name);
             Assert.AreEqual(PlanningPokerClientData.MemberType, estimationResult.Member.Type);
-            Assert.IsNull(estimationResult.Estimation.Value);
+            Assert.IsNull(estimationResult.Estimate.Value);
 
-            Assert.AreEqual(0, result.EstimationParticipants.Count);
+            Assert.AreEqual(0, result.EstimateParticipants.Count);
         }
 
         [TestMethod]
-        public async Task JoinTeam_TeamAndMemberName_ReturnsScrumTeamWithEstimationCanceled()
+        public async Task JoinTeam_TeamAndMemberName_ReturnsScrumTeamWithEstimateCanceled()
         {
-            var estimationResultJson = PlanningPokerClientData.GetEstimationResultJson(scrumMasterEstimation: "0", memberEstimation: null);
-            var httpMock = new MockHttpMessageHandler();
+            string estimationResultJson = PlanningPokerClientData.GetEstimateResultJson(scrumMasterEstimate: "0", memberEstimate: null);
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
             httpMock.When(BaseUrl + $"api/PlanningPokerService/JoinTeam")
                 .Respond(JsonType, PlanningPokerClientData.GetScrumTeamJson(member: true, state: 3, estimationResult: estimationResultJson));
-            var target = CreatePlanningPokerClient(httpMock);
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
-            var result = await target.JoinTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, false, CancellationToken.None);
+            ScrumTeam result = await target.JoinTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, false, CancellationToken.None);
 
             Assert.IsNotNull(result);
-            Assert.AreEqual(TeamState.EstimationCanceled, result.State);
+            Assert.AreEqual(TeamState.EstimateCanceled, result.State);
             Assert.AreEqual(PlanningPokerClientData.TeamName, result.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, result.ScrumMaster.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, result.ScrumMaster.Type);
 
             Assert.AreEqual(2, result.Members.Count);
-            var member = result.Members[0];
+            TeamMember member = result.Members[0];
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, member.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, member.Type);
 
@@ -283,41 +284,41 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
 
             Assert.AreEqual(0, result.Observers.Count);
 
-            AssertAvailableEstimations(result);
+            AssertAvailableEstimates(result);
 
-            Assert.AreEqual(2, result.EstimationResult.Count);
-            var estimationResult = result.EstimationResult[0];
+            Assert.AreEqual(2, result.EstimateResult.Count);
+            EstimateResultItem estimationResult = result.EstimateResult[0];
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, estimationResult.Member.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, estimationResult.Member.Type);
-            Assert.AreEqual(0.0, estimationResult.Estimation.Value);
+            Assert.AreEqual(0.0, estimationResult.Estimate.Value);
 
-            estimationResult = result.EstimationResult[1];
+            estimationResult = result.EstimateResult[1];
             Assert.AreEqual(PlanningPokerClientData.MemberName, estimationResult.Member.Name);
             Assert.AreEqual(PlanningPokerClientData.MemberType, estimationResult.Member.Type);
-            Assert.IsNull(estimationResult.Estimation);
+            Assert.IsNull(estimationResult.Estimate);
 
-            Assert.AreEqual(0, result.EstimationParticipants.Count);
+            Assert.AreEqual(0, result.EstimateParticipants.Count);
         }
 
         [TestMethod]
-        public async Task JoinTeam_TeamAndMemberName_ReturnsScrumTeamWithEstimationInProgress()
+        public async Task JoinTeam_TeamAndMemberName_ReturnsScrumTeamWithEstimateInProgress()
         {
-            var estimationParticipantsJson = PlanningPokerClientData.GetEstimationParticipantsJson();
-            var httpMock = new MockHttpMessageHandler();
+            string estimationParticipantsJson = PlanningPokerClientData.GetEstimateParticipantsJson();
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
             httpMock.When(BaseUrl + $"api/PlanningPokerService/JoinTeam")
                 .Respond(JsonType, PlanningPokerClientData.GetScrumTeamJson(member: true, state: 1, estimationParticipants: estimationParticipantsJson));
-            var target = CreatePlanningPokerClient(httpMock);
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
-            var result = await target.JoinTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, false, CancellationToken.None);
+            ScrumTeam result = await target.JoinTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, false, CancellationToken.None);
 
             Assert.IsNotNull(result);
-            Assert.AreEqual(TeamState.EstimationInProgress, result.State);
+            Assert.AreEqual(TeamState.EstimateInProgress, result.State);
             Assert.AreEqual(PlanningPokerClientData.TeamName, result.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, result.ScrumMaster.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, result.ScrumMaster.Type);
 
             Assert.AreEqual(2, result.Members.Count);
-            var member = result.Members[0];
+            TeamMember member = result.Members[0];
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, member.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, member.Type);
 
@@ -327,16 +328,16 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
 
             Assert.AreEqual(0, result.Observers.Count);
 
-            AssertAvailableEstimations(result);
+            AssertAvailableEstimates(result);
 
-            Assert.AreEqual(0, result.EstimationResult.Count);
+            Assert.AreEqual(0, result.EstimateResult.Count);
 
-            Assert.AreEqual(2, result.EstimationParticipants.Count);
-            var estimationParticipant = result.EstimationParticipants[0];
+            Assert.AreEqual(2, result.EstimateParticipants.Count);
+            EstimateParticipantStatus estimationParticipant = result.EstimateParticipants[0];
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, estimationParticipant.MemberName);
             Assert.IsTrue(estimationParticipant.Estimated);
 
-            estimationParticipant = result.EstimationParticipants[1];
+            estimationParticipant = result.EstimateParticipants[1];
             Assert.AreEqual(PlanningPokerClientData.MemberName, estimationParticipant.MemberName);
             Assert.IsFalse(estimationParticipant.Estimated);
         }
@@ -344,12 +345,12 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
         [TestMethod]
         public async Task JoinTeam_TeamDoesNotExist_PlanningPokerException()
         {
-            var httpMock = new MockHttpMessageHandler();
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
             httpMock.When(BaseUrl + "api/PlanningPokerService/JoinTeam")
                 .Respond(HttpStatusCode.BadRequest, TextType, "Team 'Test team' does not exist.");
-            var target = CreatePlanningPokerClient(httpMock);
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
-            var exception = await Assert.ThrowsExceptionAsync<PlanningPokerException>(() => target.JoinTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, false, CancellationToken.None));
+            PlanningPokerException exception = await Assert.ThrowsExceptionAsync<PlanningPokerException>(() => target.JoinTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, false, CancellationToken.None));
 
             Assert.AreEqual("Team 'Test team' does not exist.", exception.Message);
         }
@@ -357,11 +358,11 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
         [TestMethod]
         public async Task ReconnectTeam_TeamAndMemberName_RequestsJoinTeamUrl()
         {
-            var scrumTeamJson = PlanningPokerClientData.GetScrumTeamJson(member: true);
-            var httpMock = new MockHttpMessageHandler();
+            string scrumTeamJson = PlanningPokerClientData.GetScrumTeamJson(member: true);
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
             httpMock.Expect(BaseUrl + $"api/PlanningPokerService/ReconnectTeam?teamName={PlanningPokerClientData.TeamName}&memberName={PlanningPokerClientData.MemberName}")
                 .Respond(JsonType, PlanningPokerClientData.GetReconnectTeamResultJson(scrumTeamJson));
-            var target = CreatePlanningPokerClient(httpMock);
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
             await target.ReconnectTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, CancellationToken.None);
 
@@ -371,26 +372,26 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
         [TestMethod]
         public async Task ReconnectTeam_TeamAndMemberName_ReturnsScrumTeam()
         {
-            var scrumTeamJson = PlanningPokerClientData.GetScrumTeamJson(member: true);
-            var httpMock = new MockHttpMessageHandler();
+            string scrumTeamJson = PlanningPokerClientData.GetScrumTeamJson(member: true);
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
             httpMock.When(BaseUrl + $"api/PlanningPokerService/ReconnectTeam")
                 .Respond(JsonType, PlanningPokerClientData.GetReconnectTeamResultJson(scrumTeamJson));
-            var target = CreatePlanningPokerClient(httpMock);
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
-            var result = await target.ReconnectTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, CancellationToken.None);
+            ReconnectTeamResult result = await target.ReconnectTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, CancellationToken.None);
 
             Assert.IsNotNull(result.ScrumTeam);
             Assert.AreEqual(0, result.LastMessageId);
-            Assert.IsNull(result.SelectedEstimation);
+            Assert.IsNull(result.SelectedEstimate);
 
-            var scrumTeam = result.ScrumTeam;
+            ScrumTeam scrumTeam = result.ScrumTeam;
             Assert.AreEqual(TeamState.Initial, scrumTeam.State);
             Assert.AreEqual(PlanningPokerClientData.TeamName, scrumTeam.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, scrumTeam.ScrumMaster.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, scrumTeam.ScrumMaster.Type);
 
             Assert.AreEqual(2, scrumTeam.Members.Count);
-            var member = scrumTeam.Members[0];
+            TeamMember member = scrumTeam.Members[0];
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, member.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, member.Type);
 
@@ -400,36 +401,36 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
 
             Assert.AreEqual(0, scrumTeam.Observers.Count);
 
-            AssertAvailableEstimations(scrumTeam);
+            AssertAvailableEstimates(scrumTeam);
 
-            Assert.AreEqual(0, scrumTeam.EstimationResult.Count);
-            Assert.AreEqual(0, scrumTeam.EstimationParticipants.Count);
+            Assert.AreEqual(0, scrumTeam.EstimateResult.Count);
+            Assert.AreEqual(0, scrumTeam.EstimateParticipants.Count);
         }
 
         [TestMethod]
         public async Task ReconnectTeam_TeamAndMemberName_ReturnsScrumTeamAndLastMessageId()
         {
-            var estimationResultJson = PlanningPokerClientData.GetEstimationResultJson(scrumMasterEstimation: "1", memberEstimation: "1");
-            var scrumTeamJson = PlanningPokerClientData.GetScrumTeamJson(member: true, observer: true, state: 2, estimationResult: estimationResultJson);
-            var httpMock = new MockHttpMessageHandler();
+            string estimationResultJson = PlanningPokerClientData.GetEstimateResultJson(scrumMasterEstimate: "1", memberEstimate: "1");
+            string scrumTeamJson = PlanningPokerClientData.GetScrumTeamJson(member: true, observer: true, state: 2, estimationResult: estimationResultJson);
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
             httpMock.When(BaseUrl + $"api/PlanningPokerService/ReconnectTeam")
                 .Respond(JsonType, PlanningPokerClientData.GetReconnectTeamResultJson(scrumTeamJson, lastMessageId: "123"));
-            var target = CreatePlanningPokerClient(httpMock);
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
-            var result = await target.ReconnectTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, CancellationToken.None);
+            ReconnectTeamResult result = await target.ReconnectTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, CancellationToken.None);
 
             Assert.IsNotNull(result.ScrumTeam);
             Assert.AreEqual(123, result.LastMessageId);
-            Assert.IsNull(result.SelectedEstimation);
+            Assert.IsNull(result.SelectedEstimate);
 
-            var scrumTeam = result.ScrumTeam;
-            Assert.AreEqual(TeamState.EstimationFinished, scrumTeam.State);
+            ScrumTeam scrumTeam = result.ScrumTeam;
+            Assert.AreEqual(TeamState.EstimateFinished, scrumTeam.State);
             Assert.AreEqual(PlanningPokerClientData.TeamName, scrumTeam.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, scrumTeam.ScrumMaster.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, scrumTeam.ScrumMaster.Type);
 
             Assert.AreEqual(2, scrumTeam.Members.Count);
-            var member = scrumTeam.Members[0];
+            TeamMember member = scrumTeam.Members[0];
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, member.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, member.Type);
 
@@ -442,48 +443,48 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
             Assert.AreEqual(PlanningPokerClientData.ObserverName, member.Name);
             Assert.AreEqual(PlanningPokerClientData.ObserverType, member.Type);
 
-            AssertAvailableEstimations(scrumTeam);
+            AssertAvailableEstimates(scrumTeam);
 
-            Assert.AreEqual(2, scrumTeam.EstimationResult.Count);
-            var estimationResult = scrumTeam.EstimationResult[0];
+            Assert.AreEqual(2, scrumTeam.EstimateResult.Count);
+            EstimateResultItem estimationResult = scrumTeam.EstimateResult[0];
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, estimationResult.Member.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, estimationResult.Member.Type);
-            Assert.AreEqual(1.0, estimationResult.Estimation.Value);
+            Assert.AreEqual(1.0, estimationResult.Estimate.Value);
 
-            estimationResult = scrumTeam.EstimationResult[1];
+            estimationResult = scrumTeam.EstimateResult[1];
             Assert.AreEqual(PlanningPokerClientData.MemberName, estimationResult.Member.Name);
             Assert.AreEqual(PlanningPokerClientData.MemberType, estimationResult.Member.Type);
-            Assert.AreEqual(1.0, estimationResult.Estimation.Value);
+            Assert.AreEqual(1.0, estimationResult.Estimate.Value);
 
-            Assert.AreEqual(0, scrumTeam.EstimationParticipants.Count);
+            Assert.AreEqual(0, scrumTeam.EstimateParticipants.Count);
         }
 
         [TestMethod]
-        public async Task ReconnectTeam_TeamAndMemberName_ReturnsScrumTeamWithEstimationFinished()
+        public async Task ReconnectTeam_TeamAndMemberName_ReturnsScrumTeamWithEstimateFinished()
         {
-            var estimationResultJson = PlanningPokerClientData.GetEstimationResultJson(scrumMasterEstimation: "null", memberEstimation: "-1111100");
-            var scrumTeamJson = PlanningPokerClientData.GetScrumTeamJson(member: true, observer: true, state: 2, estimationResult: estimationResultJson);
-            var httpMock = new MockHttpMessageHandler();
+            string estimationResultJson = PlanningPokerClientData.GetEstimateResultJson(scrumMasterEstimate: "null", memberEstimate: "-1111100");
+            string scrumTeamJson = PlanningPokerClientData.GetScrumTeamJson(member: true, observer: true, state: 2, estimationResult: estimationResultJson);
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
             httpMock.When(BaseUrl + $"api/PlanningPokerService/ReconnectTeam")
-                .Respond(JsonType, PlanningPokerClientData.GetReconnectTeamResultJson(scrumTeamJson, lastMessageId: "123", selectedEstimation: "-1111100"));
-            var target = CreatePlanningPokerClient(httpMock);
+                .Respond(JsonType, PlanningPokerClientData.GetReconnectTeamResultJson(scrumTeamJson, lastMessageId: "123", selectedEstimate: "-1111100"));
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
-            var result = await target.ReconnectTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, CancellationToken.None);
+            ReconnectTeamResult result = await target.ReconnectTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, CancellationToken.None);
 
             Assert.IsNotNull(result.ScrumTeam);
             Assert.AreEqual(123, result.LastMessageId);
-            Assert.IsNotNull(result.SelectedEstimation);
-            Assert.IsNotNull(result.SelectedEstimation.Value);
-            Assert.IsTrue(double.IsPositiveInfinity(result.SelectedEstimation.Value.Value));
+            Assert.IsNotNull(result.SelectedEstimate);
+            Assert.IsNotNull(result.SelectedEstimate.Value);
+            Assert.IsTrue(double.IsPositiveInfinity(result.SelectedEstimate.Value.Value));
 
-            var scrumTeam = result.ScrumTeam;
-            Assert.AreEqual(TeamState.EstimationFinished, scrumTeam.State);
+            ScrumTeam scrumTeam = result.ScrumTeam;
+            Assert.AreEqual(TeamState.EstimateFinished, scrumTeam.State);
             Assert.AreEqual(PlanningPokerClientData.TeamName, scrumTeam.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, scrumTeam.ScrumMaster.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, scrumTeam.ScrumMaster.Type);
 
             Assert.AreEqual(2, scrumTeam.Members.Count);
-            var member = scrumTeam.Members[0];
+            TeamMember member = scrumTeam.Members[0];
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, member.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, member.Type);
 
@@ -496,47 +497,47 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
             Assert.AreEqual(PlanningPokerClientData.ObserverName, member.Name);
             Assert.AreEqual(PlanningPokerClientData.ObserverType, member.Type);
 
-            AssertAvailableEstimations(scrumTeam);
+            AssertAvailableEstimates(scrumTeam);
 
-            Assert.AreEqual(2, scrumTeam.EstimationResult.Count);
-            var estimationResult = scrumTeam.EstimationResult[0];
+            Assert.AreEqual(2, scrumTeam.EstimateResult.Count);
+            EstimateResultItem estimationResult = scrumTeam.EstimateResult[0];
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, estimationResult.Member.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, estimationResult.Member.Type);
-            Assert.IsNull(estimationResult.Estimation.Value);
+            Assert.IsNull(estimationResult.Estimate.Value);
 
-            estimationResult = scrumTeam.EstimationResult[1];
+            estimationResult = scrumTeam.EstimateResult[1];
             Assert.AreEqual(PlanningPokerClientData.MemberName, estimationResult.Member.Name);
             Assert.AreEqual(PlanningPokerClientData.MemberType, estimationResult.Member.Type);
-            Assert.IsTrue(double.IsPositiveInfinity(estimationResult.Estimation.Value.Value));
+            Assert.IsTrue(double.IsPositiveInfinity(estimationResult.Estimate.Value.Value));
 
-            Assert.AreEqual(0, scrumTeam.EstimationParticipants.Count);
+            Assert.AreEqual(0, scrumTeam.EstimateParticipants.Count);
         }
 
         [TestMethod]
-        public async Task ReconnectTeam_TeamAndMemberName_ReturnsScrumTeamWithEstimationFinishedAndEstimationIsNull()
+        public async Task ReconnectTeam_TeamAndMemberName_ReturnsScrumTeamWithEstimateFinishedAndEstimateIsNull()
         {
-            var estimationResultJson = PlanningPokerClientData.GetEstimationResultJson(scrumMasterEstimation: "8", memberEstimation: null);
-            var scrumTeamJson = PlanningPokerClientData.GetScrumTeamJson(member: true, state: 2, estimationResult: estimationResultJson);
-            var httpMock = new MockHttpMessageHandler();
+            string estimationResultJson = PlanningPokerClientData.GetEstimateResultJson(scrumMasterEstimate: "8", memberEstimate: null);
+            string scrumTeamJson = PlanningPokerClientData.GetScrumTeamJson(member: true, state: 2, estimationResult: estimationResultJson);
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
             httpMock.When(BaseUrl + $"api/PlanningPokerService/ReconnectTeam")
-                .Respond(JsonType, PlanningPokerClientData.GetReconnectTeamResultJson(scrumTeamJson, lastMessageId: "2157483849", selectedEstimation: "8"));
-            var target = CreatePlanningPokerClient(httpMock);
+                .Respond(JsonType, PlanningPokerClientData.GetReconnectTeamResultJson(scrumTeamJson, lastMessageId: "2157483849", selectedEstimate: "8"));
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
-            var result = await target.ReconnectTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.ScrumMasterName, CancellationToken.None);
+            ReconnectTeamResult result = await target.ReconnectTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.ScrumMasterName, CancellationToken.None);
 
             Assert.IsNotNull(result.ScrumTeam);
             Assert.AreEqual(2157483849, result.LastMessageId);
-            Assert.IsNotNull(result.SelectedEstimation);
-            Assert.AreEqual(8.0, result.SelectedEstimation.Value);
+            Assert.IsNotNull(result.SelectedEstimate);
+            Assert.AreEqual(8.0, result.SelectedEstimate.Value);
 
-            var scrumTeam = result.ScrumTeam;
-            Assert.AreEqual(TeamState.EstimationFinished, scrumTeam.State);
+            ScrumTeam scrumTeam = result.ScrumTeam;
+            Assert.AreEqual(TeamState.EstimateFinished, scrumTeam.State);
             Assert.AreEqual(PlanningPokerClientData.TeamName, scrumTeam.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, scrumTeam.ScrumMaster.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, scrumTeam.ScrumMaster.Type);
 
             Assert.AreEqual(2, scrumTeam.Members.Count);
-            var member = scrumTeam.Members[0];
+            TeamMember member = scrumTeam.Members[0];
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, member.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, member.Type);
 
@@ -546,47 +547,47 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
 
             Assert.AreEqual(0, scrumTeam.Observers.Count);
 
-            AssertAvailableEstimations(scrumTeam);
+            AssertAvailableEstimates(scrumTeam);
 
-            Assert.AreEqual(2, scrumTeam.EstimationResult.Count);
-            var estimationResult = scrumTeam.EstimationResult[0];
+            Assert.AreEqual(2, scrumTeam.EstimateResult.Count);
+            EstimateResultItem estimationResult = scrumTeam.EstimateResult[0];
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, estimationResult.Member.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, estimationResult.Member.Type);
-            Assert.AreEqual(8.0, estimationResult.Estimation.Value);
+            Assert.AreEqual(8.0, estimationResult.Estimate.Value);
 
-            estimationResult = scrumTeam.EstimationResult[1];
+            estimationResult = scrumTeam.EstimateResult[1];
             Assert.AreEqual(PlanningPokerClientData.MemberName, estimationResult.Member.Name);
             Assert.AreEqual(PlanningPokerClientData.MemberType, estimationResult.Member.Type);
-            Assert.IsNull(estimationResult.Estimation);
+            Assert.IsNull(estimationResult.Estimate);
 
-            Assert.AreEqual(0, scrumTeam.EstimationParticipants.Count);
+            Assert.AreEqual(0, scrumTeam.EstimateParticipants.Count);
         }
 
         [TestMethod]
-        public async Task ReconnectTeam_TeamAndMemberName_ReturnsScrumTeamWithEstimationInProgress()
+        public async Task ReconnectTeam_TeamAndMemberName_ReturnsScrumTeamWithEstimateInProgress()
         {
-            var estimationParticipantsJson = PlanningPokerClientData.GetEstimationParticipantsJson(scrumMaster: false, member: true);
-            var scrumTeamJson = PlanningPokerClientData.GetScrumTeamJson(member: true, state: 1, estimationParticipants: estimationParticipantsJson);
-            var httpMock = new MockHttpMessageHandler();
+            string estimationParticipantsJson = PlanningPokerClientData.GetEstimateParticipantsJson(scrumMaster: false, member: true);
+            string scrumTeamJson = PlanningPokerClientData.GetScrumTeamJson(member: true, state: 1, estimationParticipants: estimationParticipantsJson);
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
             httpMock.When(BaseUrl + $"api/PlanningPokerService/ReconnectTeam")
-                .Respond(JsonType, PlanningPokerClientData.GetReconnectTeamResultJson(scrumTeamJson, lastMessageId: "1", selectedEstimation: "null"));
-            var target = CreatePlanningPokerClient(httpMock);
+                .Respond(JsonType, PlanningPokerClientData.GetReconnectTeamResultJson(scrumTeamJson, lastMessageId: "1", selectedEstimate: "null"));
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
-            var result = await target.ReconnectTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, CancellationToken.None);
+            ReconnectTeamResult result = await target.ReconnectTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, CancellationToken.None);
 
             Assert.IsNotNull(result.ScrumTeam);
             Assert.AreEqual(1, result.LastMessageId);
-            Assert.IsNotNull(result.SelectedEstimation);
-            Assert.IsNull(result.SelectedEstimation.Value);
+            Assert.IsNotNull(result.SelectedEstimate);
+            Assert.IsNull(result.SelectedEstimate.Value);
 
-            var scrumTeam = result.ScrumTeam;
-            Assert.AreEqual(TeamState.EstimationInProgress, scrumTeam.State);
+            ScrumTeam scrumTeam = result.ScrumTeam;
+            Assert.AreEqual(TeamState.EstimateInProgress, scrumTeam.State);
             Assert.AreEqual(PlanningPokerClientData.TeamName, scrumTeam.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, scrumTeam.ScrumMaster.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, scrumTeam.ScrumMaster.Type);
 
             Assert.AreEqual(2, scrumTeam.Members.Count);
-            var member = scrumTeam.Members[0];
+            TeamMember member = scrumTeam.Members[0];
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, member.Name);
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterType, member.Type);
 
@@ -596,16 +597,16 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
 
             Assert.AreEqual(0, scrumTeam.Observers.Count);
 
-            AssertAvailableEstimations(scrumTeam);
+            AssertAvailableEstimates(scrumTeam);
 
-            Assert.AreEqual(0, scrumTeam.EstimationResult.Count);
+            Assert.AreEqual(0, scrumTeam.EstimateResult.Count);
 
-            Assert.AreEqual(2, scrumTeam.EstimationParticipants.Count);
-            var estimationParticipant = scrumTeam.EstimationParticipants[0];
+            Assert.AreEqual(2, scrumTeam.EstimateParticipants.Count);
+            EstimateParticipantStatus estimationParticipant = scrumTeam.EstimateParticipants[0];
             Assert.AreEqual(PlanningPokerClientData.ScrumMasterName, estimationParticipant.MemberName);
             Assert.IsFalse(estimationParticipant.Estimated);
 
-            estimationParticipant = scrumTeam.EstimationParticipants[1];
+            estimationParticipant = scrumTeam.EstimateParticipants[1];
             Assert.AreEqual(PlanningPokerClientData.MemberName, estimationParticipant.MemberName);
             Assert.IsTrue(estimationParticipant.Estimated);
         }
@@ -613,10 +614,10 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
         [TestMethod]
         public async Task DisconnectTeam_TeamAndMemberName_RequestsDisconnectTeamUrl()
         {
-            var httpMock = new MockHttpMessageHandler();
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
             httpMock.Expect(BaseUrl + $"api/PlanningPokerService/DisconnectTeam?teamName={PlanningPokerClientData.TeamName}&memberName={PlanningPokerClientData.MemberName}")
                 .Respond(TextType, string.Empty);
-            var target = CreatePlanningPokerClient(httpMock);
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
             await target.DisconnectTeam(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, CancellationToken.None);
 
@@ -624,120 +625,120 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
         }
 
         [TestMethod]
-        public async Task StartEstimation_TeamName_RequestsStartEstimationUrl()
+        public async Task StartEstimate_TeamName_RequestsStartEstimateUrl()
         {
-            var httpMock = new MockHttpMessageHandler();
-            httpMock.Expect(BaseUrl + $"api/PlanningPokerService/StartEstimation?teamName={PlanningPokerClientData.TeamName}")
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
+            httpMock.Expect(BaseUrl + $"api/PlanningPokerService/StartEstimate?teamName={PlanningPokerClientData.TeamName}")
                 .Respond(TextType, string.Empty);
-            var target = CreatePlanningPokerClient(httpMock);
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
-            await target.StartEstimation(PlanningPokerClientData.TeamName, CancellationToken.None);
+            await target.StartEstimate(PlanningPokerClientData.TeamName, CancellationToken.None);
 
             httpMock.VerifyNoOutstandingExpectation();
         }
 
         [TestMethod]
-        public async Task CancelEstimation_TeamName_RequestsCancelEstimationUrl()
+        public async Task CancelEstimate_TeamName_RequestsCancelEstimateUrl()
         {
-            var httpMock = new MockHttpMessageHandler();
-            httpMock.Expect(BaseUrl + $"api/PlanningPokerService/CancelEstimation?teamName={PlanningPokerClientData.TeamName}")
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
+            httpMock.Expect(BaseUrl + $"api/PlanningPokerService/CancelEstimate?teamName={PlanningPokerClientData.TeamName}")
                 .Respond(TextType, string.Empty);
-            var target = CreatePlanningPokerClient(httpMock);
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
-            await target.CancelEstimation(PlanningPokerClientData.TeamName, CancellationToken.None);
+            await target.CancelEstimate(PlanningPokerClientData.TeamName, CancellationToken.None);
 
             httpMock.VerifyNoOutstandingExpectation();
         }
 
         [TestMethod]
-        public async Task SubmitEstimation_3_RequestsSubmitEstimationUrl()
+        public async Task SubmitEstimate_3_RequestsSubmitEstimateUrl()
         {
-            var httpMock = new MockHttpMessageHandler();
-            httpMock.Expect(BaseUrl + $"api/PlanningPokerService/SubmitEstimation?teamName={PlanningPokerClientData.TeamName}&memberName={PlanningPokerClientData.MemberName}&estimation=3")
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
+            httpMock.Expect(BaseUrl + $"api/PlanningPokerService/SubmitEstimate?teamName={PlanningPokerClientData.TeamName}&memberName={PlanningPokerClientData.MemberName}&estimate=3")
                 .Respond(TextType, string.Empty);
-            var target = CreatePlanningPokerClient(httpMock);
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
-            await target.SubmitEstimation(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, 3, CancellationToken.None);
+            await target.SubmitEstimate(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, 3, CancellationToken.None);
 
             httpMock.VerifyNoOutstandingExpectation();
         }
 
         [TestMethod]
-        public async Task SubmitEstimation_0_RequestsSubmitEstimationUrl()
+        public async Task SubmitEstimate_0_RequestsSubmitEstimateUrl()
         {
-            var httpMock = new MockHttpMessageHandler();
-            httpMock.Expect(BaseUrl + $"api/PlanningPokerService/SubmitEstimation?teamName={PlanningPokerClientData.TeamName}&memberName={PlanningPokerClientData.ScrumMasterName}&estimation=0")
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
+            httpMock.Expect(BaseUrl + $"api/PlanningPokerService/SubmitEstimate?teamName={PlanningPokerClientData.TeamName}&memberName={PlanningPokerClientData.ScrumMasterName}&estimate=0")
                 .Respond(TextType, string.Empty);
-            var target = CreatePlanningPokerClient(httpMock);
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
-            await target.SubmitEstimation(PlanningPokerClientData.TeamName, PlanningPokerClientData.ScrumMasterName, 0, CancellationToken.None);
+            await target.SubmitEstimate(PlanningPokerClientData.TeamName, PlanningPokerClientData.ScrumMasterName, 0, CancellationToken.None);
 
             httpMock.VerifyNoOutstandingExpectation();
         }
 
         [TestMethod]
-        public async Task SubmitEstimation_100_RequestsSubmitEstimationUrl()
+        public async Task SubmitEstimate_100_RequestsSubmitEstimateUrl()
         {
-            var httpMock = new MockHttpMessageHandler();
-            httpMock.Expect(BaseUrl + $"api/PlanningPokerService/SubmitEstimation?teamName={PlanningPokerClientData.TeamName}&memberName={PlanningPokerClientData.MemberName}&estimation=100")
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
+            httpMock.Expect(BaseUrl + $"api/PlanningPokerService/SubmitEstimate?teamName={PlanningPokerClientData.TeamName}&memberName={PlanningPokerClientData.MemberName}&estimate=100")
                 .Respond(TextType, string.Empty);
-            var target = CreatePlanningPokerClient(httpMock);
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
-            await target.SubmitEstimation(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, 100, CancellationToken.None);
+            await target.SubmitEstimate(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, 100, CancellationToken.None);
 
             httpMock.VerifyNoOutstandingExpectation();
         }
 
         [TestMethod]
-        public async Task SubmitEstimation_PositiveInfinity_RequestsSubmitEstimationUrl()
+        public async Task SubmitEstimate_PositiveInfinity_RequestsSubmitEstimateUrl()
         {
-            var httpMock = new MockHttpMessageHandler();
-            httpMock.Expect(BaseUrl + $"api/PlanningPokerService/SubmitEstimation?teamName={PlanningPokerClientData.TeamName}&memberName={PlanningPokerClientData.MemberName}&estimation=-1111100")
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
+            httpMock.Expect(BaseUrl + $"api/PlanningPokerService/SubmitEstimate?teamName={PlanningPokerClientData.TeamName}&memberName={PlanningPokerClientData.MemberName}&estimate=-1111100")
                 .Respond(TextType, string.Empty);
-            var target = CreatePlanningPokerClient(httpMock);
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
-            await target.SubmitEstimation(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, double.PositiveInfinity, CancellationToken.None);
+            await target.SubmitEstimate(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, double.PositiveInfinity, CancellationToken.None);
 
             httpMock.VerifyNoOutstandingExpectation();
         }
 
         [TestMethod]
-        public async Task SubmitEstimation_Null_RequestsSubmitEstimationUrl()
+        public async Task SubmitEstimate_Null_RequestsSubmitEstimateUrl()
         {
-            var httpMock = new MockHttpMessageHandler();
-            httpMock.Expect(BaseUrl + $"api/PlanningPokerService/SubmitEstimation?teamName={PlanningPokerClientData.TeamName}&memberName={PlanningPokerClientData.MemberName}&estimation=-1111111")
+            MockHttpMessageHandler httpMock = new MockHttpMessageHandler();
+            httpMock.Expect(BaseUrl + $"api/PlanningPokerService/SubmitEstimate?teamName={PlanningPokerClientData.TeamName}&memberName={PlanningPokerClientData.MemberName}&estimate=-1111111")
                 .Respond(TextType, string.Empty);
-            var target = CreatePlanningPokerClient(httpMock);
+            PlanningPokerClient target = CreatePlanningPokerClient(httpMock);
 
-            await target.SubmitEstimation(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, null, CancellationToken.None);
+            await target.SubmitEstimate(PlanningPokerClientData.TeamName, PlanningPokerClientData.MemberName, null, CancellationToken.None);
 
             httpMock.VerifyNoOutstandingExpectation();
         }
 
         internal static PlanningPokerClient CreatePlanningPokerClient(MockHttpMessageHandler messageHandler)
         {
-            var httpClient = messageHandler.ToHttpClient();
+            HttpClient httpClient = messageHandler.ToHttpClient();
             httpClient.BaseAddress = new Uri(BaseUrl);
             return new PlanningPokerClient(httpClient);
         }
 
-        private static void AssertAvailableEstimations(ScrumTeam scrumTeam)
+        private static void AssertAvailableEstimates(ScrumTeam scrumTeam)
         {
-            Assert.AreEqual(13, scrumTeam.AvailableEstimations.Count);
-            Assert.AreEqual(0.0, scrumTeam.AvailableEstimations[0].Value);
-            Assert.AreEqual(0.5, scrumTeam.AvailableEstimations[1].Value);
-            Assert.AreEqual(1.0, scrumTeam.AvailableEstimations[2].Value);
-            Assert.AreEqual(2.0, scrumTeam.AvailableEstimations[3].Value);
-            Assert.AreEqual(3.0, scrumTeam.AvailableEstimations[4].Value);
-            Assert.AreEqual(5.0, scrumTeam.AvailableEstimations[5].Value);
-            Assert.AreEqual(8.0, scrumTeam.AvailableEstimations[6].Value);
-            Assert.AreEqual(13.0, scrumTeam.AvailableEstimations[7].Value);
-            Assert.AreEqual(20.0, scrumTeam.AvailableEstimations[8].Value);
-            Assert.AreEqual(40.0, scrumTeam.AvailableEstimations[9].Value);
-            Assert.AreEqual(100.0, scrumTeam.AvailableEstimations[10].Value);
-            Assert.AreEqual(100.0, scrumTeam.AvailableEstimations[10].Value);
-            Assert.IsTrue(double.IsPositiveInfinity(scrumTeam.AvailableEstimations[11].Value.Value));
-            Assert.IsNull(scrumTeam.AvailableEstimations[12].Value);
+            Assert.AreEqual(13, scrumTeam.AvailableEstimates.Count);
+            Assert.AreEqual(0.0, scrumTeam.AvailableEstimates[0].Value);
+            Assert.AreEqual(0.5, scrumTeam.AvailableEstimates[1].Value);
+            Assert.AreEqual(1.0, scrumTeam.AvailableEstimates[2].Value);
+            Assert.AreEqual(2.0, scrumTeam.AvailableEstimates[3].Value);
+            Assert.AreEqual(3.0, scrumTeam.AvailableEstimates[4].Value);
+            Assert.AreEqual(5.0, scrumTeam.AvailableEstimates[5].Value);
+            Assert.AreEqual(8.0, scrumTeam.AvailableEstimates[6].Value);
+            Assert.AreEqual(13.0, scrumTeam.AvailableEstimates[7].Value);
+            Assert.AreEqual(20.0, scrumTeam.AvailableEstimates[8].Value);
+            Assert.AreEqual(40.0, scrumTeam.AvailableEstimates[9].Value);
+            Assert.AreEqual(100.0, scrumTeam.AvailableEstimates[10].Value);
+            Assert.AreEqual(100.0, scrumTeam.AvailableEstimates[10].Value);
+            Assert.IsTrue(double.IsPositiveInfinity(scrumTeam.AvailableEstimates[11].Value.Value));
+            Assert.IsNull(scrumTeam.AvailableEstimates[12].Value);
         }
     }
 }

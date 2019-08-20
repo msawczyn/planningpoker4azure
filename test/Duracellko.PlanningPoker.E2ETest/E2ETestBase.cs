@@ -46,7 +46,7 @@ namespace Duracellko.PlanningPoker.E2ETest
             ClientTests.Clear();
             Contexts.Clear();
 
-            foreach (var browserFixture in BrowserFixtures)
+            foreach (BrowserFixture browserFixture in BrowserFixtures)
             {
                 browserFixture.Dispose();
             }
@@ -74,7 +74,7 @@ namespace Duracellko.PlanningPoker.E2ETest
         protected void StartClients()
         {
             bool first = true;
-            foreach (var context in Contexts)
+            foreach (BrowserTestContext context in Contexts)
             {
                 BrowserFixture browserFixture;
                 if (first)
@@ -95,10 +95,10 @@ namespace Duracellko.PlanningPoker.E2ETest
 
         protected async Task AssertServerSide(bool serverSide)
         {
-            var client = new HttpClient();
-            var response = await client.GetStringAsync(Server.Uri);
+            HttpClient client = new HttpClient();
+            string response = await client.GetStringAsync(Server.Uri);
 
-            var expected = serverSide ? "server" : "webassembly";
+            string expected = serverSide ? "server" : "webassembly";
             expected = @"<script src=""_framework/blazor." + expected + @".js""></script>";
             Assert.IsNotNull(response);
             Assert.IsTrue(response.Contains(expected, StringComparison.Ordinal));

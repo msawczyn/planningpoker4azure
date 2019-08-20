@@ -23,9 +23,9 @@ namespace Duracellko.PlanningPoker.Azure
                 throw new ArgumentNullException(nameof(scrumTeam));
             }
 
-            using (var memoryStream = new MemoryStream())
+            using (MemoryStream memoryStream = new MemoryStream())
             {
-                var formatter = new BinaryFormatter();
+                BinaryFormatter formatter = new BinaryFormatter();
                 formatter.Serialize(memoryStream, scrumTeam);
                 return memoryStream.ToArray();
             }
@@ -54,9 +54,9 @@ namespace Duracellko.PlanningPoker.Azure
                 throw new ArgumentNullException(nameof(buffer));
             }
 
-            using (var memoryStream = new MemoryStream(buffer))
+            using (MemoryStream memoryStream = new MemoryStream(buffer))
             {
-                var formatter = dateTimeProvider != null ? new BinaryFormatter(null, new StreamingContext(StreamingContextStates.All, dateTimeProvider)) : new BinaryFormatter();
+                BinaryFormatter formatter = dateTimeProvider != null ? new BinaryFormatter(null, new StreamingContext(StreamingContextStates.All, dateTimeProvider)) : new BinaryFormatter();
                 return (ScrumTeam)formatter.Deserialize(memoryStream);
             }
         }

@@ -40,11 +40,11 @@ namespace Duracellko.PlanningPoker.Service
         /// </returns>
         public async Task<ScrumTeam> CreateTeam(string teamName, string scrumMasterName, CancellationToken cancellationToken)
         {
-            var encodedTeamName = _urlEncoder.Encode(teamName);
-            var encodedScrumMasterName = _urlEncoder.Encode(scrumMasterName);
-            var uri = $"CreateTeam?teamName={encodedTeamName}&scrumMasterName={encodedScrumMasterName}";
+            string encodedTeamName = _urlEncoder.Encode(teamName);
+            string encodedScrumMasterName = _urlEncoder.Encode(scrumMasterName);
+            string uri = $"CreateTeam?teamName={encodedTeamName}&scrumMasterName={encodedScrumMasterName}";
 
-            var result = await GetJsonAsync<ScrumTeam>(uri, cancellationToken);
+            ScrumTeam result = await GetJsonAsync<ScrumTeam>(uri, cancellationToken);
 
             ConvertScrumTeam(result);
             return result;
@@ -62,12 +62,12 @@ namespace Duracellko.PlanningPoker.Service
         /// </returns>
         public async Task<ScrumTeam> JoinTeam(string teamName, string memberName, bool asObserver, CancellationToken cancellationToken)
         {
-            var encodedTeamName = _urlEncoder.Encode(teamName);
-            var encodedMemberName = _urlEncoder.Encode(memberName);
-            var encodedAsObserver = asObserver.ToString(CultureInfo.InvariantCulture);
-            var uri = $"JoinTeam?teamName={encodedTeamName}&memberName={encodedMemberName}&asObserver={encodedAsObserver}";
+            string encodedTeamName = _urlEncoder.Encode(teamName);
+            string encodedMemberName = _urlEncoder.Encode(memberName);
+            string encodedAsObserver = asObserver.ToString(CultureInfo.InvariantCulture);
+            string uri = $"JoinTeam?teamName={encodedTeamName}&memberName={encodedMemberName}&asObserver={encodedAsObserver}";
 
-            var result = await GetJsonAsync<ScrumTeam>(uri, cancellationToken);
+            ScrumTeam result = await GetJsonAsync<ScrumTeam>(uri, cancellationToken);
 
             ConvertScrumTeam(result);
             return result;
@@ -87,14 +87,14 @@ namespace Duracellko.PlanningPoker.Service
         /// </remarks>
         public async Task<ReconnectTeamResult> ReconnectTeam(string teamName, string memberName, CancellationToken cancellationToken)
         {
-            var encodedTeamName = _urlEncoder.Encode(teamName);
-            var encodedMemberName = _urlEncoder.Encode(memberName);
-            var uri = $"ReconnectTeam?teamName={encodedTeamName}&memberName={encodedMemberName}";
+            string encodedTeamName = _urlEncoder.Encode(teamName);
+            string encodedMemberName = _urlEncoder.Encode(memberName);
+            string uri = $"ReconnectTeam?teamName={encodedTeamName}&memberName={encodedMemberName}";
 
-            var result = await GetJsonAsync<ReconnectTeamResult>(uri, cancellationToken);
+            ReconnectTeamResult result = await GetJsonAsync<ReconnectTeamResult>(uri, cancellationToken);
 
             ConvertScrumTeam(result.ScrumTeam);
-            ConvertEstimation(result.SelectedEstimation);
+            ConvertEstimate(result.SelectedEstimate);
             return result;
         }
 
@@ -109,74 +109,74 @@ namespace Duracellko.PlanningPoker.Service
         /// </returns>
         public Task DisconnectTeam(string teamName, string memberName, CancellationToken cancellationToken)
         {
-            var encodedTeamName = _urlEncoder.Encode(teamName);
-            var encodedMemberName = _urlEncoder.Encode(memberName);
-            var uri = $"DisconnectTeam?teamName={encodedTeamName}&memberName={encodedMemberName}";
+            string encodedTeamName = _urlEncoder.Encode(teamName);
+            string encodedMemberName = _urlEncoder.Encode(memberName);
+            string uri = $"DisconnectTeam?teamName={encodedTeamName}&memberName={encodedMemberName}";
 
             return SendAsync(uri, cancellationToken);
         }
 
         /// <summary>
-        /// Signal from Scrum master to starts the estimation.
+        /// Signal from Scrum master to starts the estimate.
         /// </summary>
         /// <param name="teamName">Name of the Scrum team.</param>
         /// <param name="cancellationToken">The cancellation token to cancel operation.</param>
         /// <returns>
         /// Asynchronous operation.
         /// </returns>
-        public Task StartEstimation(string teamName, CancellationToken cancellationToken)
+        public Task StartEstimate(string teamName, CancellationToken cancellationToken)
         {
-            var encodedTeamName = _urlEncoder.Encode(teamName);
-            var uri = $"StartEstimation?teamName={encodedTeamName}";
+            string encodedTeamName = _urlEncoder.Encode(teamName);
+            string uri = $"StartEstimate?teamName={encodedTeamName}";
 
             return SendAsync(uri, cancellationToken);
         }
 
         /// <summary>
-        /// Signal from Scrum master to cancels the estimation.
+        /// Signal from Scrum master to cancels the estimate.
         /// </summary>
         /// <param name="teamName">Name of the Scrum team.</param>
         /// <param name="cancellationToken">The cancellation token to cancel operation.</param>
         /// <returns>
         /// Asynchronous operation.
         /// </returns>
-        public Task CancelEstimation(string teamName, CancellationToken cancellationToken)
+        public Task CancelEstimate(string teamName, CancellationToken cancellationToken)
         {
-            var encodedTeamName = _urlEncoder.Encode(teamName);
-            var uri = $"CancelEstimation?teamName={encodedTeamName}";
+            string encodedTeamName = _urlEncoder.Encode(teamName);
+            string uri = $"CancelEstimate?teamName={encodedTeamName}";
 
             return SendAsync(uri, cancellationToken);
         }
 
         /// <summary>
-        /// Submits the estimation for specified team member.
+        /// Submits the estimate for specified team member.
         /// </summary>
         /// <param name="teamName">Name of the Scrum team.</param>
         /// <param name="memberName">Name of the member.</param>
-        /// <param name="estimation">The estimation the member is submitting.</param>
+        /// <param name="estimate">The estimate the member is submitting.</param>
         /// <param name="cancellationToken">The cancellation token to cancel operation.</param>
         /// <returns>
         /// Asynchronous operation.
         /// </returns>
-        public Task SubmitEstimation(string teamName, string memberName, double? estimation, CancellationToken cancellationToken)
+        public Task SubmitEstimate(string teamName, string memberName, double? estimate, CancellationToken cancellationToken)
         {
-            var encodedTeamName = _urlEncoder.Encode(teamName);
-            var encodedMemberName = _urlEncoder.Encode(memberName);
-            string encodedEstimation;
-            if (!estimation.HasValue)
+            string encodedTeamName = _urlEncoder.Encode(teamName);
+            string encodedMemberName = _urlEncoder.Encode(memberName);
+            string encodedEstimate;
+            if (!estimate.HasValue)
             {
-                encodedEstimation = "-1111111";
+                encodedEstimate = "-1111111";
             }
-            else if (double.IsPositiveInfinity(estimation.Value))
+            else if (double.IsPositiveInfinity(estimate.Value))
             {
-                encodedEstimation = "-1111100";
+                encodedEstimate = "-1111100";
             }
             else
             {
-                encodedEstimation = _urlEncoder.Encode(estimation.Value.ToString(CultureInfo.InvariantCulture));
+                encodedEstimate = _urlEncoder.Encode(estimate.Value.ToString(CultureInfo.InvariantCulture));
             }
 
-            var uri = $"SubmitEstimation?teamName={encodedTeamName}&memberName={encodedMemberName}&estimation={encodedEstimation}";
+            string uri = $"SubmitEstimate?teamName={encodedTeamName}&memberName={encodedMemberName}&estimate={encodedEstimate}";
 
             return SendAsync(uri, cancellationToken);
         }
@@ -193,22 +193,22 @@ namespace Duracellko.PlanningPoker.Service
         /// </returns>
         public async Task<IList<Message>> GetMessages(string teamName, string memberName, long lastMessageId, CancellationToken cancellationToken)
         {
-            var encodedTeamName = _urlEncoder.Encode(teamName);
-            var encodedMemberName = _urlEncoder.Encode(memberName);
-            var encodedLastMessageId = _urlEncoder.Encode(lastMessageId.ToString(CultureInfo.InvariantCulture));
-            var uri = $"GetMessages?teamName={encodedTeamName}&memberName={encodedMemberName}&lastMessageId={encodedLastMessageId}";
+            string encodedTeamName = _urlEncoder.Encode(teamName);
+            string encodedMemberName = _urlEncoder.Encode(memberName);
+            string encodedLastMessageId = _urlEncoder.Encode(lastMessageId.ToString(CultureInfo.InvariantCulture));
+            string uri = $"GetMessages?teamName={encodedTeamName}&memberName={encodedMemberName}&lastMessageId={encodedLastMessageId}";
 
             return await GetJsonAsync<List<Message>>(uri, cancellationToken);
         }
 
         private static void DeserializeMessages(List<Message> messages, string json)
         {
-            var memberMessages = Json.Deserialize<List<MemberMessage>>(json);
-            var estimationResultMessages = Json.Deserialize<List<EstimationResultMessage>>(json);
+            List<MemberMessage> memberMessages = Json.Deserialize<List<MemberMessage>>(json);
+            List<EstimateResultMessage> estimationResultMessages = Json.Deserialize<List<EstimateResultMessage>>(json);
 
             for (int i = 0; i < messages.Count; i++)
             {
-                var message = messages[i];
+                Message message = messages[i];
                 switch (message.Type)
                 {
                     case MessageType.MemberJoined:
@@ -216,9 +216,9 @@ namespace Duracellko.PlanningPoker.Service
                     case MessageType.MemberEstimated:
                         messages[i] = memberMessages[i];
                         break;
-                    case MessageType.EstimationEnded:
-                        var estimationResultMessage = estimationResultMessages[i];
-                        ConvertEstimations(estimationResultMessage.EstimationResult);
+                    case MessageType.EstimateEnded:
+                        EstimateResultMessage estimationResultMessage = estimationResultMessages[i];
+                        ConvertEstimates(estimationResultMessage.EstimateResult);
                         messages[i] = estimationResultMessage;
                         break;
                 }
@@ -227,38 +227,38 @@ namespace Duracellko.PlanningPoker.Service
 
         private static void ConvertScrumTeam(ScrumTeam scrumTeam)
         {
-            if (scrumTeam.AvailableEstimations != null)
+            if (scrumTeam.AvailableEstimates != null)
             {
-                ConvertEstimations(scrumTeam.AvailableEstimations);
+                ConvertEstimates(scrumTeam.AvailableEstimates);
             }
 
-            if (scrumTeam.EstimationResult != null)
+            if (scrumTeam.EstimateResult != null)
             {
-                ConvertEstimations(scrumTeam.EstimationResult);
-            }
-        }
-
-        private static void ConvertEstimations(IEnumerable<Estimation> estimations)
-        {
-            foreach (var estimation in estimations)
-            {
-                ConvertEstimation(estimation);
+                ConvertEstimates(scrumTeam.EstimateResult);
             }
         }
 
-        private static void ConvertEstimations(IEnumerable<EstimationResultItem> estimationResultItems)
+        private static void ConvertEstimates(IEnumerable<Estimate> estimates)
         {
-            foreach (var estimationResultItem in estimationResultItems)
+            foreach (Estimate estimate in estimates)
             {
-                ConvertEstimation(estimationResultItem.Estimation);
+                ConvertEstimate(estimate);
             }
         }
 
-        private static void ConvertEstimation(Estimation estimation)
+        private static void ConvertEstimates(IEnumerable<EstimateResultItem> estimationResultItems)
         {
-            if (estimation != null && estimation.Value == Estimation.PositiveInfinity)
+            foreach (EstimateResultItem estimationResultItem in estimationResultItems)
             {
-                estimation.Value = double.PositiveInfinity;
+                ConvertEstimate(estimationResultItem.Estimate);
+            }
+        }
+
+        private static void ConvertEstimate(Estimate estimate)
+        {
+            if (estimate != null && estimate.Value == Estimate.PositiveInfinity)
+            {
+                estimate.Value = double.PositiveInfinity;
             }
         }
 
@@ -266,13 +266,13 @@ namespace Duracellko.PlanningPoker.Service
         {
             try
             {
-                using (var request = new HttpRequestMessage(HttpMethod.Get, BaseUri + requestUri))
+                using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, BaseUri + requestUri))
                 {
-                    using (var response = await _client.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken))
+                    using (HttpResponseMessage response = await _client.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken))
                     {
                         if (response.StatusCode == HttpStatusCode.BadRequest && response.Content != null)
                         {
-                            var content = await response.Content.ReadAsStringAsync();
+                            string content = await response.Content.ReadAsStringAsync();
                             throw new PlanningPokerException(content);
                         }
                         else if (!response.IsSuccessStatusCode)
@@ -280,8 +280,8 @@ namespace Duracellko.PlanningPoker.Service
                             throw new PlanningPokerException(Client.Resources.PlanningPokerService_UnexpectedError);
                         }
 
-                        var responseContent = await response.Content.ReadAsStringAsync();
-                        var result = Json.Deserialize<T>(responseContent);
+                        string responseContent = await response.Content.ReadAsStringAsync();
+                        T result = Json.Deserialize<T>(responseContent);
                         if (result is List<Message> messages)
                         {
                             DeserializeMessages(messages, responseContent);
@@ -301,13 +301,13 @@ namespace Duracellko.PlanningPoker.Service
         {
             try
             {
-                using (var request = new HttpRequestMessage(HttpMethod.Get, BaseUri + requestUri))
+                using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, BaseUri + requestUri))
                 {
-                    using (var response = await _client.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken))
+                    using (HttpResponseMessage response = await _client.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken))
                     {
                         if (response.StatusCode == HttpStatusCode.BadRequest && response.Content != null)
                         {
-                            var content = await response.Content.ReadAsStringAsync();
+                            string content = await response.Content.ReadAsStringAsync();
                             throw new PlanningPokerException(content);
                         }
                         else if (!response.IsSuccessStatusCode)

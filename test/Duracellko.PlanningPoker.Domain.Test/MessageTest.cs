@@ -9,10 +9,10 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void Constructor_TypeSpecified_MessageTypeIsSet()
         {
             // Arrange
-            var type = MessageType.EstimationStarted;
+            MessageType type = MessageType.EstimateStarted;
 
             // Act
-            var result = new Message(type);
+            Message result = new Message(type);
 
             // Verify
             Assert.AreEqual<MessageType>(type, result.MessageType);

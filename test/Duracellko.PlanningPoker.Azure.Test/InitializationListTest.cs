@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -11,10 +12,10 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void IsEmpty_NewInstance_True()
         {
             // Arrange
-            var target = new InitializationList();
+            InitializationList target = new InitializationList();
 
             // Act
-            var result = target.IsEmpty;
+            bool result = target.IsEmpty;
 
             // Verify
             Assert.IsFalse(result);
@@ -24,10 +25,10 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void Values_NewInstance_Null()
         {
             // Arrange
-            var target = new InitializationList();
+            InitializationList target = new InitializationList();
 
             // Act
-            var result = target.Values;
+            IList<string> result = target.Values;
 
             // Verify
             Assert.IsNull(result);
@@ -37,11 +38,11 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void ContainsOrNotInit_ExistingValue_ReturnsTrue()
         {
             // Arrange
-            var target = new InitializationList();
+            InitializationList target = new InitializationList();
             target.Setup(new string[] { "team1", "team2" });
 
             // Act
-            var result = target.ContainsOrNotInit("team2");
+            bool result = target.ContainsOrNotInit("team2");
 
             // Verify
             Assert.IsTrue(result);
@@ -51,11 +52,11 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void ContainsOrNotInit_NonexistingValue_ReturnsFalse()
         {
             // Arrange
-            var target = new InitializationList();
+            InitializationList target = new InitializationList();
             target.Setup(new string[] { "team1", "team2" });
 
             // Act
-            var result = target.ContainsOrNotInit("team3");
+            bool result = target.ContainsOrNotInit("team3");
 
             // Verify
             Assert.IsFalse(result);
@@ -65,10 +66,10 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void ContainsOrNotInit_NotInitialized_ReturnsTrue()
         {
             // Arrange
-            var target = new InitializationList();
+            InitializationList target = new InitializationList();
 
             // Act
-            var result = target.ContainsOrNotInit("team2");
+            bool result = target.ContainsOrNotInit("team2");
 
             // Verify
             Assert.IsTrue(result);
@@ -78,11 +79,11 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void ContainsOrNotInit_Empty_ReturnsFalse()
         {
             // Arrange
-            var target = new InitializationList();
+            InitializationList target = new InitializationList();
             target.Clear();
 
             // Act
-            var result = target.ContainsOrNotInit("team3");
+            bool result = target.ContainsOrNotInit("team3");
 
             // Verify
             Assert.IsFalse(result);
@@ -92,7 +93,7 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void Setup_2ValuesAndNotInitialized_ValuesAreSet()
         {
             // Arrange
-            var target = new InitializationList();
+            InitializationList target = new InitializationList();
 
             // Act
             target.Setup(new string[] { "team1", "team2" });
@@ -107,10 +108,10 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void Setup_2ValuesAndNotInitialized_ReturnsTrue()
         {
             // Arrange
-            var target = new InitializationList();
+            InitializationList target = new InitializationList();
 
             // Act
-            var result = target.Setup(new string[] { "team1", "team2" });
+            bool result = target.Setup(new string[] { "team1", "team2" });
 
             // Verify
             Assert.IsTrue(result);
@@ -120,7 +121,7 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void Setup_2ValuesAndInitializedAlready_ValuesAreNotSet()
         {
             // Arrange
-            var target = new InitializationList();
+            InitializationList target = new InitializationList();
             target.Setup(new string[] { "team1" });
 
             // Act
@@ -136,11 +137,11 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void Setup_2ValuesAndInitializedAlready_ReturnsFalse()
         {
             // Arrange
-            var target = new InitializationList();
+            InitializationList target = new InitializationList();
             target.Setup(new string[] { "team1" });
 
             // Act
-            var result = target.Setup(new string[] { "team3", "team4" });
+            bool result = target.Setup(new string[] { "team3", "team4" });
 
             // Verify
             Assert.IsFalse(result);
@@ -150,7 +151,7 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void Setup_2ValuesAndClearedAlready_ValuesAreNotSet()
         {
             // Arrange
-            var target = new InitializationList();
+            InitializationList target = new InitializationList();
             target.Clear();
 
             // Act
@@ -166,11 +167,11 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void Setup_2ValuesAndClearedAlready_ReturnsFalse()
         {
             // Arrange
-            var target = new InitializationList();
+            InitializationList target = new InitializationList();
             target.Clear();
 
             // Act
-            var result = target.Setup(new string[] { "team3", "team4" });
+            bool result = target.Setup(new string[] { "team3", "team4" });
 
             // Verify
             Assert.IsFalse(result);
@@ -181,7 +182,7 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void Setup_Null_ArgumentNullException()
         {
             // Arrange
-            var target = new InitializationList();
+            InitializationList target = new InitializationList();
 
             // Act
             target.Setup(null);
@@ -191,7 +192,7 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void Remove_ExistingValue_ValueNotInCollection()
         {
             // Arrange
-            var target = new InitializationList();
+            InitializationList target = new InitializationList();
             target.Setup(new string[] { "team1", "team2" });
 
             // Act
@@ -206,7 +207,7 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void Remove_OnlyValue_CollectionIsEmpty()
         {
             // Arrange
-            var target = new InitializationList();
+            InitializationList target = new InitializationList();
             target.Setup(new string[] { "team2", "team2" });
 
             // Act
@@ -221,11 +222,11 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void Remove_ExistingValue_ReturnsTrue()
         {
             // Arrange
-            var target = new InitializationList();
+            InitializationList target = new InitializationList();
             target.Setup(new string[] { "team1", "team2" });
 
             // Act
-            var result = target.Remove("team2");
+            bool result = target.Remove("team2");
 
             // Verify
             Assert.IsTrue(result);
@@ -235,7 +236,7 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void Remove_NonexistingValue_CollectionIsSame()
         {
             // Arrange
-            var target = new InitializationList();
+            InitializationList target = new InitializationList();
             target.Setup(new string[] { "team1", "team2" });
 
             // Act
@@ -250,11 +251,11 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void Remove_NonexistingValue_ReturnsFalse()
         {
             // Arrange
-            var target = new InitializationList();
+            InitializationList target = new InitializationList();
             target.Setup(new string[] { "team1", "team2" });
 
             // Act
-            var result = target.Remove("team3");
+            bool result = target.Remove("team3");
 
             // Verify
             Assert.IsFalse(result);
@@ -264,7 +265,7 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void Clear_AfterInitialization_IsEmpty()
         {
             // Arrange
-            var target = new InitializationList();
+            InitializationList target = new InitializationList();
             target.Setup(new string[] { "team1", "team2" });
 
             // Act
@@ -279,7 +280,7 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void Clear_NoInitialization_IsEmpty()
         {
             // Arrange
-            var target = new InitializationList();
+            InitializationList target = new InitializationList();
 
             // Act
             target.Clear();

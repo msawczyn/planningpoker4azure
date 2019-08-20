@@ -9,10 +9,10 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void Constructor_Message_MessagePropertyIsSet()
         {
             // Arrange
-            var message = new Message(MessageType.Empty);
+            Message message = new Message(MessageType.Empty);
 
             // Act
-            var result = new MessageReceivedEventArgs(message);
+            MessageReceivedEventArgs result = new MessageReceivedEventArgs(message);
 
             // Verify
             Assert.AreEqual(message, result.Message);

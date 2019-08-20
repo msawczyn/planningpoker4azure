@@ -34,7 +34,7 @@ namespace Duracellko.PlanningPoker.E2ETest.Server
 
                 if (_uri == null)
                 {
-                    var address = WebHost.ServerFeatures.Get<IServerAddressesFeature>().Addresses.Single();
+                    string address = WebHost.ServerFeatures.Get<IServerAddressesFeature>().Addresses.Single();
                     _uri = new Uri(address);
                 }
 
@@ -60,7 +60,7 @@ namespace Duracellko.PlanningPoker.E2ETest.Server
                 throw new InvalidOperationException("WebHost is already started.");
             }
 
-            var builder = Program.CreateWebHostBuilder(GetProgramArguments());
+            IWebHostBuilder builder = Program.CreateWebHostBuilder(GetProgramArguments());
             WebHost = builder.Build();
             RunInBackgroundThread(WebHost.Start);
             return Task.CompletedTask;
@@ -94,7 +94,7 @@ namespace Duracellko.PlanningPoker.E2ETest.Server
 
         private static void RunInBackgroundThread(Action action)
         {
-            using (var isDone = new ManualResetEvent(false))
+            using (ManualResetEvent isDone = new ManualResetEvent(false))
             {
                 new Thread(() =>
                 {

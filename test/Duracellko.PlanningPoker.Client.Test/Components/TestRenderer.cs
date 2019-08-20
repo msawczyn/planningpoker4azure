@@ -33,7 +33,7 @@ namespace Duracellko.PlanningPoker.Client.Test.Components
 
         protected override Task UpdateDisplayAsync(in RenderBatch renderBatch)
         {
-            var capturedBatch = new CapturedBatch();
+            CapturedBatch capturedBatch = new CapturedBatch();
             capturedBatch.UpdatedComponents.AddRange(renderBatch.UpdatedComponents);
             capturedBatch.ReferenceFrames.AddRange(renderBatch.ReferenceFrames);
             capturedBatch.DisposedComponentIDs.AddRange(renderBatch.DisposedComponentIDs);

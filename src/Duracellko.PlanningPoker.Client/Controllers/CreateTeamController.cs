@@ -70,7 +70,7 @@ namespace Duracellko.PlanningPoker.Client.Controllers
             }
             catch (PlanningPokerException ex)
             {
-                var message = ControllerHelper.GetErrorMessage(ex);
+                string message = ControllerHelper.GetErrorMessage(ex);
                 await _messageBoxService.ShowMessage(message, Resources.MessagePanel_Error);
             }
 

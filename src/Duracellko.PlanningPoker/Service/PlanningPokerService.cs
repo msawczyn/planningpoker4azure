@@ -47,7 +47,7 @@ namespace Duracellko.PlanningPoker.Service
 
             try
             {
-                using (var teamLock = PlanningPoker.CreateScrumTeam(teamName, scrumMasterName))
+                using (D.IScrumTeamLock teamLock = PlanningPoker.CreateScrumTeam(teamName, scrumMasterName))
                 {
                     teamLock.Lock();
                     return ServiceEntityMapper.Map<D.ScrumTeam, ScrumTeam>(teamLock.Team);
@@ -76,10 +76,10 @@ namespace Duracellko.PlanningPoker.Service
 
             try
             {
-                using (var teamLock = PlanningPoker.GetScrumTeam(teamName))
+                using (D.IScrumTeamLock teamLock = PlanningPoker.GetScrumTeam(teamName))
                 {
                     teamLock.Lock();
-                    var team = teamLock.Team;
+                    D.ScrumTeam team = teamLock.Team;
                     team.Join(memberName, asObserver);
                     return ServiceEntityMapper.Map<D.ScrumTeam, ScrumTeam>(teamLock.Team);
                 }
@@ -109,35 +109,35 @@ namespace Duracellko.PlanningPoker.Service
 
             try
             {
-                using (var teamLock = PlanningPoker.GetScrumTeam(teamName))
+                using (D.IScrumTeamLock teamLock = PlanningPoker.GetScrumTeam(teamName))
                 {
                     teamLock.Lock();
-                    var team = teamLock.Team;
-                    var observer = team.FindMemberOrObserver(memberName);
+                    D.ScrumTeam team = teamLock.Team;
+                    D.Observer observer = team.FindMemberOrObserver(memberName);
                     if (observer == null)
                     {
                         throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, Resources.Error_MemberNotFound, memberName), nameof(memberName));
                     }
 
-                    Estimation selectedEstimation = null;
-                    if (team.State == D.TeamState.EstimationInProgress)
+                    Estimate selectedEstimate = null;
+                    if (team.State == D.TeamState.EstimateInProgress)
                     {
-                        var member = observer as D.Member;
+                        D.Member member = observer as D.Member;
                         if (member != null)
                         {
-                            selectedEstimation = ServiceEntityMapper.Map<D.Estimation, Estimation>(member.Estimation);
+                            selectedEstimate = ServiceEntityMapper.Map<D.Estimate, Estimate>(member.Estimate);
                         }
                     }
 
-                    var lastMessageId = observer.ClearMessages();
+                    long lastMessageId = observer.ClearMessages();
                     observer.UpdateActivity();
 
-                    var teamResult = ServiceEntityMapper.Map<D.ScrumTeam, ScrumTeam>(teamLock.Team);
+                    ScrumTeam teamResult = ServiceEntityMapper.Map<D.ScrumTeam, ScrumTeam>(teamLock.Team);
                     return new ReconnectTeamResult()
                     {
                         ScrumTeam = teamResult,
                         LastMessageId = lastMessageId,
-                        SelectedEstimation = selectedEstimation
+                        SelectedEstimate = selectedEstimate
                     };
                 }
             }
@@ -158,82 +158,82 @@ namespace Duracellko.PlanningPoker.Service
             ValidateTeamName(teamName);
             ValidateMemberName(memberName, nameof(memberName));
 
-            using (var teamLock = PlanningPoker.GetScrumTeam(teamName))
+            using (D.IScrumTeamLock teamLock = PlanningPoker.GetScrumTeam(teamName))
             {
                 teamLock.Lock();
-                var team = teamLock.Team;
+                D.ScrumTeam team = teamLock.Team;
                 team.Disconnect(memberName);
             }
         }
 
         /// <summary>
-        /// Signal from Scrum master to starts the estimation.
+        /// Signal from Scrum master to starts the estimate.
         /// </summary>
         /// <param name="teamName">Name of the Scrum team.</param>
-        [HttpGet("StartEstimation")]
-        public void StartEstimation(string teamName)
+        [HttpGet("StartEstimate")]
+        public void StartEstimate(string teamName)
         {
             ValidateTeamName(teamName);
 
-            using (var teamLock = PlanningPoker.GetScrumTeam(teamName))
+            using (D.IScrumTeamLock teamLock = PlanningPoker.GetScrumTeam(teamName))
             {
                 teamLock.Lock();
-                var team = teamLock.Team;
-                team.ScrumMaster.StartEstimation();
+                D.ScrumTeam team = teamLock.Team;
+                team.ScrumMaster.StartEstimate();
             }
         }
 
         /// <summary>
-        /// Signal from Scrum master to cancels the estimation.
+        /// Signal from Scrum master to cancels the estimate.
         /// </summary>
         /// <param name="teamName">Name of the Scrum team.</param>
-        [HttpGet("CancelEstimation")]
-        public void CancelEstimation(string teamName)
+        [HttpGet("CancelEstimate")]
+        public void CancelEstimate(string teamName)
         {
             ValidateTeamName(teamName);
 
-            using (var teamLock = PlanningPoker.GetScrumTeam(teamName))
+            using (D.IScrumTeamLock teamLock = PlanningPoker.GetScrumTeam(teamName))
             {
                 teamLock.Lock();
-                var team = teamLock.Team;
-                team.ScrumMaster.CancelEstimation();
+                D.ScrumTeam team = teamLock.Team;
+                team.ScrumMaster.CancelEstimate();
             }
         }
 
         /// <summary>
-        /// Submits the estimation for specified team member.
+        /// Submits the estimate for specified team member.
         /// </summary>
         /// <param name="teamName">Name of the Scrum team.</param>
         /// <param name="memberName">Name of the member.</param>
-        /// <param name="estimation">The estimation the member is submitting.</param>
-        [HttpGet("SubmitEstimation")]
-        public void SubmitEstimation(string teamName, string memberName, double estimation)
+        /// <param name="estimate">The estimate the member is submitting.</param>
+        [HttpGet("SubmitEstimate")]
+        public void SubmitEstimate(string teamName, string memberName, double estimate)
         {
             ValidateTeamName(teamName);
             ValidateMemberName(memberName, nameof(memberName));
 
-            double? domainEstimation;
-            if (estimation == -1111111.0)
+            double? domainEstimate;
+            if (estimate == -1111111.0)
             {
-                domainEstimation = null;
+                domainEstimate = null;
             }
-            else if (estimation == Estimation.PositiveInfinity)
+            else if (estimate == Estimate.PositiveInfinity)
             {
-                domainEstimation = double.PositiveInfinity;
+                domainEstimate = double.PositiveInfinity;
             }
             else
             {
-                domainEstimation = estimation;
+                domainEstimate = estimate;
             }
 
-            using (var teamLock = PlanningPoker.GetScrumTeam(teamName))
+            using (D.IScrumTeamLock teamLock = PlanningPoker.GetScrumTeam(teamName))
             {
                 teamLock.Lock();
-                var team = teamLock.Team;
-                var member = team.FindMemberOrObserver(memberName) as D.Member;
+                D.ScrumTeam team = teamLock.Team;
+                D.Member member = team.FindMemberOrObserver(memberName) as D.Member;
                 if (member != null)
                 {
-                    member.Estimation = new D.Estimation(domainEstimation);
+                    member.Estimate = new D.Estimate(domainEstimate);
                 }
             }
         }
@@ -253,7 +253,7 @@ namespace Duracellko.PlanningPoker.Service
             ValidateTeamName(teamName);
             ValidateMemberName(memberName, nameof(memberName));
 
-            var getMessagesTask = new GetMessagesTask(PlanningPoker)
+            GetMessagesTask getMessagesTask = new GetMessagesTask(PlanningPoker)
             {
                 TeamName = teamName,
                 MemberName = memberName,
@@ -396,11 +396,11 @@ namespace Duracellko.PlanningPoker.Service
             {
                 try
                 {
-                    using (var teamLock = PlanningPoker.GetScrumTeam(TeamName))
+                    using (D.IScrumTeamLock teamLock = PlanningPoker.GetScrumTeam(TeamName))
                     {
                         teamLock.Lock();
-                        var team = teamLock.Team;
-                        var member = team.FindMemberOrObserver(MemberName);
+                        D.ScrumTeam team = teamLock.Team;
+                        D.Observer member = team.FindMemberOrObserver(MemberName);
 
                         // Removes old messages, which the member has already read, from the member's message queue.
                         while (member.HasMessage && member.Messages.First().Id <= LastMessageId)

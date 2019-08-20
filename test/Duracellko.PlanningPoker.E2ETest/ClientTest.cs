@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Duracellko.PlanningPoker.E2ETest.Server;
@@ -10,7 +11,7 @@ namespace Duracellko.PlanningPoker.E2ETest
 {
     public class ClientTest
     {
-        private static readonly string[] _availableEstimations = new string[]
+        private static readonly string[] _availableEstimates = new string[]
             { "0", "\u00BD", "1", "2", "3", "5", "8", "13", "20", "40", "100", "\u221E", "?" };
 
         public ClientTest(IWebDriver browser, ServerFixture server)
@@ -58,8 +59,8 @@ namespace Duracellko.PlanningPoker.E2ETest
 
         public void FillCreateTeamForm(string team, string scrumMaster)
         {
-            var teamNameInput = CreateTeamForm.FindElement(By.Id("createTeam$teamName"));
-            var scrumMasterNameInput = CreateTeamForm.FindElement(By.Id("createTeam$scrumMasterName"));
+            IWebElement teamNameInput = CreateTeamForm.FindElement(By.Id("createTeam$teamName"));
+            IWebElement scrumMasterNameInput = CreateTeamForm.FindElement(By.Id("createTeam$scrumMasterName"));
 
             teamNameInput.SendKeys(team);
             scrumMasterNameInput.SendKeys(scrumMaster);
@@ -70,7 +71,7 @@ namespace Duracellko.PlanningPoker.E2ETest
 
         public void SubmitCreateTeamForm()
         {
-            var submitButton = CreateTeamForm.FindElement(By.Id("createTeam$Submit"));
+            IWebElement submitButton = CreateTeamForm.FindElement(By.Id("createTeam$Submit"));
             submitButton.Click();
         }
 
@@ -81,9 +82,9 @@ namespace Duracellko.PlanningPoker.E2ETest
 
         public void FillJoinTeamForm(string team, string member, bool asObserver)
         {
-            var teamNameInput = JoinTeamForm.FindElement(By.Id("joinTeam$teamName"));
-            var memberNameInput = JoinTeamForm.FindElement(By.Id("joinTeam$memberName"));
-            var observerInput = JoinTeamForm.FindElement(By.Id("joinTeam$asObserver"));
+            IWebElement teamNameInput = JoinTeamForm.FindElement(By.Id("joinTeam$teamName"));
+            IWebElement memberNameInput = JoinTeamForm.FindElement(By.Id("joinTeam$memberName"));
+            IWebElement observerInput = JoinTeamForm.FindElement(By.Id("joinTeam$asObserver"));
 
             teamNameInput.SendKeys(team);
             memberNameInput.SendKeys(member);
@@ -98,7 +99,7 @@ namespace Duracellko.PlanningPoker.E2ETest
 
         public void SubmitJoinTeamForm()
         {
-            var submitButton = JoinTeamForm.FindElement(By.Id("joinTeam$submit"));
+            IWebElement submitButton = JoinTeamForm.FindElement(By.Id("joinTeam$submit"));
             submitButton.Click();
         }
 
@@ -112,22 +113,22 @@ namespace Duracellko.PlanningPoker.E2ETest
 
         public void AssertTeamName(string team, string member)
         {
-            var teamNameHeader = PlanningPokerDeskElement.FindElement(By.CssSelector("div.team-title h2"));
+            IWebElement teamNameHeader = PlanningPokerDeskElement.FindElement(By.CssSelector("div.team-title h2"));
             Assert.AreEqual(team, teamNameHeader.Text);
-            var userHeader = PlanningPokerDeskElement.FindElement(By.CssSelector("div.team-title h3"));
+            IWebElement userHeader = PlanningPokerDeskElement.FindElement(By.CssSelector("div.team-title h3"));
             Assert.AreEqual(member, userHeader.Text);
         }
 
         public void AssertScrumMasterInTeam(string scrumMaster)
         {
-            var scrumMasterElements = MembersPanelElement.FindElements(By.XPath("./div[1]/ul/li"));
+            ReadOnlyCollection<IWebElement> scrumMasterElements = MembersPanelElement.FindElements(By.XPath("./div[1]/ul/li"));
             Assert.AreEqual(1, scrumMasterElements.Count);
             Assert.AreEqual(scrumMaster, scrumMasterElements[0].Text);
         }
 
         public void AssertMembersInTeam(params string[] members)
         {
-            var elements = MembersPanelElement.FindElements(By.XPath("./div[2]/ul/li"));
+            ReadOnlyCollection<IWebElement> elements = MembersPanelElement.FindElements(By.XPath("./div[2]/ul/li"));
             if (members == null)
             {
                 Assert.AreEqual(0, elements.Count);
@@ -141,7 +142,7 @@ namespace Duracellko.PlanningPoker.E2ETest
 
         public void AssertObserversInTeam(params string[] observers)
         {
-            var elements = MembersPanelElement.FindElements(By.XPath("./div[3]/ul/li"));
+            ReadOnlyCollection<IWebElement> elements = MembersPanelElement.FindElements(By.XPath("./div[3]/ul/li"));
             if (observers == null)
             {
                 Assert.AreEqual(0, elements.Count);
@@ -153,70 +154,70 @@ namespace Duracellko.PlanningPoker.E2ETest
             }
         }
 
-        public void StartEstimation()
+        public void StartEstimate()
         {
-            var button = PlanningPokerDeskElement.FindElement(By.CssSelector("div.actionsBar a"));
-            Assert.AreEqual("Start estimation", button.Text);
+            IWebElement button = PlanningPokerDeskElement.FindElement(By.CssSelector("div.actionsBar a"));
+            Assert.AreEqual("Start estimate", button.Text);
 
             button.Click();
 
-            PlanningPokerDeskElement.FindElement(By.CssSelector("div.availableEstimations"));
+            PlanningPokerDeskElement.FindElement(By.CssSelector("div.availableEstimates"));
         }
 
-        public void CancelEstimation()
+        public void CancelEstimate()
         {
-            var button = PlanningPokerDeskElement.FindElement(By.CssSelector("div.actionsBar a"));
-            Assert.AreEqual("Cancel estimation", button.Text);
+            IWebElement button = PlanningPokerDeskElement.FindElement(By.CssSelector("div.actionsBar a"));
+            Assert.AreEqual("Cancel estimate", button.Text);
             button.Click();
         }
 
-        public void AssertAvailableEstimations()
+        public void AssertAvailableEstimates()
         {
-            var availableEstimationElements = PlanningPokerDeskElement.FindElements(By.CssSelector("div.availableEstimations ul li a"));
-            Assert.AreEqual(13, availableEstimationElements.Count);
-            CollectionAssert.AreEqual(_availableEstimations, availableEstimationElements.Select(e => e.Text).ToList());
+            ReadOnlyCollection<IWebElement> availableEstimateElements = PlanningPokerDeskElement.FindElements(By.CssSelector("div.availableEstimates ul li a"));
+            Assert.AreEqual(13, availableEstimateElements.Count);
+            CollectionAssert.AreEqual(_availableEstimates, availableEstimateElements.Select(e => e.Text).ToList());
         }
 
-        public void AssertNotAvailableEstimations()
+        public void AssertNotAvailableEstimates()
         {
-            var availableEstimationElements = PlanningPokerDeskElement.FindElements(By.CssSelector("div.availableEstimations"));
-            Assert.AreEqual(0, availableEstimationElements.Count);
+            ReadOnlyCollection<IWebElement> availableEstimateElements = PlanningPokerDeskElement.FindElements(By.CssSelector("div.availableEstimates"));
+            Assert.AreEqual(0, availableEstimateElements.Count);
         }
 
-        public void SelectEstimation(string estimation)
+        public void SelectEstimate(string estimate)
         {
-            int index = Array.IndexOf<string>(_availableEstimations, estimation);
-            var availableEstimationElements = PlanningPokerDeskElement.FindElements(By.CssSelector("div.availableEstimations ul li a"));
-            availableEstimationElements[index].Click();
+            int index = Array.IndexOf<string>(_availableEstimates, estimate);
+            ReadOnlyCollection<IWebElement> availableEstimateElements = PlanningPokerDeskElement.FindElements(By.CssSelector("div.availableEstimates ul li a"));
+            availableEstimateElements[index].Click();
         }
 
-        public void AssertSelectedEstimation(params KeyValuePair<string, string>[] estimations)
+        public void AssertSelectedEstimate(params KeyValuePair<string, string>[] estimates)
         {
-            var estimationResultElements = PlanningPokerDeskElement.FindElements(By.CssSelector("div.estimationResult ul li"));
-            if (estimations == null)
+            ReadOnlyCollection<IWebElement> estimationResultElements = PlanningPokerDeskElement.FindElements(By.CssSelector("div.estimationResult ul li"));
+            if (estimates == null)
             {
                 Assert.AreEqual(0, estimationResultElements.Count);
             }
             else
             {
-                Assert.AreEqual(estimations.Length, estimationResultElements.Count);
+                Assert.AreEqual(estimates.Length, estimationResultElements.Count);
 
-                for (int i = 0; i < estimations.Length; i++)
+                for (int i = 0; i < estimates.Length; i++)
                 {
-                    var estimation = estimations[i];
-                    var estimationResultElement = estimationResultElements[i];
-                    var valueElement = estimationResultElement.FindElement(By.XPath("./span[1]"));
-                    var nameElement = estimationResultElement.FindElement(By.XPath("./span[2]"));
-                    Assert.AreEqual(estimation.Key, nameElement.Text);
-                    Assert.AreEqual(estimation.Value, valueElement.Text);
+                    KeyValuePair<string, string> estimate = estimates[i];
+                    IWebElement estimationResultElement = estimationResultElements[i];
+                    IWebElement valueElement = estimationResultElement.FindElement(By.XPath("./span[1]"));
+                    IWebElement nameElement = estimationResultElement.FindElement(By.XPath("./span[2]"));
+                    Assert.AreEqual(estimate.Key, nameElement.Text);
+                    Assert.AreEqual(estimate.Value, valueElement.Text);
                 }
             }
         }
 
         public void Disconnect()
         {
-            var navbarPlanningPokerElement = PlanningPokerContainerElement.FindElement(By.Id("navbarPlanningPoker"));
-            var disconnectElement = navbarPlanningPokerElement.FindElement(By.TagName("a"));
+            IWebElement navbarPlanningPokerElement = PlanningPokerContainerElement.FindElement(By.Id("navbarPlanningPoker"));
+            IWebElement disconnectElement = navbarPlanningPokerElement.FindElement(By.TagName("a"));
             Assert.AreEqual("Disconnect", disconnectElement.Text);
 
             disconnectElement.Click();
@@ -227,10 +228,10 @@ namespace Duracellko.PlanningPoker.E2ETest
 
         public void AssertMessageBox(string text)
         {
-            var messageBoxElement = PageContentElement.FindElement(By.Id("messageBox"));
+            IWebElement messageBoxElement = PageContentElement.FindElement(By.Id("messageBox"));
             Assert.AreEqual("block", messageBoxElement.GetCssValue("display"));
 
-            var messageBodyElement = messageBoxElement.FindElement(By.CssSelector("div.modal-body"));
+            IWebElement messageBodyElement = messageBoxElement.FindElement(By.CssSelector("div.modal-body"));
             Assert.AreEqual(text, messageBodyElement.Text);
         }
     }

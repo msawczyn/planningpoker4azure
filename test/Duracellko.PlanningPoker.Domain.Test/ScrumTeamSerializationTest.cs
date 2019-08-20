@@ -14,11 +14,11 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void SerializeAndDeserialize_EmptyTeam_CopyOfTheTeam()
         {
             // Arrange
-            var team = new ScrumTeam("test");
+            ScrumTeam team = new ScrumTeam("test");
 
             // Act
-            var bytes = SerializeTeam(team);
-            var result = DeserializeTeam(bytes);
+            byte[] bytes = SerializeTeam(team);
+            ScrumTeam result = DeserializeTeam(bytes);
 
             // Verify
             Assert.AreEqual<string>(team.Name, result.Name);
@@ -28,12 +28,12 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void SerializeAndDeserialize_TeamWithScrumMaster_CopyOfTheTeam()
         {
             // Arrange
-            var team = new ScrumTeam("test");
+            ScrumTeam team = new ScrumTeam("test");
             team.SetScrumMaster("master");
 
             // Act
-            var bytes = SerializeTeam(team);
-            var result = DeserializeTeam(bytes);
+            byte[] bytes = SerializeTeam(team);
+            ScrumTeam result = DeserializeTeam(bytes);
 
             // Verify
             Assert.AreEqual<string>(team.ScrumMaster.Name, result.ScrumMaster.Name);
@@ -43,17 +43,17 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void SerializeAndDeserialize_TeamWithMember_CopyOfTheTeam()
         {
             // Arrange
-            var team = new ScrumTeam("test");
+            ScrumTeam team = new ScrumTeam("test");
             team.SetScrumMaster("master");
-            var member = team.Join("member", false);
+            Observer member = team.Join("member", false);
 
             // Act
-            var bytes = SerializeTeam(team);
-            var result = DeserializeTeam(bytes);
+            byte[] bytes = SerializeTeam(team);
+            ScrumTeam result = DeserializeTeam(bytes);
 
             // Verify
             Assert.AreEqual<int>(2, result.Members.Count());
-            var resultMember = result.Members.First(m => m != result.ScrumMaster);
+            Member resultMember = result.Members.First(m => m != result.ScrumMaster);
             Assert.AreEqual<string>(member.Name, resultMember.Name);
             Assert.AreEqual<DateTime>(member.LastActivity, resultMember.LastActivity);
         }
@@ -62,33 +62,33 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void SerializeAndDeserialize_TeamWithObserver_CopyOfTheTeam()
         {
             // Arrange
-            var team = new ScrumTeam("test");
+            ScrumTeam team = new ScrumTeam("test");
             team.SetScrumMaster("master");
-            var observer = team.Join("member", true);
+            Observer observer = team.Join("member", true);
 
             // Act
-            var bytes = SerializeTeam(team);
-            var result = DeserializeTeam(bytes);
+            byte[] bytes = SerializeTeam(team);
+            ScrumTeam result = DeserializeTeam(bytes);
 
             // Verify
             Assert.AreEqual<int>(1, result.Observers.Count());
-            var resultObserver = result.Observers.First();
+            Observer resultObserver = result.Observers.First();
             Assert.AreEqual<string>(observer.Name, resultObserver.Name);
             Assert.AreEqual<DateTime>(observer.LastActivity, resultObserver.LastActivity);
         }
 
         [TestMethod]
-        public void SerializeAndDeserialize_EstimationStarted_CopyOfTheTeam()
+        public void SerializeAndDeserialize_EstimateStarted_CopyOfTheTeam()
         {
             // Arrange
-            var team = new ScrumTeam("test");
-            var master = team.SetScrumMaster("master");
-            var member = team.Join("member", false);
-            master.StartEstimation();
+            ScrumTeam team = new ScrumTeam("test");
+            ScrumMaster master = team.SetScrumMaster("master");
+            Observer member = team.Join("member", false);
+            master.StartEstimate();
 
             // Act
-            var bytes = SerializeTeam(team);
-            var result = DeserializeTeam(bytes);
+            byte[] bytes = SerializeTeam(team);
+            ScrumTeam result = DeserializeTeam(bytes);
 
             // Verify
             Assert.AreEqual<TeamState>(team.State, result.State);
@@ -99,18 +99,18 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void SerializeAndDeserialize_TeamMessageReceivedEventHandler_NoMessageReceivedEventHandler()
         {
             // Arrange
-            var team = new ScrumTeam("test");
+            ScrumTeam team = new ScrumTeam("test");
             int eventsCount = 0;
             team.MessageReceived += new EventHandler<MessageReceivedEventArgs>((s, e) => eventsCount++);
-            var master = team.SetScrumMaster("master");
+            ScrumMaster master = team.SetScrumMaster("master");
 
             // Act
-            var bytes = SerializeTeam(team);
-            var result = DeserializeTeam(bytes);
+            byte[] bytes = SerializeTeam(team);
+            ScrumTeam result = DeserializeTeam(bytes);
 
             // Verify
             eventsCount = 0;
-            result.ScrumMaster.StartEstimation();
+            result.ScrumMaster.StartEstimate();
             Assert.AreEqual<int>(0, eventsCount);
         }
 
@@ -118,18 +118,18 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void SerializeAndDeserialize_MemberMessageReceivedEventHandler_NoMessageReceivedEventHandler()
         {
             // Arrange
-            var team = new ScrumTeam("test");
-            var master = team.SetScrumMaster("master");
+            ScrumTeam team = new ScrumTeam("test");
+            ScrumMaster master = team.SetScrumMaster("master");
             int eventsCount = 0;
             master.MessageReceived += new EventHandler((s, e) => eventsCount++);
 
             // Act
-            var bytes = SerializeTeam(team);
-            var result = DeserializeTeam(bytes);
+            byte[] bytes = SerializeTeam(team);
+            ScrumTeam result = DeserializeTeam(bytes);
 
             // Verify
             eventsCount = 0;
-            result.ScrumMaster.StartEstimation();
+            result.ScrumMaster.StartEstimate();
             Assert.AreEqual<int>(0, eventsCount);
         }
 
@@ -137,13 +137,13 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void SerializeAndDeserialize_DateTimeProviderAsContext_DateTimeProviderIsSet()
         {
             // Arrange
-            var team = new ScrumTeam("test");
-            var dateTimeProvider = new DateTimeProviderMock();
+            ScrumTeam team = new ScrumTeam("test");
+            DateTimeProviderMock dateTimeProvider = new DateTimeProviderMock();
 
             // Act
-            var bytes = SerializeTeam(team);
-            var streamingContext = new StreamingContext(StreamingContextStates.All, dateTimeProvider);
-            var result = DeserializeTeam(bytes, streamingContext);
+            byte[] bytes = SerializeTeam(team);
+            StreamingContext streamingContext = new StreamingContext(StreamingContextStates.All, dateTimeProvider);
+            ScrumTeam result = DeserializeTeam(bytes, streamingContext);
 
             // Verify
             Assert.AreEqual<DateTimeProvider>(dateTimeProvider, result.DateTimeProvider);
@@ -151,8 +151,8 @@ namespace Duracellko.PlanningPoker.Domain.Test
 
         private static byte[] SerializeTeam(ScrumTeam team)
         {
-            var formatter = new BinaryFormatter();
-            using (var memoryStream = new MemoryStream())
+            BinaryFormatter formatter = new BinaryFormatter();
+            using (MemoryStream memoryStream = new MemoryStream())
             {
                 formatter.Serialize(memoryStream, team);
                 return memoryStream.ToArray();
@@ -166,8 +166,8 @@ namespace Duracellko.PlanningPoker.Domain.Test
 
         private static ScrumTeam DeserializeTeam(byte[] value, StreamingContext? context)
         {
-            var formatter = context.HasValue ? new BinaryFormatter(null, context.Value) : new BinaryFormatter();
-            using (var memoryStream = new MemoryStream(value))
+            BinaryFormatter formatter = context.HasValue ? new BinaryFormatter(null, context.Value) : new BinaryFormatter();
+            using (MemoryStream memoryStream = new MemoryStream(value))
             {
                 return (ScrumTeam)formatter.Deserialize(memoryStream);
             }

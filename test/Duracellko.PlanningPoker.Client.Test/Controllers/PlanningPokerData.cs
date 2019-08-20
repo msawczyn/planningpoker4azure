@@ -47,7 +47,7 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
                     }
                 },
                 State = TeamState.Initial,
-                AvailableEstimations = GetAvailableEstimations()
+                AvailableEstimates = GetAvailableEstimates()
             };
         }
 
@@ -62,27 +62,27 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
                     Type = ScrumMasterType
                 },
                 State = TeamState.Initial,
-                AvailableEstimations = GetAvailableEstimations()
+                AvailableEstimates = GetAvailableEstimates()
             };
         }
 
-        public static IList<Estimation> GetAvailableEstimations()
+        public static IList<Estimate> GetAvailableEstimates()
         {
-            return new List<Estimation>
+            return new List<Estimate>
             {
-                new Estimation() { Value = 0.0 },
-                new Estimation() { Value = 0.5 },
-                new Estimation() { Value = 1.0 },
-                new Estimation() { Value = 2.0 },
-                new Estimation() { Value = 3.0 },
-                new Estimation() { Value = 5.0 },
-                new Estimation() { Value = 8.0 },
-                new Estimation() { Value = 13.0 },
-                new Estimation() { Value = 20.0 },
-                new Estimation() { Value = 40.0 },
-                new Estimation() { Value = 100.0 },
-                new Estimation() { Value = double.PositiveInfinity },
-                new Estimation() { Value = null }
+                new Estimate() { Value = 0.0 },
+                new Estimate() { Value = 0.5 },
+                new Estimate() { Value = 1.0 },
+                new Estimate() { Value = 2.0 },
+                new Estimate() { Value = 3.0 },
+                new Estimate() { Value = 5.0 },
+                new Estimate() { Value = 8.0 },
+                new Estimate() { Value = 13.0 },
+                new Estimate() { Value = 20.0 },
+                new Estimate() { Value = 40.0 },
+                new Estimate() { Value = 100.0 },
+                new Estimate() { Value = double.PositiveInfinity },
+                new Estimate() { Value = null }
             };
         }
 

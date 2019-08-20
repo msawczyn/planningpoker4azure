@@ -14,7 +14,7 @@ namespace Duracellko.PlanningPoker.E2ETest.Browser
             {
                 if (_basePath == null)
                 {
-                    var assemblyLocation = typeof(ScreenshotCapture).Assembly.Location;
+                    string assemblyLocation = typeof(ScreenshotCapture).Assembly.Location;
                     _basePath = Path.Combine(Path.GetDirectoryName(assemblyLocation), "Screenshots");
                 }
 
@@ -39,18 +39,18 @@ namespace Duracellko.PlanningPoker.E2ETest.Browser
                 throw new ArgumentNullException(nameof(name));
             }
 
-            var screenshot = driver.GetScreenshot();
-            var screenshotFolder = GetScreenshotFolder(context);
-            var screenshotPath = Path.Combine(screenshotFolder, name + ".png");
+            Screenshot screenshot = driver.GetScreenshot();
+            string screenshotFolder = GetScreenshotFolder(context);
+            string screenshotPath = Path.Combine(screenshotFolder, name + ".png");
             screenshot.SaveAsFile(screenshotPath);
             return screenshotPath;
         }
 
         private string GetScreenshotFolder(BrowserTestContext context)
         {
-            var browserName = context.BrowserType.ToString();
-            var serverSide = context.ServerSide ? "Server" : "Client";
-            var path = Path.Combine(BasePath, browserName, serverSide, context.ClassName, context.TestName);
+            string browserName = context.BrowserType.ToString();
+            string serverSide = context.ServerSide ? "Server" : "Client";
+            string path = Path.Combine(BasePath, browserName, serverSide, context.ClassName, context.TestName);
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);

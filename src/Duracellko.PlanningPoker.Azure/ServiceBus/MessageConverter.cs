@@ -40,7 +40,7 @@ namespace Duracellko.PlanningPoker.Azure.ServiceBus
                 messageData = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message.Data));
             }
 
-            var result = new Message(messageData);
+            Message result = new Message(messageData);
             result.UserProperties[MessageTypePropertyName] = message.MessageType.ToString();
             if (message.Data != null)
             {
@@ -59,10 +59,10 @@ namespace Duracellko.PlanningPoker.Azure.ServiceBus
         /// <returns>Converted message of NodeMessage type.</returns>
         public NodeMessage ConvertToNodeMessage(Message message)
         {
-            var messageType = (NodeMessageType)Enum.Parse(typeof(NodeMessageType), (string)message.UserProperties[MessageTypePropertyName]);
-            var messageSubtype = message.UserProperties.ContainsKey(MessageSubtypePropertyName) ? (string)message.UserProperties[MessageSubtypePropertyName] : null;
+            NodeMessageType messageType = (NodeMessageType)Enum.Parse(typeof(NodeMessageType), (string)message.UserProperties[MessageTypePropertyName]);
+            string messageSubtype = message.UserProperties.ContainsKey(MessageSubtypePropertyName) ? (string)message.UserProperties[MessageSubtypePropertyName] : null;
 
-            var result = new NodeMessage(messageType);
+            NodeMessage result = new NodeMessage(messageType);
             result.SenderNodeId = (string)message.UserProperties[SenderIdPropertyName];
             result.RecipientNodeId = (string)message.UserProperties[RecipientIdPropertyName];
 
@@ -75,9 +75,9 @@ namespace Duracellko.PlanningPoker.Azure.ServiceBus
                     {
                         result.Data = JsonConvert.DeserializeObject<ScrumTeamMemberMessage>(messageJson);
                     }
-                    else if (string.Equals(messageSubtype, typeof(ScrumTeamMemberEstimationMessage).Name, StringComparison.OrdinalIgnoreCase))
+                    else if (string.Equals(messageSubtype, typeof(ScrumTeamMemberEstimateMessage).Name, StringComparison.OrdinalIgnoreCase))
                     {
-                        result.Data = JsonConvert.DeserializeObject<ScrumTeamMemberEstimationMessage>(messageJson);
+                        result.Data = JsonConvert.DeserializeObject<ScrumTeamMemberEstimateMessage>(messageJson);
                     }
                     else
                     {

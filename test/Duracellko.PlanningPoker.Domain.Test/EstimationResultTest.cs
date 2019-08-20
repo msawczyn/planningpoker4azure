@@ -6,24 +6,24 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Duracellko.PlanningPoker.Domain.Test
 {
     [TestClass]
-    public class EstimationResultTest
+    public class EstimateResultTest
     {
         [TestMethod]
-        public void Constructor_ScrumMasterAndMember_MembersHasNoEstimation()
+        public void Constructor_ScrumMasterAndMember_MembersHasNoEstimate()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            var member = (Member)team.Join("member", false);
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            Member member = (Member)team.Join("member", false);
 
             // Act
-            var result = new EstimationResult(new Member[] { master, member });
+            EstimateResult result = new EstimateResult(new Member[] { master, member });
 
             // Verify
-            var expectedResult = new KeyValuePair<Member, Estimation>[]
+            KeyValuePair<Member, Estimate>[] expectedResult = new KeyValuePair<Member, Estimate>[]
             {
-                new KeyValuePair<Member, Estimation>(member, null),
-                new KeyValuePair<Member, Estimation>(master, null),
+                new KeyValuePair<Member, Estimate>(member, null),
+                new KeyValuePair<Member, Estimate>(master, null),
             };
             CollectionAssert.AreEquivalent(expectedResult, result.ToList());
         }
@@ -32,13 +32,13 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void Constructor_EmptyCollection_EmptyCollection()
         {
             // Arrange
-            var members = Enumerable.Empty<Member>();
+            IEnumerable<Member> members = Enumerable.Empty<Member>();
 
             // Act
-            var result = new EstimationResult(members);
+            EstimateResult result = new EstimateResult(members);
 
             // Verify
-            var expectedResult = Array.Empty<KeyValuePair<Member, Estimation>>();
+            KeyValuePair<Member, Estimate>[] expectedResult = Array.Empty<KeyValuePair<Member, Estimate>>();
             CollectionAssert.AreEquivalent(expectedResult, result.ToList());
         }
 
@@ -47,7 +47,7 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void Constructor_Null_ArgumentNullException()
         {
             // Act
-            var result = new EstimationResult(null);
+            EstimateResult result = new EstimateResult(null);
         }
 
         [TestMethod]
@@ -55,54 +55,54 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void Constructor_DuplicateMember_InvalidOperationException()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            var member = (Member)team.Join("member", false);
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            Member member = (Member)team.Join("member", false);
 
             // Act
-            var result = new EstimationResult(new Member[] { master, member, master });
+            EstimateResult result = new EstimateResult(new Member[] { master, member, master });
         }
 
         [TestMethod]
-        public void IndexerSet_SetScrumMasterEstimation_EstimationOfScrumMasterIsSet()
+        public void IndexerSet_SetScrumMasterEstimate_EstimateOfScrumMasterIsSet()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            var member = (Member)team.Join("member", false);
-            var target = new EstimationResult(new Member[] { master, member });
-            var estimation = new Estimation();
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            Member member = (Member)team.Join("member", false);
+            EstimateResult target = new EstimateResult(new Member[] { master, member });
+            Estimate estimate = new Estimate();
 
             // Act
-            target[master] = estimation;
+            target[master] = estimate;
 
             // Verify
-            var expectedResult = new KeyValuePair<Member, Estimation>[]
+            KeyValuePair<Member, Estimate>[] expectedResult = new KeyValuePair<Member, Estimate>[]
             {
-                new KeyValuePair<Member, Estimation>(member, null),
-                new KeyValuePair<Member, Estimation>(master, estimation),
+                new KeyValuePair<Member, Estimate>(member, null),
+                new KeyValuePair<Member, Estimate>(master, estimate),
             };
             CollectionAssert.AreEquivalent(expectedResult, target.ToList());
         }
 
         [TestMethod]
-        public void IndexerSet_SetMemberEstimation_EstimationOfMemberIsSet()
+        public void IndexerSet_SetMemberEstimate_EstimateOfMemberIsSet()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            var member = (Member)team.Join("member", false);
-            var target = new EstimationResult(new Member[] { master, member });
-            var estimation = new Estimation();
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            Member member = (Member)team.Join("member", false);
+            EstimateResult target = new EstimateResult(new Member[] { master, member });
+            Estimate estimate = new Estimate();
 
             // Act
-            target[member] = estimation;
+            target[member] = estimate;
 
             // Verify
-            var expectedResult = new KeyValuePair<Member, Estimation>[]
+            KeyValuePair<Member, Estimate>[] expectedResult = new KeyValuePair<Member, Estimate>[]
             {
-                new KeyValuePair<Member, Estimation>(master, null),
-                new KeyValuePair<Member, Estimation>(member, estimation),
+                new KeyValuePair<Member, Estimate>(master, null),
+                new KeyValuePair<Member, Estimate>(member, estimate),
             };
             CollectionAssert.AreEquivalent(expectedResult, target.ToList());
         }
@@ -112,14 +112,14 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void IndexerSet_MemberNotInResult_KeyNotFoundException()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            var member = (Member)team.Join("member", false);
-            var target = new EstimationResult(new Member[] { master });
-            var estimation = new Estimation();
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            Member member = (Member)team.Join("member", false);
+            EstimateResult target = new EstimateResult(new Member[] { master });
+            Estimate estimate = new Estimate();
 
             // Act
-            target[member] = estimation;
+            target[member] = estimate;
         }
 
         [TestMethod]
@@ -127,15 +127,15 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void IndexerSet_IsReadOnly_InvalidOperationException()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            var member = (Member)team.Join("member", false);
-            var target = new EstimationResult(new Member[] { master, member });
-            var estimation = new Estimation();
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            Member member = (Member)team.Join("member", false);
+            EstimateResult target = new EstimateResult(new Member[] { master, member });
+            Estimate estimate = new Estimate();
 
             // Act
             target.SetReadOnly();
-            target[member] = estimation;
+            target[member] = estimate;
         }
 
         [TestMethod]
@@ -143,26 +143,26 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void IndexerGet_MemberNotInResult_KeyNotFoundException()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            var member = (Member)team.Join("member", false);
-            var target = new EstimationResult(new Member[] { master });
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            Member member = (Member)team.Join("member", false);
+            EstimateResult target = new EstimateResult(new Member[] { master });
 
             // Act
-            var estimation = target[member];
+            Estimate estimate = target[member];
         }
 
         [TestMethod]
         public void ContainsMember_MemberIsInResult_ReturnsTrue()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            var member = (Member)team.Join("member", false);
-            var target = new EstimationResult(new Member[] { master, member });
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            Member member = (Member)team.Join("member", false);
+            EstimateResult target = new EstimateResult(new Member[] { master, member });
 
             // Act
-            var result = target.ContainsMember(member);
+            bool result = target.ContainsMember(member);
 
             // Verify
             Assert.IsTrue(result);
@@ -172,13 +172,13 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void ContainsMember_MemberIsNotInResult_ReturnsFalse()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            var member = (Member)team.Join("member", false);
-            var target = new EstimationResult(new Member[] { master });
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            Member member = (Member)team.Join("member", false);
+            EstimateResult target = new EstimateResult(new Member[] { master });
 
             // Act
-            var result = target.ContainsMember(member);
+            bool result = target.ContainsMember(member);
 
             // Verify
             Assert.IsFalse(result);
@@ -188,13 +188,13 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void Count_InitializesBy2Members_Returns2()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var master = team.SetScrumMaster("master");
-            var member = (Member)team.Join("member", false);
-            var target = new EstimationResult(new Member[] { master, member });
+            ScrumTeam team = new ScrumTeam("test team");
+            ScrumMaster master = team.SetScrumMaster("master");
+            Member member = (Member)team.Join("member", false);
+            EstimateResult target = new EstimateResult(new Member[] { master, member });
 
             // Act
-            var result = target.Count;
+            int result = target.Count;
 
             // Verify
             Assert.AreEqual<int>(2, result);
@@ -204,7 +204,7 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void SetReadOnly_Execute_SetsIsReadOnly()
         {
             // Arrange
-            var target = new EstimationResult(Enumerable.Empty<Member>());
+            EstimateResult target = new EstimateResult(Enumerable.Empty<Member>());
 
             // Act
             target.SetReadOnly();
@@ -217,10 +217,10 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void SetReadOnly_GetAfterConstruction_ReturnsFalse()
         {
             // Arrange
-            var target = new EstimationResult(Enumerable.Empty<Member>());
+            EstimateResult target = new EstimateResult(Enumerable.Empty<Member>());
 
             // Act
-            var result = target.IsReadOnly;
+            bool result = target.IsReadOnly;
 
             // Verify
             Assert.IsFalse(result);

@@ -16,7 +16,7 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
 
         public static string GetScrumTeamJson(bool member = false, bool observer = false, int state = 0, string estimationResult = "", string estimationParticipants = "")
         {
-            var sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             sb.AppendLine("{");
             sb.AppendLine(@"""name"": ""Test team"",");
             sb.AppendLine(@"    ""scrumMaster"": {
@@ -60,7 +60,7 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
             sb.AppendFormat(CultureInfo.InvariantCulture, @"    ""state"": {0},", state);
             sb.AppendLine();
 
-            sb.AppendLine(@"    ""availableEstimations"": [
+            sb.AppendLine(@"    ""availableEstimates"": [
         { ""value"": 0 },
         { ""value"": 0.5 },
         { ""value"": 1 },
@@ -89,23 +89,23 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
             return sb.ToString();
         }
 
-        public static string GetEstimationResultJson(string scrumMasterEstimation = "5", string memberEstimation = "20")
+        public static string GetEstimateResultJson(string scrumMasterEstimate = "5", string memberEstimate = "20")
         {
-            var scrumMasterEstimationJson = string.Empty;
-            if (scrumMasterEstimation != null)
+            string scrumMasterEstimateJson = string.Empty;
+            if (scrumMasterEstimate != null)
             {
-                scrumMasterEstimationJson = @",
-            ""estimation"": {
-                ""value"": " + scrumMasterEstimation + @"
+                scrumMasterEstimateJson = @",
+            ""estimate"": {
+                ""value"": " + scrumMasterEstimate + @"
             }";
             }
 
-            var memberEstimationJson = string.Empty;
-            if (memberEstimation != null)
+            string memberEstimateJson = string.Empty;
+            if (memberEstimate != null)
             {
-                memberEstimationJson = @",
-            ""estimation"": {
-                ""value"": " + memberEstimation + @"
+                memberEstimateJson = @",
+            ""estimate"": {
+                ""value"": " + memberEstimate + @"
             }";
             }
 
@@ -113,17 +113,17 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
             ""member"": {
                 ""name"": ""Test Scrum Master"",
                 ""type"": ""ScrumMaster""
-            }" + scrumMasterEstimationJson + @"
+            }" + scrumMasterEstimateJson + @"
         },
         {
             ""member"": {
                 ""name"": ""Test member"",
                 ""type"": ""Member""
-            }" + memberEstimationJson + @"
+            }" + memberEstimateJson + @"
         }";
         }
 
-        public static string GetEstimationParticipantsJson(bool scrumMaster = true, bool member = false)
+        public static string GetEstimateParticipantsJson(bool scrumMaster = true, bool member = false)
         {
             return @"{
                 ""memberName"": ""Test Scrum Master"",
@@ -135,26 +135,26 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
             }";
         }
 
-        public static string GetReconnectTeamResultJson(string scrumTeamJson, string lastMessageId = "0", string selectedEstimation = null)
+        public static string GetReconnectTeamResultJson(string scrumTeamJson, string lastMessageId = "0", string selectedEstimate = null)
         {
-            var selectedEstimationJson = string.Empty;
-            if (selectedEstimation != null)
+            string selectedEstimateJson = string.Empty;
+            if (selectedEstimate != null)
             {
-                selectedEstimationJson = @",
-                ""selectedEstimation"": {
-                    ""value"": " + selectedEstimation + @"
+                selectedEstimateJson = @",
+                ""selectedEstimate"": {
+                    ""value"": " + selectedEstimate + @"
                 }";
             }
 
             return @"{
             ""lastMessageId"": " + lastMessageId + @",
-            ""scrumTeam"": " + scrumTeamJson + selectedEstimationJson + @"
+            ""scrumTeam"": " + scrumTeamJson + selectedEstimateJson + @"
 }";
         }
 
         public static string GetMessagesJson(params string[] messages)
         {
-            var sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             sb.AppendLine("[");
             sb.AppendJoin(",\r\n", messages);
             sb.AppendLine();
@@ -194,7 +194,7 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
 }";
         }
 
-        public static string GetEstimationStartedMessageJson(string id = "0")
+        public static string GetEstimateStartedMessageJson(string id = "0")
         {
             return @"{
             ""id"": " + id + @",
@@ -202,7 +202,7 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
 }";
         }
 
-        public static string GetEstimationEndedMessageJson(string id = "0")
+        public static string GetEstimateEndedMessageJson(string id = "0")
         {
             return @"{
             ""id"": " + id + @",
@@ -213,7 +213,7 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
                         ""name"": ""Test Scrum Master"",
                         ""type"": ""ScrumMaster""
                     },
-                    ""estimation"": {
+                    ""estimate"": {
                         ""value"": 2
                     }
                 },
@@ -222,7 +222,7 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
                         ""name"": ""Test member"",
                         ""type"": ""Member""
                     },
-                    ""estimation"": {
+                    ""estimate"": {
                         ""value"": null
                     }
                 },
@@ -231,14 +231,14 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
                         ""name"": ""Me"",
                         ""type"": ""Member""
                     },
-                    ""estimation"": null
+                    ""estimate"": null
                 },
                 {
                     ""member"": {
                         ""name"": ""Test observer"",
                         ""type"": ""Member""
                     },
-                    ""estimation"": {
+                    ""estimate"": {
                         ""value"": -1111100
                     }
                 }
@@ -246,7 +246,7 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
 }";
         }
 
-        public static string GetEstimationEndedMessage2Json(string id = "0")
+        public static string GetEstimateEndedMessage2Json(string id = "0")
         {
             return @"{
             ""id"": " + id + @",
@@ -257,7 +257,7 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
                         ""name"": ""Test Scrum Master"",
                         ""type"": ""ScrumMaster""
                     },
-                    ""estimation"": {
+                    ""estimate"": {
                         ""value"": 5
                     }
                 },
@@ -266,7 +266,7 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
                         ""name"": ""Test member"",
                         ""type"": ""Member""
                     },
-                    ""estimation"": {
+                    ""estimate"": {
                         ""value"": 40
                     }
                 }
@@ -274,7 +274,7 @@ namespace Duracellko.PlanningPoker.Client.Test.Service
 }";
         }
 
-        public static string GetEstimationCanceledMessageJson(string id = "0")
+        public static string GetEstimateCanceledMessageJson(string id = "0")
         {
             return @"{
             ""id"": " + id + @",

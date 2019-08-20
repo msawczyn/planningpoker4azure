@@ -3,23 +3,23 @@
 namespace Duracellko.PlanningPoker.Azure
 {
     /// <summary>
-    /// Message of event in specific Scrum team, which notifies that a member placed estimation.
+    /// Message of event in specific Scrum team, which notifies that a member placed estimate.
     /// </summary>
-    public class ScrumTeamMemberEstimationMessage : ScrumTeamMessage
+    public class ScrumTeamMemberEstimateMessage : ScrumTeamMessage
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ScrumTeamMemberEstimationMessage"/> class.
+        /// Initializes a new instance of the <see cref="ScrumTeamMemberEstimateMessage"/> class.
         /// </summary>
-        public ScrumTeamMemberEstimationMessage()
+        public ScrumTeamMemberEstimateMessage()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ScrumTeamMemberEstimationMessage"/> class.
+        /// Initializes a new instance of the <see cref="ScrumTeamMemberEstimateMessage"/> class.
         /// </summary>
         /// <param name="teamName">The name of team, this message is related to.</param>
         /// <param name="messageType">The type of message.</param>
-        public ScrumTeamMemberEstimationMessage(string teamName, MessageType messageType)
+        public ScrumTeamMemberEstimateMessage(string teamName, MessageType messageType)
             : base(teamName, messageType)
         {
         }
@@ -31,9 +31,9 @@ namespace Duracellko.PlanningPoker.Azure
         public string MemberName { get; set; }
 
         /// <summary>
-        /// Gets or sets a member's estimation.
+        /// Gets or sets a member's estimate.
         /// </summary>
-        /// <value>The member's estimation.</value>
-        public double? Estimation { get; set; }
+        /// <value>The member's estimate.</value>
+        public double? Estimate { get; set; }
     }
 }

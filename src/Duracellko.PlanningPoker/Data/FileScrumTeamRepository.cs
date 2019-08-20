@@ -66,16 +66,16 @@ namespace Duracellko.PlanningPoker.Data
             {
                 _logger?.LogDebug(Resources.Repository_Debug_LoadScrumTeamNames);
 
-                var expirationTime = _dateTimeProvider.UtcNow - _configuration.RepositoryTeamExpiration;
-                var directory = new DirectoryInfo(Folder);
+                DateTime expirationTime = _dateTimeProvider.UtcNow - _configuration.RepositoryTeamExpiration;
+                DirectoryInfo directory = new DirectoryInfo(Folder);
                 if (directory.Exists)
                 {
-                    var files = directory.GetFiles("*" + FileExtension);
-                    foreach (var file in files)
+                    FileInfo[] files = directory.GetFiles("*" + FileExtension);
+                    foreach (FileInfo file in files)
                     {
                         if (file.LastWriteTimeUtc >= expirationTime)
                         {
-                            var teamName = GetScrumTeamName(file.Name);
+                            string teamName = GetScrumTeamName(file.Name);
                             if (teamName != null)
                             {
                                 yield return teamName;
@@ -106,7 +106,7 @@ namespace Duracellko.PlanningPoker.Data
             {
                 try
                 {
-                    using (var stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read))
+                    using (FileStream stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read))
                     {
                         result = DeserializeScrumTeam(stream);
                     }
@@ -147,7 +147,7 @@ namespace Duracellko.PlanningPoker.Data
             string file = GetFileName(team.Name);
             file = Path.Combine(Folder, file);
 
-            using (var stream = new FileStream(file, FileMode.Create, FileAccess.Write, FileShare.None))
+            using (FileStream stream = new FileStream(file, FileMode.Create, FileAccess.Write, FileShare.None))
             {
                 SerializeScrumTeam(team, stream);
             }
@@ -190,12 +190,12 @@ namespace Duracellko.PlanningPoker.Data
         {
             _logger?.LogDebug(Resources.Repository_Debug_DeleteExpiredScrumTeams);
 
-            var expirationTime = _dateTimeProvider.UtcNow - _configuration.RepositoryTeamExpiration;
-            var directory = new DirectoryInfo(Folder);
+            DateTime expirationTime = _dateTimeProvider.UtcNow - _configuration.RepositoryTeamExpiration;
+            DirectoryInfo directory = new DirectoryInfo(Folder);
             if (directory.Exists)
             {
-                var files = directory.GetFiles("*" + FileExtension);
-                foreach (var file in files)
+                FileInfo[] files = directory.GetFiles("*" + FileExtension);
+                foreach (FileInfo file in files)
                 {
                     try
                     {
@@ -219,11 +219,11 @@ namespace Duracellko.PlanningPoker.Data
         {
             _logger?.LogDebug(Resources.Repository_Debug_DeleteAllScrumTeams);
 
-            var directory = new DirectoryInfo(Folder);
+            DirectoryInfo directory = new DirectoryInfo(Folder);
             if (directory.Exists)
             {
-                var files = directory.GetFiles("*" + FileExtension);
-                foreach (var file in files)
+                FileInfo[] files = directory.GetFiles("*" + FileExtension);
+                foreach (FileInfo file in files)
                 {
                     try
                     {
@@ -239,8 +239,8 @@ namespace Duracellko.PlanningPoker.Data
 
         private static char[] GetInvalidCharacters()
         {
-            var invalidFileCharacters = Path.GetInvalidFileNameChars();
-            var result = new char[invalidFileCharacters.Length + 1];
+            char[] invalidFileCharacters = Path.GetInvalidFileNameChars();
+            char[] result = new char[invalidFileCharacters.Length + 1];
             result[0] = SpecialCharacter;
             invalidFileCharacters.CopyTo(result, 1);
             Array.Sort<char>(result, Comparer<char>.Default);
@@ -249,9 +249,9 @@ namespace Duracellko.PlanningPoker.Data
 
         private static string GetScrumTeamName(string filename)
         {
-            var name = Path.GetFileNameWithoutExtension(filename);
+            string name = Path.GetFileNameWithoutExtension(filename);
 
-            var result = new StringBuilder(name.Length);
+            StringBuilder result = new StringBuilder(name.Length);
             int specialPosition = 0;
             for (int i = 0; i < name.Length; i++)
             {
@@ -293,7 +293,7 @@ namespace Duracellko.PlanningPoker.Data
 
         private static void SerializeScrumTeam(ScrumTeam team, Stream stream)
         {
-            var formatter = new BinaryFormatter(null, new StreamingContext(StreamingContextStates.File | StreamingContextStates.Persistence));
+            BinaryFormatter formatter = new BinaryFormatter(null, new StreamingContext(StreamingContextStates.File | StreamingContextStates.Persistence));
             formatter.Serialize(stream, team);
         }
 
@@ -312,8 +312,8 @@ namespace Duracellko.PlanningPoker.Data
 
         private string GetFileName(string teamName)
         {
-            var result = new StringBuilder(teamName.Length + 10);
-            var invalidChars = _invalidCharacters.Value;
+            StringBuilder result = new StringBuilder(teamName.Length + 10);
+            char[] invalidChars = _invalidCharacters.Value;
             for (int i = 0; i < teamName.Length; i++)
             {
                 char c = teamName[i];
@@ -337,7 +337,7 @@ namespace Duracellko.PlanningPoker.Data
 
         private ScrumTeam DeserializeScrumTeam(Stream stream)
         {
-            var formatter = _dateTimeProvider != null ?
+            BinaryFormatter formatter = _dateTimeProvider != null ?
                 new BinaryFormatter(null, new StreamingContext(StreamingContextStates.File | StreamingContextStates.Persistence, _dateTimeProvider)) :
                 new BinaryFormatter();
             return (ScrumTeam)formatter.Deserialize(stream);

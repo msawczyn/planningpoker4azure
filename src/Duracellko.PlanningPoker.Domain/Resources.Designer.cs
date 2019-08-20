@@ -61,29 +61,29 @@ namespace Duracellko.PlanningPoker.Domain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cannot start estimation. Estimation is already in progress..
+        ///   Looks up a localized string similar to Cannot start estimate. Estimate is already in progress..
         /// </summary>
-        internal static string Error_EstimationIsInProgress {
+        internal static string Error_EstimateIsInProgress {
             get {
-                return ResourceManager.GetString("Error_EstimationIsInProgress", resourceCulture);
+                return ResourceManager.GetString("Error_EstimateIsInProgress", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Estimation of value {0} is not available in the team..
+        ///   Looks up a localized string similar to Estimate of value {0} is not available in the team..
         /// </summary>
-        internal static string Error_EstimationIsNotAvailableInTeam {
+        internal static string Error_EstimateIsNotAvailableInTeam {
             get {
-                return ResourceManager.GetString("Error_EstimationIsNotAvailableInTeam", resourceCulture);
+                return ResourceManager.GetString("Error_EstimateIsNotAvailableInTeam", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Estimation result is read-only..
+        ///   Looks up a localized string similar to Estimate result is read-only..
         /// </summary>
-        internal static string Error_EstimationResultIsReadOnly {
+        internal static string Error_EstimateResultIsReadOnly {
             get {
-                return ResourceManager.GetString("Error_EstimationResultIsReadOnly", resourceCulture);
+                return ResourceManager.GetString("Error_EstimateResultIsReadOnly", resourceCulture);
             }
         }
         
@@ -97,7 +97,7 @@ namespace Duracellko.PlanningPoker.Domain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The given member was not present in the estimation result..
+        ///   Looks up a localized string similar to The given member was not present in the estimate result..
         /// </summary>
         internal static string Error_MemberNotInResult {
             get {

@@ -4,21 +4,21 @@ using Newtonsoft.Json;
 namespace Duracellko.PlanningPoker.Service
 {
     /// <summary>
-    /// Estimation value of a planning poker card.
+    /// Estimate value of a planning poker card.
     /// </summary>
     [Serializable]
-    public class Estimation
+    public class Estimate
     {
         /// <summary>
-        /// Value representing estimation of positive infinity.
+        /// Value representing estimate of positive infinity.
         /// </summary>
         public const double PositiveInfinity = -1111100.0;
 
         /// <summary>
-        /// Gets or sets the estimation value. Estimation can be any positive number (usually Fibonacci numbers) or
-        /// positive infinity or null representing unknown estimation.
+        /// Gets or sets the estimate value. Estimate can be any positive number (usually Fibonacci numbers) or
+        /// positive infinity or null representing unknown estimate.
         /// </summary>
-        /// <value>The estimation value.</value>
+        /// <value>The estimate value.</value>
         [JsonProperty("value")]
         public double? Value { get; set; }
     }

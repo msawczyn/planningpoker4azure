@@ -79,7 +79,7 @@ namespace Duracellko.PlanningPoker.Client.Controllers
             }
             catch (PlanningPokerException ex)
             {
-                var message = ex.Message;
+                string message = ex.Message;
                 if (message.IndexOf(MemberExistsError1, StringComparison.OrdinalIgnoreCase) >= 0 &&
                     message.IndexOf(MemberExistsError2, StringComparison.OrdinalIgnoreCase) >= 0)
                 {
@@ -113,7 +113,7 @@ namespace Duracellko.PlanningPoker.Client.Controllers
                 return false;
             }
 
-            var memberCredentials = await _memberCredentialsStore.GetCredentialsAsync();
+            MemberCredentials memberCredentials = await _memberCredentialsStore.GetCredentialsAsync();
             if (memberCredentials != null &&
                 string.Equals(memberCredentials.TeamName, teamName, StringComparison.OrdinalIgnoreCase) &&
                 string.Equals(memberCredentials.MemberName, memberName, StringComparison.OrdinalIgnoreCase))
@@ -145,7 +145,7 @@ namespace Duracellko.PlanningPoker.Client.Controllers
             {
                 if (!ignoreError)
                 {
-                    var message = ControllerHelper.GetErrorMessage(ex);
+                    string message = ControllerHelper.GetErrorMessage(ex);
                     await _messageBoxService.ShowMessage(message, Resources.MessagePanel_Error);
                 }
             }

@@ -4,16 +4,16 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Duracellko.PlanningPoker.Domain.Test
 {
     [TestClass]
-    public class EstimationParticipantStatusTest
+    public class EstimateParticipantStatusTest
     {
         [TestMethod]
         public void Constructor_MemberNameSpecified_MemberNameIsSet()
         {
             // Arrange
-            var name = "Member";
+            string name = "Member";
 
             // Act
-            var result = new EstimationParticipantStatus(name, false);
+            EstimateParticipantStatus result = new EstimateParticipantStatus(name, false);
 
             // Verify
             Assert.AreEqual<string>(name, result.MemberName);
@@ -27,17 +27,17 @@ namespace Duracellko.PlanningPoker.Domain.Test
             string name = null;
 
             // Act
-            var result = new EstimationParticipantStatus(name, false);
+            EstimateParticipantStatus result = new EstimateParticipantStatus(name, false);
         }
 
         [TestMethod]
         public void Constructor_EstimatedSpecified_EstimatedIsSet()
         {
             // Arrange
-            var estimated = true;
+            bool estimated = true;
 
             // Act
-            var result = new EstimationParticipantStatus("Member", estimated);
+            EstimateParticipantStatus result = new EstimateParticipantStatus("Member", estimated);
 
             // Verify
             Assert.IsTrue(estimated);

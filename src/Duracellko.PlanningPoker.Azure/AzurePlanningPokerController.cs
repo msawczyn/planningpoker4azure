@@ -87,7 +87,7 @@ namespace Duracellko.PlanningPoker.Azure
 
             if (!_initialized)
             {
-                using (var teamLock = AttachScrumTeam(team))
+                using (IScrumTeamLock teamLock = AttachScrumTeam(team))
                 {
                 }
 
@@ -167,7 +167,7 @@ namespace Duracellko.PlanningPoker.Azure
 
             if (!isInitializingTeam)
             {
-                var teamCreatedMessage = new ScrumTeamMessage(team.Name, MessageType.TeamCreated);
+                ScrumTeamMessage teamCreatedMessage = new ScrumTeamMessage(team.Name, MessageType.TeamCreated);
                 _observableMessages.OnNext(teamCreatedMessage);
             }
         }
@@ -199,8 +199,8 @@ namespace Duracellko.PlanningPoker.Azure
 
                 if (!teamListInitialized)
                 {
-                    var timeout = InitializationTimeout;
-                    var stopwatch = new Stopwatch();
+                    TimeSpan timeout = InitializationTimeout;
+                    Stopwatch stopwatch = new Stopwatch();
                     stopwatch.Start();
                     while (!teamListInitialized && stopwatch.Elapsed < timeout)
                     {
@@ -247,8 +247,8 @@ namespace Duracellko.PlanningPoker.Azure
 
                 if (!teamInitialized)
                 {
-                    var timeout = InitializationTimeout;
-                    var stopwatch = new Stopwatch();
+                    TimeSpan timeout = InitializationTimeout;
+                    Stopwatch stopwatch = new Stopwatch();
                     stopwatch.Start();
                     while (!teamInitialized && stopwatch.Elapsed < timeout)
                     {
@@ -268,14 +268,14 @@ namespace Duracellko.PlanningPoker.Azure
         {
             get
             {
-                var configuration = Configuration as IAzurePlanningPokerConfiguration;
+                IAzurePlanningPokerConfiguration configuration = Configuration as IAzurePlanningPokerConfiguration;
                 return configuration != null ? configuration.InitializationTimeout : TimeSpan.FromMinutes(1.0);
             }
         }
 
         private void ScrumTeamOnMessageReceived(object sender, MessageReceivedEventArgs e)
         {
-            var team = (ScrumTeam)sender;
+            ScrumTeam team = (ScrumTeam)sender;
             ScrumTeamMessage scrumTeamMessage = null;
 
             switch (e.Message.MessageType)
@@ -283,7 +283,7 @@ namespace Duracellko.PlanningPoker.Azure
                 case MessageType.MemberJoined:
                 case MessageType.MemberDisconnected:
                 case MessageType.MemberActivity:
-                    var memberMessage = (MemberMessage)e.Message;
+                    MemberMessage memberMessage = (MemberMessage)e.Message;
                     scrumTeamMessage = new ScrumTeamMemberMessage(team.Name, memberMessage.MessageType)
                     {
                         MemberName = memberMessage.Member.Name,
@@ -291,14 +291,14 @@ namespace Duracellko.PlanningPoker.Azure
                     };
                     break;
                 case MessageType.MemberEstimated:
-                    var memberEstimatedMessage = (MemberMessage)e.Message;
-                    var member = memberEstimatedMessage.Member as Member;
-                    if (member != null && member.Estimation != null)
+                    MemberMessage memberEstimatedMessage = (MemberMessage)e.Message;
+                    Member member = memberEstimatedMessage.Member as Member;
+                    if (member != null && member.Estimate != null)
                     {
-                        scrumTeamMessage = new ScrumTeamMemberEstimationMessage(team.Name, memberEstimatedMessage.MessageType)
+                        scrumTeamMessage = new ScrumTeamMemberEstimateMessage(team.Name, memberEstimatedMessage.MessageType)
                         {
                             MemberName = member.Name,
-                            Estimation = member.Estimation.Value
+                            Estimate = member.Estimate.Value
                         };
                     }
 

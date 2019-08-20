@@ -27,7 +27,7 @@ namespace Duracellko.PlanningPoker.Service
 
         private static IConfigurationProvider CreateMapperConfiguration()
         {
-            var result = new MapperConfiguration(config =>
+            MapperConfiguration result = new MapperConfiguration(config =>
             {
                 config.AllowNullCollections = true;
                 config.CreateMap<D.ScrumTeam, ScrumTeam>();
@@ -35,23 +35,23 @@ namespace Duracellko.PlanningPoker.Service
                     .ForMember(m => m.Type, mc => mc.MapFrom((s, d, m) => s.GetType().Name));
                 config.CreateMap<D.Message, Message>()
                     .Include<D.MemberMessage, MemberMessage>()
-                    .Include<D.EstimationResultMessage, EstimationResultMessage>()
+                    .Include<D.EstimateResultMessage, EstimateResultMessage>()
                     .ForMember(m => m.Type, mc => mc.MapFrom(m => m.MessageType));
                 config.CreateMap<D.MemberMessage, MemberMessage>();
-                config.CreateMap<D.EstimationResultMessage, EstimationResultMessage>();
-                config.CreateMap<KeyValuePair<D.Member, D.Estimation>, EstimationResultItem>()
+                config.CreateMap<D.EstimateResultMessage, EstimateResultMessage>();
+                config.CreateMap<KeyValuePair<D.Member, D.Estimate>, EstimateResultItem>()
                     .ForMember(i => i.Member, mc => mc.MapFrom(p => p.Key))
-                    .ForMember(i => i.Estimation, mc => mc.MapFrom(p => p.Value));
-                config.CreateMap<D.EstimationParticipantStatus, EstimationParticipantStatus>();
-                config.CreateMap<D.Estimation, Estimation>()
-                    .ForMember(e => e.Value, mc => mc.MapFrom((s, d, m) => MapEstimationValue(s.Value)));
+                    .ForMember(i => i.Estimate, mc => mc.MapFrom(p => p.Value));
+                config.CreateMap<D.EstimateParticipantStatus, EstimateParticipantStatus>();
+                config.CreateMap<D.Estimate, Estimate>()
+                    .ForMember(e => e.Value, mc => mc.MapFrom((s, d, m) => MapEstimateValue(s.Value)));
             });
 
             result.AssertConfigurationIsValid();
             return result;
         }
 
-        private static double? MapEstimationValue(double? value) =>
-            value.HasValue && double.IsPositiveInfinity(value.Value) ? Estimation.PositiveInfinity : value;
+        private static double? MapEstimateValue(double? value) =>
+            value.HasValue && double.IsPositiveInfinity(value.Value) ? Estimate.PositiveInfinity : value;
     }
 }

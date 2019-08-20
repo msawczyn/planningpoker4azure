@@ -4,13 +4,13 @@ using Newtonsoft.Json;
 namespace Duracellko.PlanningPoker.Service
 {
     /// <summary>
-    /// Item of estimation result. It specifies what member picked what estimation.
+    /// Item of estimate result. It specifies what member picked what estimate.
     /// </summary>
     [Serializable]
-    public class EstimationResultItem
+    public class EstimateResultItem
     {
         /// <summary>
-        /// Gets or sets the member, who picked an estimation.
+        /// Gets or sets the member, who picked an estimate.
         /// </summary>
         /// <value>
         /// The Scrum team member.
@@ -19,12 +19,12 @@ namespace Duracellko.PlanningPoker.Service
         public TeamMember Member { get; set; }
 
         /// <summary>
-        /// Gets or sets the estimation picked by the member.
+        /// Gets or sets the estimate picked by the member.
         /// </summary>
         /// <value>
-        /// The picked estimation.
+        /// The picked estimate.
         /// </value>
-        [JsonProperty("estimation")]
-        public Estimation Estimation { get; set; }
+        [JsonProperty("estimate")]
+        public Estimate Estimate { get; set; }
     }
 }

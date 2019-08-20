@@ -3,16 +3,16 @@
 namespace Duracellko.PlanningPoker.Domain
 {
     /// <summary>
-    /// Status of participant in estimation.
+    /// Status of participant in estimate.
     /// </summary>
-    public class EstimationParticipantStatus
+    public class EstimateParticipantStatus
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="EstimationParticipantStatus"/> class.
+        /// Initializes a new instance of the <see cref="EstimateParticipantStatus"/> class.
         /// </summary>
         /// <param name="memberName">Name of the member.</param>
         /// <param name="estimated">If set to <c>true</c> then the member already estimated.</param>
-        public EstimationParticipantStatus(string memberName, bool estimated)
+        public EstimateParticipantStatus(string memberName, bool estimated)
         {
             if (string.IsNullOrEmpty(memberName))
             {

@@ -11,9 +11,9 @@ namespace Duracellko.PlanningPoker.Client.Test.UI
         [TestMethod]
         public void ShowMessage_NoHandler_ReturnsCompletedTask()
         {
-            var target = CreateMessageBoxService();
+            MessageBoxService target = CreateMessageBoxService();
 
-            var result = target.ShowMessage("My message", "Test");
+            Task result = target.ShowMessage("My message", "Test");
 
             Assert.IsTrue(result.IsCompletedSuccessfully);
         }
@@ -21,8 +21,8 @@ namespace Duracellko.PlanningPoker.Client.Test.UI
         [TestMethod]
         public async Task ShowMessage_Handler_HandlerIsExecuted()
         {
-            var handler = new MessageHandler();
-            var target = CreateMessageBoxService(messageHandler: handler);
+            MessageHandler handler = new MessageHandler();
+            MessageBoxService target = CreateMessageBoxService(messageHandler: handler);
 
             await target.ShowMessage("My message", "Test");
 
@@ -35,8 +35,8 @@ namespace Duracellko.PlanningPoker.Client.Test.UI
         [TestMethod]
         public async Task ShowMessage_MessageIsNull_HandlerIsExecuted()
         {
-            var handler = new MessageHandler();
-            var target = CreateMessageBoxService(messageHandler: handler);
+            MessageHandler handler = new MessageHandler();
+            MessageBoxService target = CreateMessageBoxService(messageHandler: handler);
 
             await target.ShowMessage(null, null);
 
@@ -49,8 +49,8 @@ namespace Duracellko.PlanningPoker.Client.Test.UI
         [TestMethod]
         public async Task ShowMessage_MessageIsEmpty_HandlerIsExecuted()
         {
-            var handler = new MessageHandler();
-            var target = CreateMessageBoxService(messageHandler: handler);
+            MessageHandler handler = new MessageHandler();
+            MessageBoxService target = CreateMessageBoxService(messageHandler: handler);
 
             await target.ShowMessage(string.Empty, string.Empty);
 
@@ -63,11 +63,11 @@ namespace Duracellko.PlanningPoker.Client.Test.UI
         [TestMethod]
         public async Task ShowMessage_HandlerIsNotCompleted_ReturnsNotCompletedTask()
         {
-            var task = new TaskCompletionSource<bool>();
-            var handler = new MessageHandler() { ResultTask = task.Task };
-            var target = CreateMessageBoxService(messageHandler: handler);
+            TaskCompletionSource<bool> task = new TaskCompletionSource<bool>();
+            MessageHandler handler = new MessageHandler() { ResultTask = task.Task };
+            MessageBoxService target = CreateMessageBoxService(messageHandler: handler);
 
-            var result = target.ShowMessage("My message", "Test");
+            Task result = target.ShowMessage("My message", "Test");
 
             Assert.IsFalse(result.IsCompleted);
 
@@ -80,9 +80,9 @@ namespace Duracellko.PlanningPoker.Client.Test.UI
         [TestMethod]
         public void ShowMessage_PrimaryButtonAndNoHandler_ReturnsCompletedTask()
         {
-            var target = CreateMessageBoxService();
+            MessageBoxService target = CreateMessageBoxService();
 
-            var result = target.ShowMessage("My message", "Test", "Click me");
+            Task<bool> result = target.ShowMessage("My message", "Test", "Click me");
 
             Assert.IsTrue(result.IsCompletedSuccessfully);
         }
@@ -90,8 +90,8 @@ namespace Duracellko.PlanningPoker.Client.Test.UI
         [TestMethod]
         public async Task ShowMessage_PrimaryButtonAndHandler_HandlerIsExecuted()
         {
-            var handler = new MessageHandler();
-            var target = CreateMessageBoxService(messageHandler: handler);
+            MessageHandler handler = new MessageHandler();
+            MessageBoxService target = CreateMessageBoxService(messageHandler: handler);
 
             await target.ShowMessage("My message", "Test", "Click me");
 
@@ -104,8 +104,8 @@ namespace Duracellko.PlanningPoker.Client.Test.UI
         [TestMethod]
         public async Task ShowMessage_PrimaryButtonIsNull_HandlerIsExecuted()
         {
-            var handler = new MessageHandler();
-            var target = CreateMessageBoxService(messageHandler: handler);
+            MessageHandler handler = new MessageHandler();
+            MessageBoxService target = CreateMessageBoxService(messageHandler: handler);
 
             await target.ShowMessage("My message", "Test", null);
 
@@ -118,8 +118,8 @@ namespace Duracellko.PlanningPoker.Client.Test.UI
         [TestMethod]
         public async Task ShowMessage_PrimaryButtonAndMessageIsNull_HandlerIsExecuted()
         {
-            var handler = new MessageHandler();
-            var target = CreateMessageBoxService(messageHandler: handler);
+            MessageHandler handler = new MessageHandler();
+            MessageBoxService target = CreateMessageBoxService(messageHandler: handler);
 
             await target.ShowMessage(null, null, null);
 
@@ -132,10 +132,10 @@ namespace Duracellko.PlanningPoker.Client.Test.UI
         [TestMethod]
         public async Task ShowMessage_PrimaryButtonAndHandlerReturnsTrue_ReturnsTrue()
         {
-            var handler = new MessageHandler();
-            var target = CreateMessageBoxService(messageHandler: handler);
+            MessageHandler handler = new MessageHandler();
+            MessageBoxService target = CreateMessageBoxService(messageHandler: handler);
 
-            var result = await target.ShowMessage("My message", "Test", "Click me");
+            bool result = await target.ShowMessage("My message", "Test", "Click me");
 
             Assert.IsTrue(result);
         }
@@ -143,10 +143,10 @@ namespace Duracellko.PlanningPoker.Client.Test.UI
         [TestMethod]
         public async Task ShowMessage_PrimaryButtonAndHandlerReturnsFalse_ReturnsFalse()
         {
-            var handler = new MessageHandler() { Result = false };
-            var target = CreateMessageBoxService(messageHandler: handler);
+            MessageHandler handler = new MessageHandler() { Result = false };
+            MessageBoxService target = CreateMessageBoxService(messageHandler: handler);
 
-            var result = await target.ShowMessage("My message", "Test", "Click me");
+            bool result = await target.ShowMessage("My message", "Test", "Click me");
 
             Assert.IsFalse(result);
         }
@@ -154,10 +154,10 @@ namespace Duracellko.PlanningPoker.Client.Test.UI
         [TestMethod]
         public async Task ShowMessage_PrimaryButtonIsNullAndHandlerReturnsFalse_ReturnsFalse()
         {
-            var handler = new MessageHandler() { Result = false };
-            var target = CreateMessageBoxService(messageHandler: handler);
+            MessageHandler handler = new MessageHandler() { Result = false };
+            MessageBoxService target = CreateMessageBoxService(messageHandler: handler);
 
-            var result = await target.ShowMessage("My message", "Test", null);
+            bool result = await target.ShowMessage("My message", "Test", null);
 
             Assert.IsFalse(result);
         }
@@ -165,11 +165,11 @@ namespace Duracellko.PlanningPoker.Client.Test.UI
         [TestMethod]
         public async Task ShowMessage_PrimaryButtonAndHandlerIsNotCompleted_ReturnsNotCompletedTask()
         {
-            var task = new TaskCompletionSource<bool>();
-            var handler = new MessageHandler() { ResultTask = task.Task };
-            var target = CreateMessageBoxService(messageHandler: handler);
+            TaskCompletionSource<bool> task = new TaskCompletionSource<bool>();
+            MessageHandler handler = new MessageHandler() { ResultTask = task.Task };
+            MessageBoxService target = CreateMessageBoxService(messageHandler: handler);
 
-            var result = target.ShowMessage("My message", "Test", "Click me");
+            Task<bool> result = target.ShowMessage("My message", "Test", "Click me");
 
             Assert.IsFalse(result.IsCompleted);
 
@@ -181,7 +181,7 @@ namespace Duracellko.PlanningPoker.Client.Test.UI
 
         private static MessageBoxService CreateMessageBoxService(MessageHandler messageHandler = null)
         {
-            var result = new MessageBoxService();
+            MessageBoxService result = new MessageBoxService();
             result.SetMessageHandler(messageHandler != null ? messageHandler.HandleMessage : default(Func<string, string, string, Task<bool>>));
             return result;
         }

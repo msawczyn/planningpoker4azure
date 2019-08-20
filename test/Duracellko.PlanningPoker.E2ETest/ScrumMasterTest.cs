@@ -39,13 +39,13 @@ namespace Duracellko.PlanningPoker.E2ETest
             ClientTest.AssertScrumMasterInTeam(scrumMaster);
             ClientTest.AssertMembersInTeam();
             ClientTest.AssertObserversInTeam();
-            ClientTest.StartEstimation();
-            TakeScreenshot("05-EstimationStarted");
-            ClientTest.AssertAvailableEstimations();
-            ClientTest.SelectEstimation("1");
+            ClientTest.StartEstimate();
+            TakeScreenshot("05-EstimateStarted");
+            ClientTest.AssertAvailableEstimates();
+            ClientTest.SelectEstimate("1");
             await Task.Delay(500);
             TakeScreenshot("06-Estimated");
-            ClientTest.AssertSelectedEstimation(new KeyValuePair<string, string>(scrumMaster, "1"));
+            ClientTest.AssertSelectedEstimate(new KeyValuePair<string, string>(scrumMaster, "1"));
             ClientTest.Disconnect();
             TakeScreenshot("07-Disconnected");
         }
@@ -72,8 +72,8 @@ namespace Duracellko.PlanningPoker.E2ETest
             ClientTest.AssertIndexPage();
             TakeScreenshot("03-RequiredError");
 
-            var input = ClientTest.CreateTeamForm.FindElement(By.Id("createTeam$teamName"));
-            var required = input.FindElement(By.XPath("../span"));
+            IWebElement input = ClientTest.CreateTeamForm.FindElement(By.Id("createTeam$teamName"));
+            IWebElement required = input.FindElement(By.XPath("../span"));
             Assert.AreEqual("Required", required.Text);
 
             input = ClientTest.CreateTeamForm.FindElement(By.Id("createTeam$scrumMasterName"));

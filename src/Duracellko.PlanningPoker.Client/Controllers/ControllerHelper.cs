@@ -22,8 +22,8 @@ namespace Duracellko.PlanningPoker.Client.Controllers
                 throw new ArgumentNullException(nameof(exception));
             }
 
-            var result = exception.Message;
-            var newLineIndex = result.IndexOf('\n');
+            string result = exception.Message;
+            int newLineIndex = result.IndexOf('\n');
             if (newLineIndex >= 0)
             {
                 result = result.Substring(0, newLineIndex);
@@ -45,8 +45,8 @@ namespace Duracellko.PlanningPoker.Client.Controllers
                 throw new ArgumentNullException(nameof(uriHelper));
             }
 
-            var urlEncoder = UrlEncoder.Default;
-            var uri = $"PlanningPoker/{urlEncoder.Encode(team.Name)}/{urlEncoder.Encode(member)}";
+            UrlEncoder urlEncoder = UrlEncoder.Default;
+            string uri = $"PlanningPoker/{urlEncoder.Encode(team.Name)}/{urlEncoder.Encode(member)}";
             uriHelper.NavigateTo(uri);
         }
     }

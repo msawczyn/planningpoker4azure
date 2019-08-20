@@ -30,7 +30,7 @@ namespace Duracellko.PlanningPoker.Data
         {
             get
             {
-                var result = _configuration.RepositoryFolder;
+                string result = _configuration.RepositoryFolder;
                 if (string.IsNullOrEmpty(result))
                 {
                     result = @"App_Data\Teams";

@@ -5,41 +5,41 @@ using System.Diagnostics.CodeAnalysis;
 namespace Duracellko.PlanningPoker.Domain
 {
     /// <summary>
-    /// Collection of estimations of all members involved in planning poker.
+    /// Collection of estimates of all members involved in planning poker.
     /// </summary>
     [Serializable]
-    [SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "EstimationResult is more than just a collection.")]
+    [SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "EstimateResult is more than just a collection.")]
     [SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1201:ElementsMustAppearInTheCorrectOrder", Justification = "Interface implemetnation members are grouped together.")]
-    public sealed class EstimationResult : ICollection<KeyValuePair<Member, Estimation>>
+    public sealed class EstimateResult : ICollection<KeyValuePair<Member, Estimate>>
     {
-        private readonly Dictionary<Member, Estimation> _estimations = new Dictionary<Member, Estimation>();
+        private readonly Dictionary<Member, Estimate> _estimates = new Dictionary<Member, Estimate>();
         private bool _isReadOnly;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EstimationResult"/> class.
+        /// Initializes a new instance of the <see cref="EstimateResult"/> class.
         /// </summary>
         /// <param name="members">The members involved in planning poker.</param>
-        public EstimationResult(IEnumerable<Member> members)
+        public EstimateResult(IEnumerable<Member> members)
         {
             if (members == null)
             {
                 throw new ArgumentNullException(nameof(members));
             }
 
-            foreach (var member in members)
+            foreach (Member member in members)
             {
-                _estimations.Add(member, null);
+                _estimates.Add(member, null);
             }
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="Duracellko.PlanningPoker.Domain.Estimation"/> for the specified member.
+        /// Gets or sets the <see cref="Duracellko.PlanningPoker.Domain.Estimate"/> for the specified member.
         /// </summary>
-        /// <param name="member">The member to get or set estimation for.</param>
-        /// <returns>The estimation of the member.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers", Justification = "Member is valid indexer of EstimationResult.")]
+        /// <param name="member">The member to get or set estimate for.</param>
+        /// <returns>The estimate of the member.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers", Justification = "Member is valid indexer of EstimateResult.")]
         [SuppressMessage("Design", "CA1065:Do not raise exceptions in unexpected locations", Justification = "Key not found in indexer.")]
-        public Estimation this[Member member]
+        public Estimate this[Member member]
         {
             get
             {
@@ -48,14 +48,14 @@ namespace Duracellko.PlanningPoker.Domain
                     throw new KeyNotFoundException(Resources.Error_MemberNotInResult);
                 }
 
-                return _estimations[member];
+                return _estimates[member];
             }
 
             set
             {
                 if (_isReadOnly)
                 {
-                    throw new InvalidOperationException(Resources.Error_EstimationResultIsReadOnly);
+                    throw new InvalidOperationException(Resources.Error_EstimateResultIsReadOnly);
                 }
 
                 if (!ContainsMember(member))
@@ -63,7 +63,7 @@ namespace Duracellko.PlanningPoker.Domain
                     throw new KeyNotFoundException(Resources.Error_MemberNotInResult);
                 }
 
-                _estimations[member] = value;
+                _estimates[member] = value;
             }
         }
 
@@ -76,11 +76,11 @@ namespace Duracellko.PlanningPoker.Domain
         /// </returns>
         public bool ContainsMember(Member member)
         {
-            return _estimations.ContainsKey(member);
+            return _estimates.ContainsKey(member);
         }
 
         /// <summary>
-        /// Sets the collection as read only. Mostly used after all members picked their estimations.
+        /// Sets the collection as read only. Mostly used after all members picked their estimates.
         /// </summary>
         public void SetReadOnly()
         {
@@ -93,7 +93,7 @@ namespace Duracellko.PlanningPoker.Domain
         /// <value>The number of elements.</value>
         public int Count
         {
-            get { return _estimations.Count; }
+            get { return _estimates.Count; }
         }
 
         /// <summary>
@@ -111,9 +111,9 @@ namespace Duracellko.PlanningPoker.Domain
         /// Returns an enumerator that iterates through the collection.
         /// </summary>
         /// <returns>A <see cref="System.Collections.Generic.IEnumerator&lt;T&gt;"/> that can be used to iterate through the collection.</returns>
-        public IEnumerator<KeyValuePair<Member, Estimation>> GetEnumerator()
+        public IEnumerator<KeyValuePair<Member, Estimate>> GetEnumerator()
         {
-            return _estimations.GetEnumerator();
+            return _estimates.GetEnumerator();
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
@@ -121,27 +121,27 @@ namespace Duracellko.PlanningPoker.Domain
             return GetEnumerator();
         }
 
-        bool ICollection<KeyValuePair<Member, Estimation>>.Contains(KeyValuePair<Member, Estimation> item)
+        bool ICollection<KeyValuePair<Member, Estimate>>.Contains(KeyValuePair<Member, Estimate> item)
         {
-            return ((ICollection<KeyValuePair<Member, Estimation>>)_estimations).Contains(item);
+            return ((ICollection<KeyValuePair<Member, Estimate>>)_estimates).Contains(item);
         }
 
-        void ICollection<KeyValuePair<Member, Estimation>>.CopyTo(KeyValuePair<Member, Estimation>[] array, int arrayIndex)
+        void ICollection<KeyValuePair<Member, Estimate>>.CopyTo(KeyValuePair<Member, Estimate>[] array, int arrayIndex)
         {
-            ((ICollection<KeyValuePair<Member, Estimation>>)_estimations).CopyTo(array, arrayIndex);
+            ((ICollection<KeyValuePair<Member, Estimate>>)_estimates).CopyTo(array, arrayIndex);
         }
 
-        void ICollection<KeyValuePair<Member, Estimation>>.Add(KeyValuePair<Member, Estimation> item)
-        {
-            throw new NotSupportedException();
-        }
-
-        void ICollection<KeyValuePair<Member, Estimation>>.Clear()
+        void ICollection<KeyValuePair<Member, Estimate>>.Add(KeyValuePair<Member, Estimate> item)
         {
             throw new NotSupportedException();
         }
 
-        bool ICollection<KeyValuePair<Member, Estimation>>.Remove(KeyValuePair<Member, Estimation> item)
+        void ICollection<KeyValuePair<Member, Estimate>>.Clear()
+        {
+            throw new NotSupportedException();
+        }
+
+        bool ICollection<KeyValuePair<Member, Estimate>>.Remove(KeyValuePair<Member, Estimate> item)
         {
             throw new NotSupportedException();
         }

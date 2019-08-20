@@ -30,7 +30,7 @@ namespace Duracellko.PlanningPoker.Client.UI
         /// <returns><c>True</c> if user clicked the primary button; otherwise <c>false</c>.</returns>
         public Task<bool> ShowMessage(string message, string title, string primaryButton)
         {
-            var handler = _messageHandler;
+            Func<string, string, string, Task<bool>> handler = _messageHandler;
             if (handler != null)
             {
                 return handler(message, title, primaryButton);

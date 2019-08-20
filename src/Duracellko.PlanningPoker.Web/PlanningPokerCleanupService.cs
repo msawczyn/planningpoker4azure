@@ -26,7 +26,7 @@ namespace Duracellko.PlanningPoker.Web
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            var timerInterval = _configuration.ClientInactivityCheckInterval;
+            TimeSpan timerInterval = _configuration.ClientInactivityCheckInterval;
 
             _cleanupTimer = new System.Timers.Timer(timerInterval.TotalMilliseconds);
             _cleanupTimer.Elapsed += new ElapsedEventHandler(CleanupTimerOnElapsed);

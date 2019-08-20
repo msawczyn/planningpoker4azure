@@ -20,9 +20,9 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void ObservableMessages_TeamCreated_ScrumTeamCreatedMessage()
         {
             // Arrange
-            var target = CreateAzurePlanningPokerController();
+            AzurePlanningPokerController target = CreateAzurePlanningPokerController();
             target.EndInitialization();
-            var messages = new List<ScrumTeamMessage>();
+            List<ScrumTeamMessage> messages = new List<ScrumTeamMessage>();
 
             // Act
             target.ObservableMessages.Subscribe(m => messages.Add(m));
@@ -39,10 +39,10 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void ObservableMessages_MemberJoined_ScrumTeamMemberMessage()
         {
             // Arrange
-            var target = CreateAzurePlanningPokerController();
+            AzurePlanningPokerController target = CreateAzurePlanningPokerController();
             target.EndInitialization();
-            var messages = new List<ScrumTeamMessage>();
-            var teamLock = target.CreateScrumTeam("test", "master");
+            List<ScrumTeamMessage> messages = new List<ScrumTeamMessage>();
+            IScrumTeamLock teamLock = target.CreateScrumTeam("test", "master");
 
             // Act
             target.ObservableMessages.Subscribe(m => messages.Add(m));
@@ -54,7 +54,7 @@ namespace Duracellko.PlanningPoker.Azure.Test
             Assert.AreEqual<MessageType>(MessageType.MemberJoined, messages[0].MessageType);
             Assert.AreEqual<string>("test", messages[0].TeamName);
             Assert.IsInstanceOfType(messages[0], typeof(ScrumTeamMemberMessage));
-            var memberMessage = (ScrumTeamMemberMessage)messages[0];
+            ScrumTeamMemberMessage memberMessage = (ScrumTeamMemberMessage)messages[0];
             Assert.AreEqual<string>("member", memberMessage.MemberName);
             Assert.AreEqual<string>("Member", memberMessage.MemberType);
         }
@@ -63,10 +63,10 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void ObservableMessages_MemberDisconnected_ScrumTeamMemberMessage()
         {
             // Arrange
-            var target = CreateAzurePlanningPokerController();
+            AzurePlanningPokerController target = CreateAzurePlanningPokerController();
             target.EndInitialization();
-            var messages = new List<ScrumTeamMessage>();
-            var teamLock = target.CreateScrumTeam("test", "master");
+            List<ScrumTeamMessage> messages = new List<ScrumTeamMessage>();
+            IScrumTeamLock teamLock = target.CreateScrumTeam("test", "master");
 
             // Act
             target.ObservableMessages.Subscribe(m => messages.Add(m));
@@ -78,7 +78,7 @@ namespace Duracellko.PlanningPoker.Azure.Test
             Assert.AreEqual<MessageType>(MessageType.MemberDisconnected, messages[0].MessageType);
             Assert.AreEqual<string>("test", messages[0].TeamName);
             Assert.IsInstanceOfType(messages[0], typeof(ScrumTeamMemberMessage));
-            var memberMessage = (ScrumTeamMemberMessage)messages[0];
+            ScrumTeamMemberMessage memberMessage = (ScrumTeamMemberMessage)messages[0];
             Assert.AreEqual<string>("master", memberMessage.MemberName);
             Assert.AreEqual<string>("ScrumMaster", memberMessage.MemberType);
         }
@@ -87,10 +87,10 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void ObservableMessages_MemberUpdateActivity_ScrumTeamMemberMessage()
         {
             // Arrange
-            var target = CreateAzurePlanningPokerController();
+            AzurePlanningPokerController target = CreateAzurePlanningPokerController();
             target.EndInitialization();
-            var messages = new List<ScrumTeamMessage>();
-            var teamLock = target.CreateScrumTeam("test", "master");
+            List<ScrumTeamMessage> messages = new List<ScrumTeamMessage>();
+            IScrumTeamLock teamLock = target.CreateScrumTeam("test", "master");
 
             // Act
             target.ObservableMessages.Subscribe(m => messages.Add(m));
@@ -102,49 +102,49 @@ namespace Duracellko.PlanningPoker.Azure.Test
             Assert.AreEqual<MessageType>(MessageType.MemberActivity, messages[0].MessageType);
             Assert.AreEqual<string>("test", messages[0].TeamName);
             Assert.IsInstanceOfType(messages[0], typeof(ScrumTeamMemberMessage));
-            var memberMessage = (ScrumTeamMemberMessage)messages[0];
+            ScrumTeamMemberMessage memberMessage = (ScrumTeamMemberMessage)messages[0];
             Assert.AreEqual<string>("master", memberMessage.MemberName);
             Assert.AreEqual<string>("ScrumMaster", memberMessage.MemberType);
         }
 
         [TestMethod]
-        public void ObservableMessages_EstimationStarted_ScrumTeamMessage()
+        public void ObservableMessages_EstimateStarted_ScrumTeamMessage()
         {
             // Arrange
-            var target = CreateAzurePlanningPokerController();
+            AzurePlanningPokerController target = CreateAzurePlanningPokerController();
             target.EndInitialization();
-            var messages = new List<ScrumTeamMessage>();
-            var teamLock = target.CreateScrumTeam("test", "master");
+            List<ScrumTeamMessage> messages = new List<ScrumTeamMessage>();
+            IScrumTeamLock teamLock = target.CreateScrumTeam("test", "master");
 
             // Act
             target.ObservableMessages.Subscribe(m => messages.Add(m));
-            teamLock.Team.ScrumMaster.StartEstimation();
+            teamLock.Team.ScrumMaster.StartEstimate();
             target.Dispose();
 
             // Verify
             Assert.AreEqual<int>(1, messages.Count);
-            Assert.AreEqual<MessageType>(MessageType.EstimationStarted, messages[0].MessageType);
+            Assert.AreEqual<MessageType>(MessageType.EstimateStarted, messages[0].MessageType);
             Assert.AreEqual<string>("test", messages[0].TeamName);
         }
 
         [TestMethod]
-        public void ObservableMessages_EstimationCanceled_ScrumTeamMessage()
+        public void ObservableMessages_EstimateCanceled_ScrumTeamMessage()
         {
             // Arrange
-            var target = CreateAzurePlanningPokerController();
+            AzurePlanningPokerController target = CreateAzurePlanningPokerController();
             target.EndInitialization();
-            var messages = new List<ScrumTeamMessage>();
-            var teamLock = target.CreateScrumTeam("test", "master");
-            teamLock.Team.ScrumMaster.StartEstimation();
+            List<ScrumTeamMessage> messages = new List<ScrumTeamMessage>();
+            IScrumTeamLock teamLock = target.CreateScrumTeam("test", "master");
+            teamLock.Team.ScrumMaster.StartEstimate();
 
             // Act
             target.ObservableMessages.Subscribe(m => messages.Add(m));
-            teamLock.Team.ScrumMaster.CancelEstimation();
+            teamLock.Team.ScrumMaster.CancelEstimate();
             target.Dispose();
 
             // Verify
             Assert.AreEqual<int>(1, messages.Count);
-            Assert.AreEqual<MessageType>(MessageType.EstimationCanceled, messages[0].MessageType);
+            Assert.AreEqual<MessageType>(MessageType.EstimateCanceled, messages[0].MessageType);
             Assert.AreEqual<string>("test", messages[0].TeamName);
         }
 
@@ -152,36 +152,36 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void ObservableMessages_MemberEstimated_ScrumTeamMemberMessage()
         {
             // Arrange
-            var target = CreateAzurePlanningPokerController();
+            AzurePlanningPokerController target = CreateAzurePlanningPokerController();
             target.EndInitialization();
-            var messages = new List<ScrumTeamMessage>();
-            var teamLock = target.CreateScrumTeam("test", "master");
-            teamLock.Team.ScrumMaster.StartEstimation();
+            List<ScrumTeamMessage> messages = new List<ScrumTeamMessage>();
+            IScrumTeamLock teamLock = target.CreateScrumTeam("test", "master");
+            teamLock.Team.ScrumMaster.StartEstimate();
 
             // Act
             target.ObservableMessages.Subscribe(m => messages.Add(m));
-            teamLock.Team.ScrumMaster.Estimation = new Estimation(3.0);
+            teamLock.Team.ScrumMaster.Estimate = new Estimate(3.0);
             target.Dispose();
 
             // Verify
             Assert.AreEqual<int>(2, messages.Count);
             Assert.AreEqual<MessageType>(MessageType.MemberEstimated, messages[0].MessageType);
             Assert.AreEqual<string>("test", messages[0].TeamName);
-            Assert.IsInstanceOfType(messages[0], typeof(ScrumTeamMemberEstimationMessage));
-            var memberMessage = (ScrumTeamMemberEstimationMessage)messages[0];
+            Assert.IsInstanceOfType(messages[0], typeof(ScrumTeamMemberEstimateMessage));
+            ScrumTeamMemberEstimateMessage memberMessage = (ScrumTeamMemberEstimateMessage)messages[0];
             Assert.AreEqual<string>("master", memberMessage.MemberName);
-            Assert.AreEqual<double?>(3.0, memberMessage.Estimation);
+            Assert.AreEqual<double?>(3.0, memberMessage.Estimate);
         }
 
         [TestMethod]
         public void CreateScrumteam_AfterInitialization_CreatesNewTeam()
         {
             // Arrange
-            var target = CreateAzurePlanningPokerController();
+            AzurePlanningPokerController target = CreateAzurePlanningPokerController();
             target.EndInitialization();
 
             // Act
-            var result = target.CreateScrumTeam("test", "master");
+            IScrumTeamLock result = target.CreateScrumTeam("test", "master");
 
             // Verify
             Assert.IsNotNull(result);
@@ -194,10 +194,10 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void CreateScrumteam_InitializationTeamListIsNotSet_WaitForInitializationTeamList()
         {
             // Arrange
-            var target = CreateAzurePlanningPokerController();
+            AzurePlanningPokerController target = CreateAzurePlanningPokerController();
 
             // Act
-            var task = Task.Factory.StartNew<IScrumTeamLock>(() => target.CreateScrumTeam("test", "master"), default(CancellationToken), TaskCreationOptions.None, TaskScheduler.Default);
+            Task<IScrumTeamLock> task = Task.Factory.StartNew<IScrumTeamLock>(() => target.CreateScrumTeam("test", "master"), default(CancellationToken), TaskCreationOptions.None, TaskScheduler.Default);
             Assert.IsFalse(task.IsCompleted);
             Thread.Sleep(50);
             Assert.IsFalse(task.IsCompleted);
@@ -213,7 +213,7 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void CreateScrumteam_TeamNameIsInInitializationTeamList_ArgumentException()
         {
             // Arrange
-            var target = CreateAzurePlanningPokerController();
+            AzurePlanningPokerController target = CreateAzurePlanningPokerController();
             target.SetTeamsInitializingList(new string[] { "test" });
 
             // Act
@@ -225,8 +225,8 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void CreateScrumteam_InitializationTimeout_Exception()
         {
             // Arrange
-            var configuration = new AzurePlanningPokerConfiguration() { InitializationTimeout = 1 };
-            var target = CreateAzurePlanningPokerController(configuration: configuration);
+            AzurePlanningPokerConfiguration configuration = new AzurePlanningPokerConfiguration() { InitializationTimeout = 1 };
+            AzurePlanningPokerController target = CreateAzurePlanningPokerController(configuration: configuration);
 
             // Act
             target.CreateScrumTeam("test", "master");
@@ -236,16 +236,16 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void GetScrumTeam_AfterInitialization_GetsExistingTeam()
         {
             // Arrange
-            var target = CreateAzurePlanningPokerController();
+            AzurePlanningPokerController target = CreateAzurePlanningPokerController();
             target.EndInitialization();
             ScrumTeam team;
-            using (var teamLock = target.CreateScrumTeam("test team", "master"))
+            using (IScrumTeamLock teamLock = target.CreateScrumTeam("test team", "master"))
             {
                 team = teamLock.Team;
             }
 
             // Act
-            var result = target.GetScrumTeam("test team");
+            IScrumTeamLock result = target.GetScrumTeam("test team");
 
             // Verify
             Assert.AreEqual<ScrumTeam>(team, result.Team);
@@ -255,11 +255,11 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void GetScrumTeam_TeamIsNotInitialized_WaitForTeamInitialization()
         {
             // Arrange
-            var target = CreateAzurePlanningPokerController();
+            AzurePlanningPokerController target = CreateAzurePlanningPokerController();
             target.SetTeamsInitializingList(new string[] { "test team", "team2" });
 
             // Act
-            var task = Task.Factory.StartNew<IScrumTeamLock>(() => target.GetScrumTeam("test team"), default(CancellationToken), TaskCreationOptions.None, TaskScheduler.Default);
+            Task<IScrumTeamLock> task = Task.Factory.StartNew<IScrumTeamLock>(() => target.GetScrumTeam("test team"), default(CancellationToken), TaskCreationOptions.None, TaskScheduler.Default);
             Assert.IsFalse(task.IsCompleted);
             Thread.Sleep(50);
             Assert.IsFalse(task.IsCompleted);
@@ -274,12 +274,12 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void GetScrumTeam_TeamIsNotWaitingForInitialization_ReturnsTeam()
         {
             // Arrange
-            var target = CreateAzurePlanningPokerController();
+            AzurePlanningPokerController target = CreateAzurePlanningPokerController();
             target.SetTeamsInitializingList(new string[] { "test team", "team2" });
             target.InitializeScrumTeam(new ScrumTeam("test team"));
 
             // Act
-            var result = target.GetScrumTeam("test team");
+            IScrumTeamLock result = target.GetScrumTeam("test team");
 
             // Verify
             Assert.IsNotNull(result);
@@ -290,8 +290,8 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void GetScrumTeam_InitializationTimeout_ArgumentException()
         {
             // Arrange
-            var configuration = new AzurePlanningPokerConfiguration() { InitializationTimeout = 1 };
-            var target = CreateAzurePlanningPokerController(configuration: configuration);
+            AzurePlanningPokerConfiguration configuration = new AzurePlanningPokerConfiguration() { InitializationTimeout = 1 };
+            AzurePlanningPokerController target = CreateAzurePlanningPokerController(configuration: configuration);
 
             // Act
             target.GetScrumTeam("test team");
@@ -301,9 +301,9 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void SetTeamsInitializingList_TeamSpeacified_DeleteAllFromRepository()
         {
             // Arrange
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
             repository.Setup(r => r.DeleteAll());
-            var target = CreateAzurePlanningPokerController(repository: repository.Object);
+            AzurePlanningPokerController target = CreateAzurePlanningPokerController(repository: repository.Object);
 
             // Act
             target.SetTeamsInitializingList(new string[] { "team" });
@@ -316,8 +316,8 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void SetTeamsInitializingList_AfterEndInitialization_NotDeleteAnythingFromRepository()
         {
             // Arrange
-            var repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
-            var target = CreateAzurePlanningPokerController(repository: repository.Object);
+            Mock<IScrumTeamRepository> repository = new Mock<IScrumTeamRepository>(MockBehavior.Strict);
+            AzurePlanningPokerController target = CreateAzurePlanningPokerController(repository: repository.Object);
             target.EndInitialization();
 
             // Act
@@ -331,15 +331,15 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void InitializeScrumTeam_TeamSpeacified_TeamAddedToController()
         {
             // Arrange
-            var target = CreateAzurePlanningPokerController();
-            var team = new ScrumTeam("team");
+            AzurePlanningPokerController target = CreateAzurePlanningPokerController();
+            ScrumTeam team = new ScrumTeam("team");
             target.SetTeamsInitializingList(new string[] { "team" });
 
             // Act
             target.InitializeScrumTeam(team);
 
             // Verify
-            var result = target.GetScrumTeam("team");
+            IScrumTeamLock result = target.GetScrumTeam("team");
             Assert.AreEqual<ScrumTeam>(team, result.Team);
         }
 
@@ -347,8 +347,8 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void InitializeScrumTeam_TeamSpecified_TeamCreatedMessageIsNotSent()
         {
             // Arrange
-            var target = CreateAzurePlanningPokerController();
-            var team = new ScrumTeam("team");
+            AzurePlanningPokerController target = CreateAzurePlanningPokerController();
+            ScrumTeam team = new ScrumTeam("team");
             target.SetTeamsInitializingList(new string[] { "team" });
             ScrumTeamMessage message = null;
             target.ObservableMessages.Subscribe(m => message = m);

@@ -7,6 +7,7 @@ using Duracellko.PlanningPoker.Service;
 using Microsoft.AspNetCore.Blazor.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Moq.Language.Flow;
 
 namespace Duracellko.PlanningPoker.Client.Test.Controllers
 {
@@ -16,11 +17,11 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task CreateTeam_TeamName_CreateTeamOnService()
         {
-            var scrumTeam = PlanningPokerData.GetInitialScrumTeam();
-            var planningPokerService = new Mock<IPlanningPokerClient>();
+            ScrumTeam scrumTeam = PlanningPokerData.GetInitialScrumTeam();
+            Mock<IPlanningPokerClient> planningPokerService = new Mock<IPlanningPokerClient>();
             planningPokerService.Setup(o => o.CreateTeam(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(scrumTeam);
-            var target = CreateController(planningPokerService: planningPokerService.Object);
+            CreateTeamController target = CreateController(planningPokerService: planningPokerService.Object);
 
             await target.CreateTeam(PlanningPokerData.TeamName, PlanningPokerData.ScrumMasterName);
 
@@ -30,10 +31,10 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task CreateTeam_TeamNameAndScrumMasterName_ReturnTrue()
         {
-            var scrumTeam = PlanningPokerData.GetInitialScrumTeam();
-            var target = CreateController(scrumTeam: scrumTeam);
+            ScrumTeam scrumTeam = PlanningPokerData.GetInitialScrumTeam();
+            CreateTeamController target = CreateController(scrumTeam: scrumTeam);
 
-            var result = await target.CreateTeam(PlanningPokerData.TeamName, PlanningPokerData.ScrumMasterName);
+            bool result = await target.CreateTeam(PlanningPokerData.TeamName, PlanningPokerData.ScrumMasterName);
 
             Assert.IsTrue(result);
         }
@@ -45,10 +46,10 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [DataRow(null, PlanningPokerData.ScrumMasterName, DisplayName = "TeamName Is Null")]
         public async Task CreateTeam_TeamNameOrScrumMasterNameIsEmpty_ReturnFalse(string teamName, string scrumMasterName)
         {
-            var planningPokerService = new Mock<IPlanningPokerClient>();
-            var target = CreateController(planningPokerService: planningPokerService.Object);
+            Mock<IPlanningPokerClient> planningPokerService = new Mock<IPlanningPokerClient>();
+            CreateTeamController target = CreateController(planningPokerService: planningPokerService.Object);
 
-            var result = await target.CreateTeam(teamName, scrumMasterName);
+            bool result = await target.CreateTeam(teamName, scrumMasterName);
 
             Assert.IsFalse(result);
             planningPokerService.Verify(o => o.CreateTeam(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never());
@@ -57,9 +58,9 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task CreateTeam_ServiceReturnsTeam_InitializePlanningPokerController()
         {
-            var scrumTeam = PlanningPokerData.GetInitialScrumTeam();
-            var planningPokerInitializer = new Mock<IPlanningPokerInitializer>();
-            var target = CreateController(planningPokerInitializer: planningPokerInitializer.Object, scrumTeam: scrumTeam);
+            ScrumTeam scrumTeam = PlanningPokerData.GetInitialScrumTeam();
+            Mock<IPlanningPokerInitializer> planningPokerInitializer = new Mock<IPlanningPokerInitializer>();
+            CreateTeamController target = CreateController(planningPokerInitializer: planningPokerInitializer.Object, scrumTeam: scrumTeam);
 
             await target.CreateTeam(PlanningPokerData.TeamName, PlanningPokerData.ScrumMasterName);
 
@@ -69,9 +70,9 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task CreateTeam_ServiceReturnsTeam_NavigatesToPlanningPoker()
         {
-            var scrumTeam = PlanningPokerData.GetInitialScrumTeam();
-            var uriHelper = new Mock<IUriHelper>();
-            var target = CreateController(uriHelper: uriHelper.Object, scrumTeam: scrumTeam);
+            ScrumTeam scrumTeam = PlanningPokerData.GetInitialScrumTeam();
+            Mock<IUriHelper> uriHelper = new Mock<IUriHelper>();
+            CreateTeamController target = CreateController(uriHelper: uriHelper.Object, scrumTeam: scrumTeam);
 
             await target.CreateTeam(PlanningPokerData.TeamName, PlanningPokerData.ScrumMasterName);
 
@@ -81,9 +82,9 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task CreateTeam_ServiceThrowsException_ReturnsFalse()
         {
-            var target = CreateController(errorMessage: string.Empty);
+            CreateTeamController target = CreateController(errorMessage: string.Empty);
 
-            var result = await target.CreateTeam(PlanningPokerData.TeamName, PlanningPokerData.ScrumMasterName);
+            bool result = await target.CreateTeam(PlanningPokerData.TeamName, PlanningPokerData.ScrumMasterName);
 
             Assert.IsFalse(result);
         }
@@ -91,9 +92,9 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task CreateTeam_ServiceThrowsException_DoesNotInitializePlanningPokerController()
         {
-            var planningPokerInitializer = new Mock<IPlanningPokerInitializer>();
+            Mock<IPlanningPokerInitializer> planningPokerInitializer = new Mock<IPlanningPokerInitializer>();
 
-            var target = CreateController(planningPokerInitializer: planningPokerInitializer.Object, errorMessage: string.Empty);
+            CreateTeamController target = CreateController(planningPokerInitializer: planningPokerInitializer.Object, errorMessage: string.Empty);
 
             await target.CreateTeam(PlanningPokerData.TeamName, PlanningPokerData.ScrumMasterName);
 
@@ -103,9 +104,9 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task CreateTeam_ServiceThrowsException_DoesNotNavigateToPlanningPoker()
         {
-            var uriHelper = new Mock<IUriHelper>();
+            Mock<IUriHelper> uriHelper = new Mock<IUriHelper>();
 
-            var target = CreateController(uriHelper: uriHelper.Object, errorMessage: string.Empty);
+            CreateTeamController target = CreateController(uriHelper: uriHelper.Object, errorMessage: string.Empty);
 
             await target.CreateTeam(PlanningPokerData.TeamName, PlanningPokerData.ScrumMasterName);
 
@@ -115,10 +116,10 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task CreateTeam_ServiceThrowsException_ShowsMessage()
         {
-            var errorMessage = "Planning Poker Error";
-            var messageBoxService = new Mock<IMessageBoxService>();
+            string errorMessage = "Planning Poker Error";
+            Mock<IMessageBoxService> messageBoxService = new Mock<IMessageBoxService>();
 
-            var target = CreateController(messageBoxService: messageBoxService.Object, errorMessage: errorMessage);
+            CreateTeamController target = CreateController(messageBoxService: messageBoxService.Object, errorMessage: errorMessage);
 
             await target.CreateTeam(PlanningPokerData.TeamName, PlanningPokerData.ScrumMasterName);
 
@@ -128,10 +129,10 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task CreateTeam_ServiceThrowsException_Shows1LineMessage()
         {
-            var errorMessage = "Planning Poker Error\r\nArgumentException";
-            var messageBoxService = new Mock<IMessageBoxService>();
+            string errorMessage = "Planning Poker Error\r\nArgumentException";
+            Mock<IMessageBoxService> messageBoxService = new Mock<IMessageBoxService>();
 
-            var target = CreateController(messageBoxService: messageBoxService.Object, errorMessage: errorMessage);
+            CreateTeamController target = CreateController(messageBoxService: messageBoxService.Object, errorMessage: errorMessage);
 
             await target.CreateTeam(PlanningPokerData.TeamName, PlanningPokerData.ScrumMasterName);
 
@@ -141,16 +142,16 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         [TestMethod]
         public async Task CreateTeam_TeamName_ShowsBusyIndicator()
         {
-            var planningPokerService = new Mock<IPlanningPokerClient>();
-            var busyIndicatorService = new Mock<IBusyIndicatorService>();
-            var createTeamTask = new TaskCompletionSource<ScrumTeam>();
+            Mock<IPlanningPokerClient> planningPokerService = new Mock<IPlanningPokerClient>();
+            Mock<IBusyIndicatorService> busyIndicatorService = new Mock<IBusyIndicatorService>();
+            TaskCompletionSource<ScrumTeam> createTeamTask = new TaskCompletionSource<ScrumTeam>();
             planningPokerService.Setup(o => o.CreateTeam(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .Returns(createTeamTask.Task);
-            var busyIndicatorInstance = new Mock<IDisposable>();
+            Mock<IDisposable> busyIndicatorInstance = new Mock<IDisposable>();
             busyIndicatorService.Setup(o => o.Show()).Returns(busyIndicatorInstance.Object);
-            var target = CreateController(planningPokerService: planningPokerService.Object, busyIndicatorService: busyIndicatorService.Object);
+            CreateTeamController target = CreateController(planningPokerService: planningPokerService.Object, busyIndicatorService: busyIndicatorService.Object);
 
-            var result = target.CreateTeam(PlanningPokerData.TeamName, PlanningPokerData.ScrumMasterName);
+            Task<bool> result = target.CreateTeam(PlanningPokerData.TeamName, PlanningPokerData.ScrumMasterName);
 
             busyIndicatorService.Verify(o => o.Show());
             busyIndicatorInstance.Verify(o => o.Dispose(), Times.Never());
@@ -172,14 +173,14 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
         {
             if (planningPokerInitializer == null)
             {
-                var planningPokerInitializerMock = new Mock<IPlanningPokerInitializer>();
+                Mock<IPlanningPokerInitializer> planningPokerInitializerMock = new Mock<IPlanningPokerInitializer>();
                 planningPokerInitializer = planningPokerInitializerMock.Object;
             }
 
             if (planningPokerService == null)
             {
-                var planningPokerServiceMock = new Mock<IPlanningPokerClient>();
-                var createSetup = planningPokerServiceMock.Setup(o => o.CreateTeam(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()));
+                Mock<IPlanningPokerClient> planningPokerServiceMock = new Mock<IPlanningPokerClient>();
+                ISetup<IPlanningPokerClient, Task<ScrumTeam>> createSetup = planningPokerServiceMock.Setup(o => o.CreateTeam(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()));
                 if (errorMessage == null)
                 {
                     createSetup.ReturnsAsync(scrumTeam);
@@ -194,19 +195,19 @@ namespace Duracellko.PlanningPoker.Client.Test.Controllers
 
             if (messageBoxService == null)
             {
-                var messageBoxServiceMock = new Mock<IMessageBoxService>();
+                Mock<IMessageBoxService> messageBoxServiceMock = new Mock<IMessageBoxService>();
                 messageBoxService = messageBoxServiceMock.Object;
             }
 
             if (busyIndicatorService == null)
             {
-                var busyIndicatorServiceMock = new Mock<IBusyIndicatorService>();
+                Mock<IBusyIndicatorService> busyIndicatorServiceMock = new Mock<IBusyIndicatorService>();
                 busyIndicatorService = busyIndicatorServiceMock.Object;
             }
 
             if (uriHelper == null)
             {
-                var uriHelperMock = new Mock<IUriHelper>();
+                Mock<IUriHelper> uriHelperMock = new Mock<IUriHelper>();
                 uriHelper = uriHelperMock.Object;
             }
 

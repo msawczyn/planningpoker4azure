@@ -28,12 +28,12 @@ namespace Duracellko.PlanningPoker.Service
         public long LastMessageId { get; set; }
 
         /// <summary>
-        /// Gets or sets the last selected estimation by member.
+        /// Gets or sets the last selected estimate by member.
         /// </summary>
         /// <value>
-        /// The selected estimation.
+        /// The selected estimate.
         /// </value>
-        [JsonProperty("selectedEstimation")]
-        public Estimation SelectedEstimation { get; set; }
+        [JsonProperty("selectedEstimate")]
+        public Estimate SelectedEstimate { get; set; }
     }
 }

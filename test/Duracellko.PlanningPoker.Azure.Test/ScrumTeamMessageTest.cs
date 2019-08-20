@@ -11,11 +11,11 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void Constructor_TeamNameSpecified_TeamNameIsSet()
         {
             // Arrange
-            var teamName = "test";
-            var messageType = MessageType.Empty;
+            string teamName = "test";
+            MessageType messageType = MessageType.Empty;
 
             // Act
-            var result = new ScrumTeamMessage(teamName, messageType);
+            ScrumTeamMessage result = new ScrumTeamMessage(teamName, messageType);
 
             // Verify
             Assert.AreEqual<string>(teamName, result.TeamName);
@@ -25,11 +25,11 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void Constructor_MessageTypeSpecified_MessageTypeIsSet()
         {
             // Arrange
-            var teamName = "test";
-            var messageType = MessageType.MemberJoined;
+            string teamName = "test";
+            MessageType messageType = MessageType.MemberJoined;
 
             // Act
-            var result = new ScrumTeamMessage(teamName, messageType);
+            ScrumTeamMessage result = new ScrumTeamMessage(teamName, messageType);
 
             // Verify
             Assert.AreEqual<MessageType>(messageType, result.MessageType);
@@ -40,11 +40,11 @@ namespace Duracellko.PlanningPoker.Azure.Test
         public void Constructor_TeamNameIsEmpty_ArgumentNullException()
         {
             // Arrange
-            var teamName = string.Empty;
-            var messageType = MessageType.Empty;
+            string teamName = string.Empty;
+            MessageType messageType = MessageType.Empty;
 
             // Act
-            var result = new ScrumTeamMessage(teamName, messageType);
+            ScrumTeamMessage result = new ScrumTeamMessage(teamName, messageType);
         }
     }
 }

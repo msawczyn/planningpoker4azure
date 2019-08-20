@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+
+using Duracellko.PlanningPoker.Configuration;
 using Duracellko.PlanningPoker.Domain;
 using Duracellko.PlanningPoker.Test;
 using Microsoft.Extensions.Logging;
@@ -14,7 +17,7 @@ namespace Duracellko.PlanningPoker.Controllers.Test
         public void PlanningPokerController_Create_DefaultDateTimeProvider()
         {
             // Act
-            var result = CreatePlanningPokerController();
+            PlanningPokerController result = CreatePlanningPokerController();
 
             // Verify
             Assert.AreEqual<DateTimeProvider>(DateTimeProvider.Default, result.DateTimeProvider);
@@ -24,10 +27,10 @@ namespace Duracellko.PlanningPoker.Controllers.Test
         public void PlanningPokerController_SpecificDateTimeProvider_DateTimeProviderIsSet()
         {
             // Arrange
-            var dateTimeProvider = new DateTimeProviderMock();
+            DateTimeProviderMock dateTimeProvider = new DateTimeProviderMock();
 
             // Act
-            var result = CreatePlanningPokerController(dateTimeProvider: dateTimeProvider);
+            PlanningPokerController result = CreatePlanningPokerController(dateTimeProvider: dateTimeProvider);
 
             // Verify
             Assert.AreEqual<DateTimeProvider>(dateTimeProvider, result.DateTimeProvider);
@@ -37,10 +40,10 @@ namespace Duracellko.PlanningPoker.Controllers.Test
         public void PlanningPokerController_Configuration_ConfigurationIsSet()
         {
             // Arrange
-            var configuration = new Duracellko.PlanningPoker.Configuration.PlanningPokerConfiguration();
+            PlanningPokerConfiguration configuration = new Duracellko.PlanningPoker.Configuration.PlanningPokerConfiguration();
 
             // Act
-            var result = CreatePlanningPokerController(configuration: configuration);
+            PlanningPokerController result = CreatePlanningPokerController(configuration: configuration);
 
             // Verify
             Assert.AreEqual(configuration, result.Configuration);
@@ -50,20 +53,20 @@ namespace Duracellko.PlanningPoker.Controllers.Test
         public void ScrumTeamNames_Get_ReturnsListOfTeamNames()
         {
             // Arrange
-            var target = CreatePlanningPokerController();
-            using (var teamLock1 = target.CreateScrumTeam("team1", "master1"))
+            PlanningPokerController target = CreatePlanningPokerController();
+            using (IScrumTeamLock teamLock1 = target.CreateScrumTeam("team1", "master1"))
             {
             }
 
-            using (var teamLock2 = target.CreateScrumTeam("team2", "master1"))
+            using (IScrumTeamLock teamLock2 = target.CreateScrumTeam("team2", "master1"))
             {
             }
 
             // Act
-            var result = target.ScrumTeamNames;
+            IEnumerable<string> result = target.ScrumTeamNames;
 
             // Verify
-            var expectedCollection = new string[] { "team1", "team2" };
+            string[] expectedCollection = new string[] { "team1", "team2" };
             CollectionAssert.AreEquivalent(expectedCollection, result.ToList());
         }
 
@@ -71,10 +74,10 @@ namespace Duracellko.PlanningPoker.Controllers.Test
         public void CreateScrumTeam_TeamName_CreatedTeamWithSpecifiedName()
         {
             // Arrange
-            var target = CreatePlanningPokerController();
+            PlanningPokerController target = CreatePlanningPokerController();
 
             // Act
-            using (var teamLock = target.CreateScrumTeam("team", "master"))
+            using (IScrumTeamLock teamLock = target.CreateScrumTeam("team", "master"))
             {
                 // Verify
                 Assert.IsNotNull(teamLock);
@@ -87,10 +90,10 @@ namespace Duracellko.PlanningPoker.Controllers.Test
         public void CreateScrumTeam_ScrumMasterName_CreatedTeamWithSpecifiedScrumMaster()
         {
             // Arrange
-            var target = CreatePlanningPokerController();
+            PlanningPokerController target = CreatePlanningPokerController();
 
             // Act
-            using (var teamLock = target.CreateScrumTeam("team", "master"))
+            using (IScrumTeamLock teamLock = target.CreateScrumTeam("team", "master"))
             {
                 // Verify
                 Assert.IsNotNull(teamLock.Team.ScrumMaster);
@@ -103,8 +106,8 @@ namespace Duracellko.PlanningPoker.Controllers.Test
         public void CreateScrumTeam_TeamNameAlreadyExists_ArgumentException()
         {
             // Arrange
-            var target = CreatePlanningPokerController();
-            var team = target.CreateScrumTeam("team", "master");
+            PlanningPokerController target = CreatePlanningPokerController();
+            IScrumTeamLock team = target.CreateScrumTeam("team", "master");
             team.Dispose();
 
             // Act
@@ -116,7 +119,7 @@ namespace Duracellko.PlanningPoker.Controllers.Test
         public void CreateScrumTeam_TeamNameIsEmpty_ArgumentNullException()
         {
             // Arrange
-            var target = CreatePlanningPokerController();
+            PlanningPokerController target = CreatePlanningPokerController();
 
             // Act
             target.CreateScrumTeam(string.Empty, "master");
@@ -127,7 +130,7 @@ namespace Duracellko.PlanningPoker.Controllers.Test
         public void CreateScrumTeam_ScrumMasterNameIsEmpty_ArgumentNullException()
         {
             // Arrange
-            var target = CreatePlanningPokerController();
+            PlanningPokerController target = CreatePlanningPokerController();
 
             // Act
             target.CreateScrumTeam("test team", string.Empty);
@@ -137,11 +140,11 @@ namespace Duracellko.PlanningPoker.Controllers.Test
         public void CreateScrumTeam_SpecificDateTimeProvider_CreatedTeamWithDateTimeProvider()
         {
             // Arrange
-            var dateTimeProvider = new DateTimeProviderMock();
-            var target = CreatePlanningPokerController(dateTimeProvider: dateTimeProvider);
+            DateTimeProviderMock dateTimeProvider = new DateTimeProviderMock();
+            PlanningPokerController target = CreatePlanningPokerController(dateTimeProvider: dateTimeProvider);
 
             // Act
-            using (var teamLock = target.CreateScrumTeam("team", "master"))
+            using (IScrumTeamLock teamLock = target.CreateScrumTeam("team", "master"))
             {
                 // Verify
                 Assert.AreEqual<DateTimeProvider>(dateTimeProvider, teamLock.Team.DateTimeProvider);
@@ -152,8 +155,8 @@ namespace Duracellko.PlanningPoker.Controllers.Test
         public void AttachScrumTeam_ScrumTeam_TeamIsInCollection()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var target = CreatePlanningPokerController();
+            ScrumTeam team = new ScrumTeam("test team");
+            PlanningPokerController target = CreatePlanningPokerController();
 
             // Act
             target.AttachScrumTeam(team);
@@ -166,11 +169,11 @@ namespace Duracellko.PlanningPoker.Controllers.Test
         public void AttachScrumTeam_ScrumTeam_ReturnsSameTeam()
         {
             // Arrange
-            var team = new ScrumTeam("test team");
-            var target = CreatePlanningPokerController();
+            ScrumTeam team = new ScrumTeam("test team");
+            PlanningPokerController target = CreatePlanningPokerController();
 
             // Act
-            var result = target.AttachScrumTeam(team);
+            IScrumTeamLock result = target.AttachScrumTeam(team);
 
             // Verify
             Assert.AreEqual<ScrumTeam>(team, result.Team);
@@ -181,10 +184,10 @@ namespace Duracellko.PlanningPoker.Controllers.Test
         public void AttachScrumTeam_TeamNameAlreadyExists_ArgumentException()
         {
             // Arrange
-            var target = CreatePlanningPokerController();
-            var existingTeam = target.CreateScrumTeam("team", "master");
+            PlanningPokerController target = CreatePlanningPokerController();
+            IScrumTeamLock existingTeam = target.CreateScrumTeam("team", "master");
             existingTeam.Dispose();
-            var team = new ScrumTeam("team");
+            ScrumTeam team = new ScrumTeam("team");
 
             // Act
             target.AttachScrumTeam(team);
@@ -195,7 +198,7 @@ namespace Duracellko.PlanningPoker.Controllers.Test
         public void AttachScrumTeam_Null_ArgumentNullException()
         {
             // Arrange
-            var target = CreatePlanningPokerController();
+            PlanningPokerController target = CreatePlanningPokerController();
 
             // Act
             target.AttachScrumTeam(null);
@@ -205,15 +208,15 @@ namespace Duracellko.PlanningPoker.Controllers.Test
         public void GetScrumTeam_TeamNameExists_ReturnsExistingTeam()
         {
             // Arrange
-            var target = CreatePlanningPokerController();
+            PlanningPokerController target = CreatePlanningPokerController();
             ScrumTeam team;
-            using (var teamLock = target.CreateScrumTeam("team", "master"))
+            using (IScrumTeamLock teamLock = target.CreateScrumTeam("team", "master"))
             {
                 team = teamLock.Team;
             }
 
             // Act
-            using (var teamLock = target.GetScrumTeam("team"))
+            using (IScrumTeamLock teamLock = target.GetScrumTeam("team"))
             {
                 // Verify
                 Assert.AreEqual<ScrumTeam>(team, teamLock.Team);
@@ -225,7 +228,7 @@ namespace Duracellko.PlanningPoker.Controllers.Test
         public void GetScrumTeam_TeamNameNotExists_ArgumentException()
         {
             // Arrange
-            var target = CreatePlanningPokerController();
+            PlanningPokerController target = CreatePlanningPokerController();
 
             // Act
             target.GetScrumTeam("team");
@@ -236,7 +239,7 @@ namespace Duracellko.PlanningPoker.Controllers.Test
         public void GetScrumTeam_TeamNameIsEmpty_ArgumentNullException()
         {
             // Arrange
-            var target = CreatePlanningPokerController();
+            PlanningPokerController target = CreatePlanningPokerController();
 
             // Act
             target.GetScrumTeam(string.Empty);
@@ -247,9 +250,9 @@ namespace Duracellko.PlanningPoker.Controllers.Test
         public void GetScrumTeam_AfterDisconnectingAllMembers_ArgumentException()
         {
             // Arrange
-            var target = CreatePlanningPokerController();
+            PlanningPokerController target = CreatePlanningPokerController();
             ScrumTeam team;
-            using (var teamLock = target.CreateScrumTeam("team", "master"))
+            using (IScrumTeamLock teamLock = target.CreateScrumTeam("team", "master"))
             {
                 team = teamLock.Team;
             }
@@ -265,7 +268,7 @@ namespace Duracellko.PlanningPoker.Controllers.Test
         public void GetMessagesAsync_ObserverIsNull_ArgumentNullException()
         {
             // Arrange
-            var target = CreatePlanningPokerController();
+            PlanningPokerController target = CreatePlanningPokerController();
 
             // Act
             target.GetMessagesAsync(null, (f, o) => { });
@@ -276,8 +279,8 @@ namespace Duracellko.PlanningPoker.Controllers.Test
         public void GetMessagesAsync_CallbackIsNull_ArgumentNullException()
         {
             // Arrange
-            var target = CreatePlanningPokerController();
-            using (var teamLock = target.CreateScrumTeam("team", "master"))
+            PlanningPokerController target = CreatePlanningPokerController();
+            using (IScrumTeamLock teamLock = target.CreateScrumTeam("team", "master"))
             {
                 // Act
                 target.GetMessagesAsync(teamLock.Team.ScrumMaster, null);
@@ -288,12 +291,12 @@ namespace Duracellko.PlanningPoker.Controllers.Test
         public void DisconnectInactiveObservers_NoInactiveMembers_TeamIsUnchanged()
         {
             // Arrange
-            var dateTimeProvider = new DateTimeProviderMock();
+            DateTimeProviderMock dateTimeProvider = new DateTimeProviderMock();
             dateTimeProvider.SetUtcNow(new DateTime(2012, 1, 1, 3, 2, 20));
 
-            var target = CreatePlanningPokerController(dateTimeProvider: dateTimeProvider);
+            PlanningPokerController target = CreatePlanningPokerController(dateTimeProvider: dateTimeProvider);
             ScrumTeam team;
-            using (var teamLock = target.CreateScrumTeam("team", "master"))
+            using (IScrumTeamLock teamLock = target.CreateScrumTeam("team", "master"))
             {
                 team = teamLock.Team;
                 team.Join("member", false);
@@ -306,7 +309,7 @@ namespace Duracellko.PlanningPoker.Controllers.Test
             target.DisconnectInactiveObservers(TimeSpan.FromSeconds(30.0));
 
             // Verify
-            using (var teamLock = target.GetScrumTeam("team"))
+            using (IScrumTeamLock teamLock = target.GetScrumTeam("team"))
             {
                 Assert.AreEqual<int>(2, teamLock.Team.Members.Count());
             }
@@ -316,12 +319,12 @@ namespace Duracellko.PlanningPoker.Controllers.Test
         public void DisconnectInactiveObservers_InactiveMember_MemberIsDisconnected()
         {
             // Arrange
-            var dateTimeProvider = new DateTimeProviderMock();
+            DateTimeProviderMock dateTimeProvider = new DateTimeProviderMock();
             dateTimeProvider.SetUtcNow(new DateTime(2012, 1, 1, 3, 2, 20));
 
-            var target = CreatePlanningPokerController(dateTimeProvider: dateTimeProvider);
+            PlanningPokerController target = CreatePlanningPokerController(dateTimeProvider: dateTimeProvider);
             ScrumTeam team;
-            using (var teamLock = target.CreateScrumTeam("team", "master"))
+            using (IScrumTeamLock teamLock = target.CreateScrumTeam("team", "master"))
             {
                 team = teamLock.Team;
                 team.Join("member", false);
@@ -334,7 +337,7 @@ namespace Duracellko.PlanningPoker.Controllers.Test
             target.DisconnectInactiveObservers(TimeSpan.FromSeconds(30.0));
 
             // Verify
-            using (var teamLock = target.GetScrumTeam("team"))
+            using (IScrumTeamLock teamLock = target.GetScrumTeam("team"))
             {
                 Assert.AreEqual<int>(1, teamLock.Team.Members.Count());
             }
@@ -344,12 +347,12 @@ namespace Duracellko.PlanningPoker.Controllers.Test
         public void DisconnectInactiveObservers_NoInactiveObservers_TeamIsUnchanged()
         {
             // Arrange
-            var dateTimeProvider = new DateTimeProviderMock();
+            DateTimeProviderMock dateTimeProvider = new DateTimeProviderMock();
             dateTimeProvider.SetUtcNow(new DateTime(2012, 1, 1, 3, 2, 20));
 
-            var target = CreatePlanningPokerController(dateTimeProvider: dateTimeProvider);
+            PlanningPokerController target = CreatePlanningPokerController(dateTimeProvider: dateTimeProvider);
             ScrumTeam team;
-            using (var teamLock = target.CreateScrumTeam("team", "master"))
+            using (IScrumTeamLock teamLock = target.CreateScrumTeam("team", "master"))
             {
                 team = teamLock.Team;
                 team.Join("observer", true);
@@ -362,7 +365,7 @@ namespace Duracellko.PlanningPoker.Controllers.Test
             target.DisconnectInactiveObservers(TimeSpan.FromSeconds(30.0));
 
             // Verify
-            using (var teamLock = target.GetScrumTeam("team"))
+            using (IScrumTeamLock teamLock = target.GetScrumTeam("team"))
             {
                 Assert.AreEqual<int>(1, teamLock.Team.Observers.Count());
             }
@@ -372,12 +375,12 @@ namespace Duracellko.PlanningPoker.Controllers.Test
         public void DisconnectInactiveObservers_InactiveObserver_ObserverIsDisconnected()
         {
             // Arrange
-            var dateTimeProvider = new DateTimeProviderMock();
+            DateTimeProviderMock dateTimeProvider = new DateTimeProviderMock();
             dateTimeProvider.SetUtcNow(new DateTime(2012, 1, 1, 3, 2, 20));
 
-            var target = CreatePlanningPokerController(dateTimeProvider: dateTimeProvider);
+            PlanningPokerController target = CreatePlanningPokerController(dateTimeProvider: dateTimeProvider);
             ScrumTeam team;
-            using (var teamLock = target.CreateScrumTeam("team", "master"))
+            using (IScrumTeamLock teamLock = target.CreateScrumTeam("team", "master"))
             {
                 team = teamLock.Team;
                 team.Join("observer", true);
@@ -390,7 +393,7 @@ namespace Duracellko.PlanningPoker.Controllers.Test
             target.DisconnectInactiveObservers(TimeSpan.FromSeconds(30.0));
 
             // Verify
-            using (var teamLock = target.GetScrumTeam("team"))
+            using (IScrumTeamLock teamLock = target.GetScrumTeam("team"))
             {
                 Assert.AreEqual<int>(0, teamLock.Team.Observers.Count());
             }
@@ -401,12 +404,12 @@ namespace Duracellko.PlanningPoker.Controllers.Test
         public void DisconnectInactiveObservers_InactiveScrumMaster_TeamIsClosed()
         {
             // Arrange
-            var dateTimeProvider = new DateTimeProviderMock();
+            DateTimeProviderMock dateTimeProvider = new DateTimeProviderMock();
             dateTimeProvider.SetUtcNow(new DateTime(2012, 1, 1, 3, 2, 20));
 
-            var target = CreatePlanningPokerController(dateTimeProvider: dateTimeProvider);
+            PlanningPokerController target = CreatePlanningPokerController(dateTimeProvider: dateTimeProvider);
             ScrumTeam team;
-            using (var teamLock = target.CreateScrumTeam("team", "master"))
+            using (IScrumTeamLock teamLock = target.CreateScrumTeam("team", "master"))
             {
                 team = teamLock.Team;
             }

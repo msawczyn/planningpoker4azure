@@ -64,27 +64,27 @@ namespace Duracellko.PlanningPoker.E2ETest
             await Task.Delay(200);
             ClientTest.AssertMembersInTeam(member);
 
-            // Alice starts estimation
-            ClientTest.StartEstimation();
-            TakeScreenshot("09-A-EstimationStarted");
+            // Alice starts estimate
+            ClientTest.StartEstimate();
+            TakeScreenshot("09-A-EstimateStarted");
 
             // Bob estimates
             await Task.Delay(200);
-            TakeScreenshot(1, "10-B-EstimationStarted");
-            ClientTests[1].AssertAvailableEstimations();
-            ClientTests[1].SelectEstimation("\u221E");
+            TakeScreenshot(1, "10-B-EstimateStarted");
+            ClientTests[1].AssertAvailableEstimates();
+            ClientTests[1].SelectEstimate("\u221E");
 
             await Task.Delay(500);
-            var expectedResult = new[] { new KeyValuePair<string, string>(member, string.Empty) };
+            KeyValuePair<string, string>[] expectedResult = new[] { new KeyValuePair<string, string>(member, string.Empty) };
             TakeScreenshot(1, "11-B-MemberEstimated");
-            ClientTests[1].AssertSelectedEstimation(expectedResult);
-            ClientTests[1].AssertNotAvailableEstimations();
+            ClientTests[1].AssertSelectedEstimate(expectedResult);
+            ClientTests[1].AssertNotAvailableEstimates();
             TakeScreenshot("12-A-MemberEstimated");
-            ClientTest.AssertSelectedEstimation(expectedResult);
+            ClientTest.AssertSelectedEstimate(expectedResult);
 
             // Alice estimates
-            ClientTest.AssertAvailableEstimations();
-            ClientTest.SelectEstimation("\u00BD");
+            ClientTest.AssertAvailableEstimates();
+            ClientTest.SelectEstimate("\u00BD");
             await Task.Delay(500);
             expectedResult = new[]
             {
@@ -92,31 +92,31 @@ namespace Duracellko.PlanningPoker.E2ETest
                 new KeyValuePair<string, string>(member, "\u221E")
             };
             TakeScreenshot("13-A-ScrumMasterEstimated");
-            ClientTest.AssertSelectedEstimation(expectedResult);
+            ClientTest.AssertSelectedEstimate(expectedResult);
             TakeScreenshot(1, "14-B-ScrumMasterEstimated");
-            ClientTests[1].AssertSelectedEstimation(expectedResult);
+            ClientTests[1].AssertSelectedEstimate(expectedResult);
 
-            // Alice starts 2nd round of estimation
-            ClientTest.StartEstimation();
-            TakeScreenshot("15-A-EstimationStarted");
+            // Alice starts 2nd round of estimate
+            ClientTest.StartEstimate();
+            TakeScreenshot("15-A-EstimateStarted");
 
             // Alice estimates
             await Task.Delay(200);
-            TakeScreenshot(1, "16-B-EstimationStarted");
-            ClientTest.AssertAvailableEstimations();
-            ClientTest.SelectEstimation("5");
+            TakeScreenshot(1, "16-B-EstimateStarted");
+            ClientTest.AssertAvailableEstimates();
+            ClientTest.SelectEstimate("5");
 
             await Task.Delay(500);
             expectedResult = new[] { new KeyValuePair<string, string>(scrumMaster, string.Empty) };
             TakeScreenshot("17-A-ScrumMasterEstimated");
-            ClientTest.AssertSelectedEstimation(expectedResult);
-            ClientTest.AssertNotAvailableEstimations();
+            ClientTest.AssertSelectedEstimate(expectedResult);
+            ClientTest.AssertNotAvailableEstimates();
             TakeScreenshot(1, "18-B-ScrumMasterEstimated");
-            ClientTests[1].AssertSelectedEstimation(expectedResult);
+            ClientTests[1].AssertSelectedEstimate(expectedResult);
 
             // Bob estimates
-            ClientTests[1].AssertAvailableEstimations();
-            ClientTests[1].SelectEstimation("5");
+            ClientTests[1].AssertAvailableEstimates();
+            ClientTests[1].SelectEstimate("5");
             await Task.Delay(500);
             expectedResult = new[]
             {
@@ -124,9 +124,9 @@ namespace Duracellko.PlanningPoker.E2ETest
                 new KeyValuePair<string, string>(member, "5")
             };
             TakeScreenshot(1, "19-B-MemberEstimated");
-            ClientTests[1].AssertSelectedEstimation(expectedResult);
+            ClientTests[1].AssertSelectedEstimate(expectedResult);
             TakeScreenshot("20-A-MemberEstimated");
-            ClientTest.AssertSelectedEstimation(expectedResult);
+            ClientTest.AssertSelectedEstimate(expectedResult);
 
             // Bob disconnects
             ClientTests[1].Disconnect();
@@ -144,16 +144,16 @@ namespace Duracellko.PlanningPoker.E2ETest
         [DataTestMethod]
         [DataRow(false, BrowserType.Chrome, DisplayName = "Client-side Chrome")]
         [DataRow(true, BrowserType.Chrome, DisplayName = "Server-side Chrome")]
-        public async Task Cancel_Estimation(bool serverSide, BrowserType browserType)
+        public async Task Cancel_Estimate(bool serverSide, BrowserType browserType)
         {
             Contexts.Add(new BrowserTestContext(
                 nameof(PlanningPokerTest),
-                nameof(Cancel_Estimation),
+                nameof(Cancel_Estimate),
                 browserType,
                 serverSide));
             Contexts.Add(new BrowserTestContext(
                 nameof(PlanningPokerTest),
-                nameof(Cancel_Estimation),
+                nameof(Cancel_Estimate),
                 browserType,
                 serverSide));
 
@@ -197,56 +197,56 @@ namespace Duracellko.PlanningPoker.E2ETest
             await Task.Delay(200);
             ClientTest.AssertMembersInTeam(member);
 
-            // Alice starts estimation
-            ClientTest.StartEstimation();
-            TakeScreenshot("09-A-EstimationStarted");
-            ClientTest.AssertAvailableEstimations();
+            // Alice starts estimate
+            ClientTest.StartEstimate();
+            TakeScreenshot("09-A-EstimateStarted");
+            ClientTest.AssertAvailableEstimates();
 
             await Task.Delay(200);
-            TakeScreenshot(1, "10-B-EstimationStarted");
-            ClientTests[1].AssertAvailableEstimations();
+            TakeScreenshot(1, "10-B-EstimateStarted");
+            ClientTests[1].AssertAvailableEstimates();
 
             // Alice estimates
-            ClientTest.SelectEstimation("100");
+            ClientTest.SelectEstimate("100");
             await Task.Delay(500);
-            var expectedResult = new[] { new KeyValuePair<string, string>(scrumMaster, string.Empty) };
+            KeyValuePair<string, string>[] expectedResult = new[] { new KeyValuePair<string, string>(scrumMaster, string.Empty) };
             TakeScreenshot(1, "11-B-ScrumMasterEstimated");
-            ClientTests[1].AssertSelectedEstimation(expectedResult);
+            ClientTests[1].AssertSelectedEstimate(expectedResult);
             TakeScreenshot("12-A-ScrumMasterEstimated");
-            ClientTest.AssertSelectedEstimation(expectedResult);
-            ClientTest.AssertNotAvailableEstimations();
+            ClientTest.AssertSelectedEstimate(expectedResult);
+            ClientTest.AssertNotAvailableEstimates();
 
-            // Alice cancels estimation
-            ClientTest.CancelEstimation();
+            // Alice cancels estimate
+            ClientTest.CancelEstimate();
             await Task.Delay(200);
 
-            TakeScreenshot("13-A-EstimationCancelled");
-            ClientTest.AssertNotAvailableEstimations();
-            ClientTest.AssertSelectedEstimation(expectedResult);
-            TakeScreenshot(1, "14-B-EstimationCancelled");
-            ClientTests[1].AssertNotAvailableEstimations();
-            ClientTests[1].AssertSelectedEstimation(expectedResult);
+            TakeScreenshot("13-A-EstimateCancelled");
+            ClientTest.AssertNotAvailableEstimates();
+            ClientTest.AssertSelectedEstimate(expectedResult);
+            TakeScreenshot(1, "14-B-EstimateCancelled");
+            ClientTests[1].AssertNotAvailableEstimates();
+            ClientTests[1].AssertSelectedEstimate(expectedResult);
 
-            // Alice starts estimation again
-            ClientTest.StartEstimation();
-            TakeScreenshot("15-A-EstimationStarted");
+            // Alice starts estimate again
+            ClientTest.StartEstimate();
+            TakeScreenshot("15-A-EstimateStarted");
 
             // Alice estimates
             await Task.Delay(200);
-            TakeScreenshot(1, "16-B-EstimationStarted");
-            ClientTest.AssertAvailableEstimations();
-            ClientTest.SelectEstimation("100");
+            TakeScreenshot(1, "16-B-EstimateStarted");
+            ClientTest.AssertAvailableEstimates();
+            ClientTest.SelectEstimate("100");
 
             await Task.Delay(500);
             expectedResult = new[] { new KeyValuePair<string, string>(scrumMaster, string.Empty) };
             TakeScreenshot("17-A-ScrumMasterEstimated");
-            ClientTest.AssertSelectedEstimation(expectedResult);
+            ClientTest.AssertSelectedEstimate(expectedResult);
             TakeScreenshot(1, "18-B-ScrumMasterEstimated");
-            ClientTests[1].AssertSelectedEstimation(expectedResult);
+            ClientTests[1].AssertSelectedEstimate(expectedResult);
 
             // Bob estimates
-            ClientTests[1].AssertAvailableEstimations();
-            ClientTests[1].SelectEstimation("20");
+            ClientTests[1].AssertAvailableEstimates();
+            ClientTests[1].SelectEstimate("20");
             await Task.Delay(500);
             expectedResult = new[]
             {
@@ -254,10 +254,10 @@ namespace Duracellko.PlanningPoker.E2ETest
                 new KeyValuePair<string, string>(scrumMaster, "100")
             };
             TakeScreenshot(1, "19-B-MemberEstimated");
-            ClientTests[1].AssertSelectedEstimation(expectedResult);
-            ClientTests[1].AssertNotAvailableEstimations();
+            ClientTests[1].AssertSelectedEstimate(expectedResult);
+            ClientTests[1].AssertNotAvailableEstimates();
             TakeScreenshot("20-A-MemberEstimated");
-            ClientTest.AssertSelectedEstimation(expectedResult);
+            ClientTest.AssertSelectedEstimate(expectedResult);
 
             // Alice disconnects
             ClientTest.Disconnect();
@@ -351,30 +351,30 @@ namespace Duracellko.PlanningPoker.E2ETest
             ClientTest.AssertObserversInTeam(observer);
             ClientTests[1].AssertObserversInTeam(observer);
 
-            // Alice starts estimation
-            ClientTest.StartEstimation();
-            TakeScreenshot("13-A-EstimationStarted");
+            // Alice starts estimate
+            ClientTest.StartEstimate();
+            TakeScreenshot("13-A-EstimateStarted");
 
             await Task.Delay(200);
-            TakeScreenshot(1, "14-B-EstimationStarted");
-            ClientTests[1].AssertAvailableEstimations();
-            TakeScreenshot(2, "15-C-EstimationStarted");
-            ClientTests[2].AssertNotAvailableEstimations();
+            TakeScreenshot(1, "14-B-EstimateStarted");
+            ClientTests[1].AssertAvailableEstimates();
+            TakeScreenshot(2, "15-C-EstimateStarted");
+            ClientTests[2].AssertNotAvailableEstimates();
 
             // Bob estimates
-            ClientTests[1].SelectEstimation("3");
+            ClientTests[1].SelectEstimate("3");
             await Task.Delay(500);
-            var expectedResult = new[] { new KeyValuePair<string, string>(member, string.Empty) };
+            KeyValuePair<string, string>[] expectedResult = new[] { new KeyValuePair<string, string>(member, string.Empty) };
             TakeScreenshot(1, "16-B-MemberEstimated");
-            ClientTests[1].AssertSelectedEstimation(expectedResult);
+            ClientTests[1].AssertSelectedEstimate(expectedResult);
             TakeScreenshot("17-A-MemberEstimated");
-            ClientTest.AssertSelectedEstimation(expectedResult);
+            ClientTest.AssertSelectedEstimate(expectedResult);
             TakeScreenshot(2, "16-C-MemberEstimated");
-            ClientTests[2].AssertSelectedEstimation(expectedResult);
+            ClientTests[2].AssertSelectedEstimate(expectedResult);
 
             // Alice estimates
-            ClientTest.AssertAvailableEstimations();
-            ClientTest.SelectEstimation("2");
+            ClientTest.AssertAvailableEstimates();
+            ClientTest.SelectEstimate("2");
             await Task.Delay(500);
             expectedResult = new[]
             {
@@ -382,11 +382,11 @@ namespace Duracellko.PlanningPoker.E2ETest
                 new KeyValuePair<string, string>(member, "3")
             };
             TakeScreenshot("17-A-ScrumMasterEstimated");
-            ClientTest.AssertSelectedEstimation(expectedResult);
+            ClientTest.AssertSelectedEstimate(expectedResult);
             TakeScreenshot(1, "18-B-ScrumMasterEstimated");
-            ClientTests[1].AssertSelectedEstimation(expectedResult);
+            ClientTests[1].AssertSelectedEstimate(expectedResult);
             TakeScreenshot(2, "19-C-ScrumMasterEstimated");
-            ClientTests[2].AssertSelectedEstimation(expectedResult);
+            ClientTests[2].AssertSelectedEstimate(expectedResult);
 
             // Bob disconnects
             ClientTests[1].Disconnect();
@@ -477,14 +477,14 @@ namespace Duracellko.PlanningPoker.E2ETest
             await Task.Delay(200);
             ClientTest.AssertMembersInTeam(member1);
 
-            // Alice starts estimation
-            ClientTest.StartEstimation();
-            TakeScreenshot("09-A-EstimationStarted");
-            ClientTest.AssertAvailableEstimations();
+            // Alice starts estimate
+            ClientTest.StartEstimate();
+            TakeScreenshot("09-A-EstimateStarted");
+            ClientTest.AssertAvailableEstimates();
 
             await Task.Delay(200);
-            TakeScreenshot(1, "10-B-EstimationStarted");
-            ClientTests[1].AssertAvailableEstimations();
+            TakeScreenshot(1, "10-B-EstimateStarted");
+            ClientTests[1].AssertAvailableEstimates();
 
             // Charlie joins team
             await ClientTests[2].OpenApplication();
@@ -506,22 +506,22 @@ namespace Duracellko.PlanningPoker.E2ETest
             TakeScreenshot("15-A-MemberJoiner");
             ClientTests[1].AssertMembersInTeam(member1, member2);
             TakeScreenshot(1, "16-B-MemberJoiner");
-            ClientTests[2].AssertNotAvailableEstimations();
+            ClientTests[2].AssertNotAvailableEstimates();
 
             // Bob estimates
-            ClientTests[1].SelectEstimation("13");
+            ClientTests[1].SelectEstimate("13");
             await Task.Delay(500);
-            var expectedResult = new[] { new KeyValuePair<string, string>(member1, string.Empty) };
+            KeyValuePair<string, string>[] expectedResult = new[] { new KeyValuePair<string, string>(member1, string.Empty) };
             TakeScreenshot(1, "17-B-MemberEstimated");
-            ClientTests[1].AssertSelectedEstimation(expectedResult);
+            ClientTests[1].AssertSelectedEstimate(expectedResult);
             TakeScreenshot("18-A-MemberEstimated");
-            ClientTest.AssertSelectedEstimation(expectedResult);
+            ClientTest.AssertSelectedEstimate(expectedResult);
             TakeScreenshot(2, "19-C-MemberEstimated");
-            ClientTests[2].AssertSelectedEstimation(expectedResult);
+            ClientTests[2].AssertSelectedEstimate(expectedResult);
 
             // Alice estimates
-            ClientTest.AssertAvailableEstimations();
-            ClientTest.SelectEstimation("20");
+            ClientTest.AssertAvailableEstimates();
+            ClientTest.SelectEstimate("20");
             await Task.Delay(500);
             expectedResult = new[]
             {
@@ -529,38 +529,38 @@ namespace Duracellko.PlanningPoker.E2ETest
                 new KeyValuePair<string, string>(scrumMaster, "20")
             };
             TakeScreenshot("20-A-ScrumMasterEstimated");
-            ClientTest.AssertSelectedEstimation(expectedResult);
+            ClientTest.AssertSelectedEstimate(expectedResult);
             TakeScreenshot(1, "21-B-ScrumMasterEstimated");
-            ClientTests[1].AssertSelectedEstimation(expectedResult);
+            ClientTests[1].AssertSelectedEstimate(expectedResult);
             TakeScreenshot(2, "22-C-ScrumMasterEstimated");
-            ClientTests[2].AssertSelectedEstimation(expectedResult);
+            ClientTests[2].AssertSelectedEstimate(expectedResult);
 
-            // Alice starts 2nd round of estimation
-            ClientTest.StartEstimation();
-            TakeScreenshot("23-A-EstimationStarted");
-            ClientTest.AssertAvailableEstimations();
+            // Alice starts 2nd round of estimate
+            ClientTest.StartEstimate();
+            TakeScreenshot("23-A-EstimateStarted");
+            ClientTest.AssertAvailableEstimates();
 
             await Task.Delay(200);
-            TakeScreenshot(1, "24-B-EstimationStarted");
-            ClientTests[1].AssertAvailableEstimations();
-            TakeScreenshot(2, "25-C-EstimationStarted");
-            ClientTests[2].AssertAvailableEstimations();
+            TakeScreenshot(1, "24-B-EstimateStarted");
+            ClientTests[1].AssertAvailableEstimates();
+            TakeScreenshot(2, "25-C-EstimateStarted");
+            ClientTests[2].AssertAvailableEstimates();
 
             // Charlie estimates
-            ClientTests[2].SelectEstimation("20");
+            ClientTests[2].SelectEstimate("20");
             await Task.Delay(500);
             expectedResult = new[] { new KeyValuePair<string, string>(member2, string.Empty) };
             TakeScreenshot(2, "26-C-MemberEstimated");
-            ClientTests[2].AssertSelectedEstimation(expectedResult);
-            ClientTests[2].AssertNotAvailableEstimations();
+            ClientTests[2].AssertSelectedEstimate(expectedResult);
+            ClientTests[2].AssertNotAvailableEstimates();
             TakeScreenshot("27-A-MemberEstimated");
-            ClientTest.AssertSelectedEstimation(expectedResult);
+            ClientTest.AssertSelectedEstimate(expectedResult);
             TakeScreenshot(1, "28-B-MemberEstimated");
-            ClientTests[1].AssertSelectedEstimation(expectedResult);
+            ClientTests[1].AssertSelectedEstimate(expectedResult);
 
             // Alice estimates
-            ClientTest.AssertAvailableEstimations();
-            ClientTest.SelectEstimation("20");
+            ClientTest.AssertAvailableEstimates();
+            ClientTest.SelectEstimate("20");
             await Task.Delay(500);
             expectedResult = new[]
             {
@@ -568,16 +568,16 @@ namespace Duracellko.PlanningPoker.E2ETest
                 new KeyValuePair<string, string>(scrumMaster, string.Empty)
             };
             TakeScreenshot("29-A-ScrumMasterEstimated");
-            ClientTest.AssertSelectedEstimation(expectedResult);
-            ClientTest.AssertNotAvailableEstimations();
+            ClientTest.AssertSelectedEstimate(expectedResult);
+            ClientTest.AssertNotAvailableEstimates();
             TakeScreenshot(1, "30-B-ScrumMasterEstimated");
-            ClientTests[1].AssertSelectedEstimation(expectedResult);
+            ClientTests[1].AssertSelectedEstimate(expectedResult);
             TakeScreenshot(2, "31-C-ScrumMasterEstimated");
-            ClientTests[2].AssertSelectedEstimation(expectedResult);
+            ClientTests[2].AssertSelectedEstimate(expectedResult);
 
             // Bob estimates
-            ClientTests[1].AssertAvailableEstimations();
-            ClientTests[1].SelectEstimation("2");
+            ClientTests[1].AssertAvailableEstimates();
+            ClientTests[1].SelectEstimate("2");
             await Task.Delay(500);
             expectedResult = new[]
             {
@@ -586,12 +586,12 @@ namespace Duracellko.PlanningPoker.E2ETest
                 new KeyValuePair<string, string>(member1, "2")
             };
             TakeScreenshot(1, "32-B-MemberEstimated");
-            ClientTests[1].AssertSelectedEstimation(expectedResult);
-            ClientTests[1].AssertNotAvailableEstimations();
+            ClientTests[1].AssertSelectedEstimate(expectedResult);
+            ClientTests[1].AssertNotAvailableEstimates();
             TakeScreenshot("33-A-MemberEstimated");
-            ClientTest.AssertSelectedEstimation(expectedResult);
+            ClientTest.AssertSelectedEstimate(expectedResult);
             TakeScreenshot(2, "34-C-MemberEstimated");
-            ClientTests[2].AssertSelectedEstimation(expectedResult);
+            ClientTests[2].AssertSelectedEstimate(expectedResult);
 
             // Bob diconnects
             ClientTests[1].Disconnect();

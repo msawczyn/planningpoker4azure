@@ -3,12 +3,15 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using Duracellko.PlanningPoker.Configuration;
 using Duracellko.PlanningPoker.Data;
 using Duracellko.PlanningPoker.Domain;
 using Microsoft.Extensions.Logging;
+
+using Observer = Duracellko.PlanningPoker.Domain.Observer;
 
 namespace Duracellko.PlanningPoker.Controllers
 {
@@ -97,10 +100,10 @@ namespace Duracellko.PlanningPoker.Controllers
 
             OnBeforeCreateScrumTeam(teamName, scrumMasterName);
 
-            var team = new ScrumTeam(teamName, DateTimeProvider);
+            ScrumTeam team = new ScrumTeam(teamName, DateTimeProvider);
             team.SetScrumMaster(scrumMasterName);
-            var teamLock = new object();
-            var teamTuple = new Tuple<ScrumTeam, object>(team, teamLock);
+            object teamLock = new object();
+            Tuple<ScrumTeam, object> teamTuple = new Tuple<ScrumTeam, object>(team, teamLock);
 
             // loads team from repository and adds it to in-memory collection
             LoadScrumTeam(teamName);
@@ -128,9 +131,9 @@ namespace Duracellko.PlanningPoker.Controllers
                 throw new ArgumentNullException(nameof(team));
             }
 
-            var teamName = team.Name;
-            var teamLock = new object();
-            var teamTuple = new Tuple<ScrumTeam, object>(team, teamLock);
+            string teamName = team.Name;
+            object teamLock = new object();
+            Tuple<ScrumTeam, object> teamTuple = new Tuple<ScrumTeam, object>(team, teamLock);
 
             // loads team from repository and adds it to in-memory collection
             LoadScrumTeam(teamName);
@@ -204,7 +207,7 @@ namespace Duracellko.PlanningPoker.Controllers
                     throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resources.Error_ScrumTeamNotExist, observer.Team.Name));
                 }
 
-                var messageReceivedObservable = Observable.FromEventPattern(h => observer.MessageReceived += h, h => observer.MessageReceived -= h);
+                IObservable<EventPattern<object>> messageReceivedObservable = Observable.FromEventPattern(h => observer.MessageReceived += h, h => observer.MessageReceived -= h);
                 messageReceivedObservable = messageReceivedObservable.Timeout(Configuration.WaitForMessageTimeout, Observable.Return<System.Reactive.EventPattern<object>>(null));
                 messageReceivedObservable = messageReceivedObservable.Take(1);
                 messageReceivedObservable.Subscribe(p => ExecuteGetMessagesAsyncCallback(callback, observer, teamTuple));
@@ -225,10 +228,10 @@ namespace Duracellko.PlanningPoker.Controllers
         /// <param name="inactivityTime">The inactivity time.</param>
         public void DisconnectInactiveObservers(TimeSpan inactivityTime)
         {
-            var teamTuples = _scrumTeams.ToArray();
-            foreach (var teamTuple in teamTuples)
+            KeyValuePair<string, Tuple<ScrumTeam, object>>[] teamTuples = _scrumTeams.ToArray();
+            foreach (KeyValuePair<string, Tuple<ScrumTeam, object>> teamTuple in teamTuples)
             {
-                using (var teamLock = new ScrumTeamLock(teamTuple.Value.Item1, teamTuple.Value.Item2))
+                using (ScrumTeamLock teamLock = new ScrumTeamLock(teamTuple.Value.Item1, teamTuple.Value.Item2))
                 {
                     teamLock.Lock();
                     _logger?.LogInformation(Resources.Info_DisconnectingInactiveObservers, teamLock.Team.Name);
@@ -278,7 +281,7 @@ namespace Duracellko.PlanningPoker.Controllers
 
         private void ExecuteGetMessagesAsyncCallback(Action<bool, Observer> callback, Observer observer, Tuple<ScrumTeam, object> teamTuple)
         {
-            using (var teamLock = new ScrumTeamLock(teamTuple.Item1, teamTuple.Item2))
+            using (ScrumTeamLock teamLock = new ScrumTeamLock(teamTuple.Item1, teamTuple.Item2))
             {
                 teamLock.Lock();
                 _logger?.LogDebug(Resources.Debug_ObserverMessageReceived, observer.Name, teamLock.Team.Name, observer.HasMessage);
@@ -288,7 +291,7 @@ namespace Duracellko.PlanningPoker.Controllers
 
         private void ScrumTeamOnMessageReceived(object sender, MessageReceivedEventArgs e)
         {
-            var team = (ScrumTeam)sender;
+            ScrumTeam team = (ScrumTeam)sender;
             bool saveTeam = true;
 
             LogScrumTeamMessage(team, e.Message);
@@ -326,12 +329,12 @@ namespace Duracellko.PlanningPoker.Controllers
                 {
                     result = null;
 
-                    var team = Repository.LoadScrumTeam(teamName);
+                    ScrumTeam team = Repository.LoadScrumTeam(teamName);
                     if (team != null)
                     {
                         if (VerifyTeamActive(team))
                         {
-                            var teamLock = new object();
+                            object teamLock = new object();
                             result = new Tuple<ScrumTeam, object>(team, teamLock);
                             if (_scrumTeams.TryAdd(team.Name, result))
                             {

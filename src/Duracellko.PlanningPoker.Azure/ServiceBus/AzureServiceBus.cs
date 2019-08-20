@@ -88,7 +88,7 @@ namespace Duracellko.PlanningPoker.Azure.ServiceBus
                 throw new ArgumentNullException(nameof(message));
             }
 
-            var topicMessage = MessageConverter.ConvertToBrokeredMessage(message);
+            Message topicMessage = MessageConverter.ConvertToBrokeredMessage(message);
 
             TopicClient topicClient = null;
             try
@@ -193,7 +193,7 @@ namespace Duracellko.PlanningPoker.Azure.ServiceBus
 
         private static XDocument CreateSubscriptionDescription()
         {
-            var subscriptionDescription = new XElement(
+            XElement subscriptionDescription = new XElement(
                 _servicebusNamespace + "SubscriptionDescription",
                 new XElement(_servicebusNamespace + "DefaultMessageTimeToLive", TimeSpan.FromMinutes(1)));
             return new XDocument(
@@ -206,17 +206,17 @@ namespace Duracellko.PlanningPoker.Azure.ServiceBus
         {
             if (_subscriptionClient == null)
             {
-                using (var httpClient = new HttpClient())
+                using (HttpClient httpClient = new HttpClient())
                 {
-                    var uri = GetSubscriptionUri(_nodeId);
-                    var tokenProvider = CreateTokenProvider();
-                    var token = await tokenProvider.GetTokenAsync(uri.ToString(), _serviceBusTokenTimeOut);
+                    Uri uri = GetSubscriptionUri(_nodeId);
+                    ITokenProvider tokenProvider = CreateTokenProvider();
+                    SecurityToken token = await tokenProvider.GetTokenAsync(uri.ToString(), _serviceBusTokenTimeOut);
                     httpClient.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse(token.TokenValue);
 
-                    using (var content = new StringContent(CreateSubscriptionDescription().ToString(SaveOptions.None), Encoding.UTF8, "application/atom+xml"))
+                    using (StringContent content = new StringContent(CreateSubscriptionDescription().ToString(SaveOptions.None), Encoding.UTF8, "application/atom+xml"))
                     {
                         content.Headers.ContentType.Parameters.Add(new NameValueHeaderValue("type", "entry"));
-                        var subscriptionResponse = await httpClient.PutAsync(uri, content);
+                        HttpResponseMessage subscriptionResponse = await httpClient.PutAsync(uri, content);
                         subscriptionResponse.Dispose();
                     }
                 }
@@ -227,7 +227,7 @@ namespace Duracellko.PlanningPoker.Azure.ServiceBus
                 string sqlPattern = "{0} <> '{2}' AND ({1} IS NULL OR {1} = '{2}')";
                 string senderIdPropertyName = ServiceBus.MessageConverter.SenderIdPropertyName;
                 string recipientIdPropertyName = ServiceBus.MessageConverter.RecipientIdPropertyName;
-                var filter = new SqlFilter(string.Format(CultureInfo.InvariantCulture, sqlPattern, senderIdPropertyName, recipientIdPropertyName, _nodeId));
+                SqlFilter filter = new SqlFilter(string.Format(CultureInfo.InvariantCulture, sqlPattern, senderIdPropertyName, recipientIdPropertyName, _nodeId));
                 await _subscriptionClient.AddRuleAsync("RecipientFilter", filter);
 
                 _subscriptionClient.RegisterMessageHandler(ReceiveMessage, ex => Task.CompletedTask);
@@ -258,7 +258,7 @@ namespace Duracellko.PlanningPoker.Azure.ServiceBus
                     }
                     else
                     {
-                        var nodeMessage = MessageConverter.ConvertToNodeMessage(message);
+                        NodeMessage nodeMessage = MessageConverter.ConvertToNodeMessage(message);
                         _observableMessages.OnNext(nodeMessage);
                     }
 
@@ -288,15 +288,15 @@ namespace Duracellko.PlanningPoker.Azure.ServiceBus
 
         private void ProcessSubscriptionIsAliveMessage(Message message)
         {
-            var subscriptionLastActivityTime = (DateTime)message.UserProperties[SubscriptionPingPropertyName];
-            var subscriptionId = (string)message.UserProperties[ServiceBus.MessageConverter.SenderIdPropertyName];
+            DateTime subscriptionLastActivityTime = (DateTime)message.UserProperties[SubscriptionPingPropertyName];
+            string subscriptionId = (string)message.UserProperties[ServiceBus.MessageConverter.SenderIdPropertyName];
             _logger?.LogDebug(Resources.AzureServiceBus_Debug_SubscriptionAliveMessageReceived, _topicName, _nodeId, subscriptionId);
             _nodes[subscriptionId] = subscriptionLastActivityTime;
         }
 
         private async Task SendSubscriptionIsAliveMessage()
         {
-            var message = new Message();
+            Message message = new Message();
             message.UserProperties[SubscriptionPingPropertyName] = DateTime.UtcNow;
             message.UserProperties[ServiceBus.MessageConverter.SenderIdPropertyName] = _nodeId;
             TopicClient topicClient = null;
@@ -317,8 +317,8 @@ namespace Duracellko.PlanningPoker.Azure.ServiceBus
 
         private async Task DeleteInactiveSubscriptions()
         {
-            var subscriptions = await GetTopicSubscriptions();
-            foreach (var subscription in subscriptions)
+            IEnumerable<string> subscriptions = await GetTopicSubscriptions();
+            foreach (string subscription in subscriptions)
             {
                 if (!string.Equals(subscription, _nodeId, StringComparison.OrdinalIgnoreCase))
                 {
@@ -342,45 +342,45 @@ namespace Duracellko.PlanningPoker.Azure.ServiceBus
 
         private async Task<IEnumerable<string>> GetTopicSubscriptions()
         {
-            using (var httpClient = new HttpClient())
+            using (HttpClient httpClient = new HttpClient())
             {
-                var uri = GetSubscriptionUri(string.Empty);
-                var tokenProvider = CreateTokenProvider();
-                var token = await tokenProvider.GetTokenAsync(uri.ToString(), _serviceBusTokenTimeOut);
+                Uri uri = GetSubscriptionUri(string.Empty);
+                ITokenProvider tokenProvider = CreateTokenProvider();
+                SecurityToken token = await tokenProvider.GetTokenAsync(uri.ToString(), _serviceBusTokenTimeOut);
                 httpClient.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse(token.TokenValue);
 
-                var subscriptionsResponse = await httpClient.GetStringAsync(uri);
-                var subscriptionsXml = XDocument.Parse(subscriptionsResponse);
+                string subscriptionsResponse = await httpClient.GetStringAsync(uri);
+                XDocument subscriptionsXml = XDocument.Parse(subscriptionsResponse);
 
-                var subscriptionElements = subscriptionsXml.Root.Elements(_entityNamespace + "entry").Elements(_entityNamespace + "title");
+                IEnumerable<XElement> subscriptionElements = subscriptionsXml.Root.Elements(_entityNamespace + "entry").Elements(_entityNamespace + "title");
                 return subscriptionElements.Select(e => e.Value).ToList();
             }
         }
 
         private async Task DeleteSubscription(string name)
         {
-            using (var httpClient = new HttpClient())
+            using (HttpClient httpClient = new HttpClient())
             {
-                var uri = GetSubscriptionUri(name);
-                var tokenProvider = CreateTokenProvider();
-                var token = await tokenProvider.GetTokenAsync(uri.ToString(), _serviceBusTokenTimeOut);
+                Uri uri = GetSubscriptionUri(name);
+                ITokenProvider tokenProvider = CreateTokenProvider();
+                SecurityToken token = await tokenProvider.GetTokenAsync(uri.ToString(), _serviceBusTokenTimeOut);
                 httpClient.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse(token.TokenValue);
 
-                var subscriptionResponse = await httpClient.DeleteAsync(uri);
+                HttpResponseMessage subscriptionResponse = await httpClient.DeleteAsync(uri);
                 subscriptionResponse.Dispose();
             }
         }
 
         private ITokenProvider CreateTokenProvider()
         {
-            var connectionStringBuilder = new ServiceBusConnectionStringBuilder(_connectionString);
+            ServiceBusConnectionStringBuilder connectionStringBuilder = new ServiceBusConnectionStringBuilder(_connectionString);
             return TokenProvider.CreateSharedAccessSignatureTokenProvider(connectionStringBuilder.SasKeyName, connectionStringBuilder.SasKey, TokenScope.Namespace);
         }
 
         private Uri GetSubscriptionUri(string subcriptionName)
         {
-            var connectionStringBuilder = new ServiceBusConnectionStringBuilder(_connectionString);
-            var uri = connectionStringBuilder.Endpoint.Replace("sb://", "https://");
+            ServiceBusConnectionStringBuilder connectionStringBuilder = new ServiceBusConnectionStringBuilder(_connectionString);
+            string uri = connectionStringBuilder.Endpoint.Replace("sb://", "https://");
             uri = $"{uri}/{Uri.EscapeDataString(_topicName)}/subscriptions/{Uri.EscapeDataString(subcriptionName)}";
             return new Uri(uri);
         }

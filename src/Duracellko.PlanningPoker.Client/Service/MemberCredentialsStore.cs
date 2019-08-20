@@ -17,7 +17,7 @@ namespace Duracellko.PlanningPoker.Client.Service
         {
             try
             {
-                var credentialsString = await JSRuntime.Current.InvokeAsync<string>("Duracellko.PlanningPoker.getMemberCredentials");
+                string credentialsString = await JSRuntime.Current.InvokeAsync<string>("Duracellko.PlanningPoker.getMemberCredentials");
                 if (string.IsNullOrEmpty(credentialsString))
                 {
                     return null;
@@ -43,7 +43,7 @@ namespace Duracellko.PlanningPoker.Client.Service
         {
             try
             {
-                var credentialsString = credentials != null ? Json.Serialize(credentials) : null;
+                string credentialsString = credentials != null ? Json.Serialize(credentials) : null;
                 await JSRuntime.Current.InvokeAsync<object>("Duracellko.PlanningPoker.setMemberCredentials", credentialsString);
             }
             catch (Exception)

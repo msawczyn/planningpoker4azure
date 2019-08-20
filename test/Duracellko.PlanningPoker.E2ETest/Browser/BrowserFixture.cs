@@ -29,7 +29,7 @@ namespace Duracellko.PlanningPoker.E2ETest.Browser
                 throw new InvalidOperationException("Selenium driver was already started.");
             }
 
-            var driver = CreateDriver(browserType);
+            IWebDriver driver = CreateDriver(browserType);
             driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(1);
             Browser = driver;
         }
@@ -51,13 +51,13 @@ namespace Duracellko.PlanningPoker.E2ETest.Browser
             switch (browserType)
             {
                 case BrowserType.Chrome:
-                    var chromeOptions = new ChromeOptions();
+                    ChromeOptions chromeOptions = new ChromeOptions();
                     chromeOptions.AddArgument("--headless");
                     chromeOptions.AddArgument("--window-size=1920,1080");
                     chromeOptions.SetLoggingPreference(LogType.Browser, LogLevel.All);
                     return new ChromeDriver(GetDriverLocation(browserType), chromeOptions);
                 case BrowserType.Firefox:
-                    var firefoxOptions = new FirefoxOptions();
+                    FirefoxOptions firefoxOptions = new FirefoxOptions();
                     firefoxOptions.AddArgument("-headless");
                     firefoxOptions.AddArgument("--window-size=1920,1080");
                     firefoxOptions.SetLoggingPreference(LogType.Browser, LogLevel.All);
@@ -85,24 +85,24 @@ namespace Duracellko.PlanningPoker.E2ETest.Browser
                     throw new NotSupportedException($"Browser type '{browserType}' is not supported.");
             }
 
-            var driverLocation = Environment.GetEnvironmentVariable(environmentVariable);
+            string driverLocation = Environment.GetEnvironmentVariable(environmentVariable);
             if (string.IsNullOrEmpty(driverLocation) || !Directory.Exists(driverLocation))
             {
-                var assemblyLocation = Path.GetDirectoryName(typeof(BrowserFixture).Assembly.Location);
-                var seleniumFolder = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(assemblyLocation))));
+                string assemblyLocation = Path.GetDirectoryName(typeof(BrowserFixture).Assembly.Location);
+                string seleniumFolder = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(assemblyLocation))));
                 seleniumFolder = Path.Combine(seleniumFolder, "node_modules", "selenium-standalone", ".selenium");
                 driverLocation = Path.Combine(seleniumFolder, driverName);
 
-                var driverFile = Directory.GetFiles(driverLocation)
+                string driverFile = Directory.GetFiles(driverLocation)
                     .Select(p => Path.GetFileName(p))
                     .Where(f => !f.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
                     .OrderByDescending(f => f, StringComparer.OrdinalIgnoreCase)
                     .First();
                 driverFile = Path.Combine(driverLocation, driverFile);
 
-                var windir = Environment.GetEnvironmentVariable("windir");
-                var isWindows = !string.IsNullOrEmpty(windir) && Directory.Exists(windir);
-                var targetFile = isWindows ? (driverName + ".exe") : driverName;
+                string windir = Environment.GetEnvironmentVariable("windir");
+                bool isWindows = !string.IsNullOrEmpty(windir) && Directory.Exists(windir);
+                string targetFile = isWindows ? (driverName + ".exe") : driverName;
                 targetFile = Path.Combine(driverLocation, targetFile);
                 if (!File.Exists(targetFile) || File.GetLastWriteTimeUtc(targetFile) != File.GetLastWriteTimeUtc(driverFile))
                 {

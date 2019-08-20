@@ -22,32 +22,32 @@ namespace Duracellko.PlanningPoker.Domain
         {
         }
 
-        private Estimation _estimation;
+        private Estimate _estimate;
 
         /// <summary>
-        /// Gets or sets the estimation, the member is picking in planning poker.
+        /// Gets or sets the estimate, the member is picking in planning poker.
         /// </summary>
         /// <value>
-        /// The estimation.
+        /// The estimate.
         /// </value>
-        public Estimation Estimation
+        public Estimate Estimate
         {
             get
             {
-                return _estimation;
+                return _estimate;
             }
 
             set
             {
-                if (_estimation != value)
+                if (_estimate != value)
                 {
-                    if (value != null && !Team.AvailableEstimations.Contains(value))
+                    if (value != null && !Team.Estimates.Contains(value))
                     {
-                        throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Error_EstimationIsNotAvailableInTeam, value.Value), nameof(value));
+                        throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Error_EstimateIsNotAvailableInTeam, value.Value), nameof(value));
                     }
 
-                    _estimation = value;
-                    if (Team.State == TeamState.EstimationInProgress)
+                    _estimate = value;
+                    if (Team.State == TeamState.EstimateInProgress)
                     {
                         Team.OnMemberEstimated(this);
                     }
@@ -56,11 +56,11 @@ namespace Duracellko.PlanningPoker.Domain
         }
 
         /// <summary>
-        /// Resets the estimation to unselected.
+        /// Resets the estimate to unselected.
         /// </summary>
-        internal void ResetEstimation()
+        internal void ResetEstimate()
         {
-            _estimation = null;
+            _estimate = null;
         }
     }
 }

@@ -3,7 +3,7 @@
 namespace Duracellko.PlanningPoker.Domain.Test
 {
     [TestClass]
-    public class EstimationTest
+    public class EstimateTest
     {
         [TestMethod]
         public void Constructor_Null_ValueIsNull()
@@ -12,7 +12,7 @@ namespace Duracellko.PlanningPoker.Domain.Test
             double? value = null;
 
             // Act
-            var result = new Estimation(value);
+            Estimate result = new Estimate(value);
 
             // Verify
             Assert.IsNull(result.Value);
@@ -25,7 +25,7 @@ namespace Duracellko.PlanningPoker.Domain.Test
             double value = 0.0;
 
             // Act
-            var result = new Estimation(value);
+            Estimate result = new Estimate(value);
 
             // Verify
             Assert.AreEqual<double?>(value, result.Value);
@@ -38,7 +38,7 @@ namespace Duracellko.PlanningPoker.Domain.Test
             double value = 3.3;
 
             // Act
-            var result = new Estimation(value);
+            Estimate result = new Estimate(value);
 
             // Verify
             Assert.AreEqual<double?>(value, result.Value);
@@ -51,7 +51,7 @@ namespace Duracellko.PlanningPoker.Domain.Test
             double value = double.PositiveInfinity;
 
             // Act
-            var result = new Estimation(value);
+            Estimate result = new Estimate(value);
 
             // Verify
             Assert.AreEqual<double?>(value, result.Value);
@@ -64,7 +64,7 @@ namespace Duracellko.PlanningPoker.Domain.Test
             double value = double.NaN;
 
             // Act
-            var result = new Estimation(value);
+            Estimate result = new Estimate(value);
 
             // Verify
             Assert.AreEqual<double?>(value, result.Value);
@@ -74,11 +74,11 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void Equals_ZeroAndZero_ReturnsTrue()
         {
             // Arrange
-            var target = new Estimation(0.0);
-            var estimation2 = new Estimation(0.0);
+            Estimate target = new Estimate(0.0);
+            Estimate estimation2 = new Estimate(0.0);
 
             // Act
-            var result = target.Equals(estimation2);
+            bool result = target.Equals(estimation2);
 
             // Verify
             Assert.IsTrue(result);
@@ -88,11 +88,11 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void Equals_3point6And3point6_ReturnsTrue()
         {
             // Arrange
-            var target = new Estimation(3.6);
-            var estimation2 = new Estimation(3.6);
+            Estimate target = new Estimate(3.6);
+            Estimate estimation2 = new Estimate(3.6);
 
             // Act
-            var result = target.Equals(estimation2);
+            bool result = target.Equals(estimation2);
 
             // Verify
             Assert.IsTrue(result);
@@ -102,11 +102,11 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void Equals_6And2_ReturnsFalse()
         {
             // Arrange
-            var target = new Estimation(6);
-            var estimation2 = new Estimation(2);
+            Estimate target = new Estimate(6);
+            Estimate estimation2 = new Estimate(2);
 
             // Act
-            var result = target.Equals(estimation2);
+            bool result = target.Equals(estimation2);
 
             // Verify
             Assert.IsFalse(result);
@@ -116,10 +116,10 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void Equals_DiferentObjectTypes_ReturnsFalse()
         {
             // Arrange
-            var target = new Estimation(6);
+            Estimate target = new Estimate(6);
 
             // Act
-            var result = target.Equals(2.0);
+            bool result = target.Equals(2.0);
 
             // Verify
             Assert.IsFalse(result);
@@ -129,38 +129,38 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void Equals_Null_ReturnsFalse()
         {
             // Arrange
-            var target = new Estimation(6);
+            Estimate target = new Estimate(6);
 
             // Act
-            var result = target.Equals(null);
+            bool result = target.Equals(null);
 
             // Verify
             Assert.IsFalse(result);
         }
 
         [TestMethod]
-        public void Equals_NullEstimations_ReturnsTrue()
+        public void Equals_NullEstimates_ReturnsTrue()
         {
             // Arrange
-            var target = new Estimation();
-            var estimation2 = new Estimation(null);
+            Estimate target = new Estimate();
+            Estimate estimation2 = new Estimate(null);
 
             // Act
-            var result = target.Equals(estimation2);
+            bool result = target.Equals(estimation2);
 
             // Verify
             Assert.IsTrue(result);
         }
 
         [TestMethod]
-        public void Equals_NullEstimationAndZero_ReturnsTrue()
+        public void Equals_NullEstimateAndZero_ReturnsTrue()
         {
             // Arrange
-            var target = new Estimation();
-            var estimation2 = new Estimation(0.0);
+            Estimate target = new Estimate();
+            Estimate estimation2 = new Estimate(0.0);
 
             // Act
-            var result = target.Equals(estimation2);
+            bool result = target.Equals(estimation2);
 
             // Verify
             Assert.IsFalse(result);
@@ -170,11 +170,11 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void Equals_PositiveInfinityAndPositiveInfinity_ReturnsTrue()
         {
             // Arrange
-            var target = new Estimation(double.PositiveInfinity);
-            var estimation2 = new Estimation(double.PositiveInfinity);
+            Estimate target = new Estimate(double.PositiveInfinity);
+            Estimate estimation2 = new Estimate(double.PositiveInfinity);
 
             // Act
-            var result = target.Equals(estimation2);
+            bool result = target.Equals(estimation2);
 
             // Verify
             Assert.IsTrue(result);
@@ -184,11 +184,11 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void Equals_ZeroAndPositiveInfinity_ReturnsFalse()
         {
             // Arrange
-            var target = new Estimation();
-            var estimation2 = new Estimation(double.PositiveInfinity);
+            Estimate target = new Estimate();
+            Estimate estimation2 = new Estimate(double.PositiveInfinity);
 
             // Act
-            var result = target.Equals(estimation2);
+            bool result = target.Equals(estimation2);
 
             // Verify
             Assert.IsFalse(result);
@@ -198,11 +198,11 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void Equals_NaNAndNaN_ReturnsFalse()
         {
             // Arrange
-            var target = new Estimation(double.NaN);
-            var estimation2 = new Estimation(double.NaN);
+            Estimate target = new Estimate(double.NaN);
+            Estimate estimation2 = new Estimate(double.NaN);
 
             // Act
-            var result = target.Equals(estimation2);
+            bool result = target.Equals(estimation2);
 
             // Verify
             Assert.IsFalse(result);
@@ -212,11 +212,11 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void Equals_ZeroAndNaN_ReturnsFalse()
         {
             // Arrange
-            var target = new Estimation();
-            var estimation2 = new Estimation(double.NaN);
+            Estimate target = new Estimate();
+            Estimate estimation2 = new Estimate(double.NaN);
 
             // Act
-            var result = target.Equals(estimation2);
+            bool result = target.Equals(estimation2);
 
             // Verify
             Assert.IsFalse(result);

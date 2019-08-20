@@ -9,10 +9,10 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void Constructor_TypeSpecified_MessageTypeIsSet()
         {
             // Arrange
-            var type = MessageType.MemberJoined;
+            MessageType type = MessageType.MemberJoined;
 
             // Act
-            var result = new MemberMessage(type);
+            MemberMessage result = new MemberMessage(type);
 
             // Verify
             Assert.AreEqual<MessageType>(type, result.MessageType);
@@ -22,9 +22,9 @@ namespace Duracellko.PlanningPoker.Domain.Test
         public void Member_Set_MemberIsSet()
         {
             // Arrange
-            var target = new MemberMessage(MessageType.MemberJoined);
-            var team = new ScrumTeam("test team");
-            var member = new Member(team, "test");
+            MemberMessage target = new MemberMessage(MessageType.MemberJoined);
+            ScrumTeam team = new ScrumTeam("test team");
+            Member member = new Member(team, "test");
 
             // Act
             target.Member = member;

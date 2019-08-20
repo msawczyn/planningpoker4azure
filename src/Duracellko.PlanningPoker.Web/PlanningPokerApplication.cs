@@ -10,7 +10,7 @@ namespace Duracellko.PlanningPoker.Web
         public void Apply(ApplicationModel application)
         {
             // Remove PlanningPokerController, because it is not MVC controller.
-            var planningPokerController = application.Controllers.FirstOrDefault(c => c.ControllerType == typeof(PlanningPokerController));
+            ControllerModel planningPokerController = application.Controllers.FirstOrDefault(c => c.ControllerType == typeof(PlanningPokerController));
             if (planningPokerController != null)
             {
                 application.Controllers.Remove(planningPokerController);

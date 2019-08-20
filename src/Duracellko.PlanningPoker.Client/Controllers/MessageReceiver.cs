@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Duracellko.PlanningPoker.Service;
@@ -28,7 +29,7 @@ namespace Duracellko.PlanningPoker.Client.Controllers
         /// <returns><see cref="IDisposable"/> object that can be used to stop receiving of messages.</returns>
         public IDisposable StartReceiving(PlanningPokerController planningPokerController)
         {
-            var result = new MessageController(planningPokerController, _planningPokerClient);
+            MessageController result = new MessageController(planningPokerController, _planningPokerClient);
             result.StartReceiving();
             return result;
         }
@@ -64,10 +65,10 @@ namespace Duracellko.PlanningPoker.Client.Controllers
                 {
                     using (_cancellationTokenSource = new CancellationTokenSource())
                     {
-                        var cancellationToken = _cancellationTokenSource.Token;
+                        CancellationToken cancellationToken = _cancellationTokenSource.Token;
                         while (!cancellationToken.IsCancellationRequested)
                         {
-                            var success = await ReceiveMessages(cancellationToken);
+                            bool success = await ReceiveMessages(cancellationToken);
                             await Task.Delay(success ? 100 : 500, cancellationToken);
                         }
                     }
@@ -86,7 +87,7 @@ namespace Duracellko.PlanningPoker.Client.Controllers
             {
                 try
                 {
-                    var messages = await _planningPokerClient.GetMessages(
+                    IList<Message> messages = await _planningPokerClient.GetMessages(
                         _planningPokerController.TeamName,
                         _planningPokerController.User.Name,
                         _planningPokerController.LastMessageId,
